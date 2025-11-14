@@ -1,0 +1,5 @@
+{
+  "name": "Gentle Focus Timer",
+  "description": "A minimal and calming Pomodoro timer inspired by popular study-with-me videos. Designed to help you focus during study or work, with configurable times and ambient white noise sounds. The gentle UI is ideal for those sensitive to stimulation.",
+  "requestFramePermissions": []
+}
