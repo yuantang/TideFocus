@@ -7,27 +7,28 @@ export const DEFAULT_SESSIONS_PER_ROUND = 4;
 
 
 export const SOUNDS: Sound[] = [
-  { id: 'none', name: 'None', url: '' },
-  { id: 'rain', name: 'Rain', url: 'https://cdn.pixabay.com/audio/2022/10/20/audio_2769062f34.mp3' },
-  { id: 'forest', name: 'Forest', url: 'https://cdn.pixabay.com/audio/2022/11/17/audio_88a4d2156a.mp3' },
-  { id: 'cafe', name: 'Cafe', url: 'https://cdn.pixabay.com/audio/2022/07/02/audio_30b666a31c.mp3' },
-  { id: 'fireplace', name: 'Fireplace', url: 'https://cdn.pixabay.com/audio/2023/10/24/audio_34b074a3f1.mp3' },
-  { id: 'lofi', name: 'Lofi Beat', url: 'https://cdn.pixabay.com/audio/2022/02/07/audio_7313a54a22.mp3' },
-  { id: 'ocean', name: 'Ocean Waves', url: 'https://cdn.pixabay.com/audio/2023/09/14/audio_3792518f6f.mp3' },
-  { id: 'wind_chimes', name: 'Wind Chimes', url: 'https://cdn.pixabay.com/audio/2022/03/24/audio_111b302294.mp3' },
+  { id: 'none', name: '无声 (None)', url: '' },
+  { id: 'rain', name: '雨声 (Rain)', url: '/sounds/ambient/rain.ogg' },
+  { id: 'forest', name: '森林 (Forest)', url: '/sounds/ambient/forest.ogg' },
+  { id: 'cafe', name: '咖啡店 (Cafe)', url: '/sounds/ambient/cafe.ogg' },
+  { id: 'fireplace', name: '壁炉 (Fireplace)', url: '/sounds/ambient/fireplace.ogg' },
+  { id: 'ocean', name: '海洋 (Ocean)', url: '/sounds/ambient/ocean.ogg' },
+  { id: 'wind_chimes', name: '风铃 (Wind Chimes)', url: '/sounds/ambient/wind-chimes.ogg' },
+  { id: 'white_noise', name: '白噪音 (White Noise)', url: '/sounds/ambient/white-noise.ogg' },
+  { id: 'library', name: '图书馆 (Library)', url: '/sounds/ambient/library.ogg' },
 ];
 
 export const COMPLETION_SOUNDS: Sound[] = [
-    { id: 'none', name: 'None', url: '' },
-    { id: 'ding', name: 'Ding', url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_75eb4735a2.mp3'},
-    { id: 'chime', name: 'Chime', url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_57a9b73559.mp3'},
-    { id: 'harp', name: 'Harp', url: 'https://cdn.pixabay.com/audio/2022/11/21/audio_a0a2a5df62.mp3'}
+    { id: 'none', name: '无声 (None)', url: '' },
+    { id: 'singing_bowl', name: '颂钵 (Singing Bowl)', url: '/sounds/completion/singing-bowl.ogg'},
+    { id: 'bamboo_chime', name: '竹风铃 (Bamboo Chime)', url: '/sounds/completion/bamboo-chime.ogg'},
+    { id: 'music_box', name: '音乐盒 (Music Box)', url: '/sounds/completion/music-box.ogg'}
 ];
 
 export const REMINDER_SOUNDS: Sound[] = [
-    { id: 'none', name: 'None', url: '' },
-    { id: 'gentle_bell', name: 'Gentle Bell', url: 'https://cdn.pixabay.com/audio/2022/02/08/audio_34b31c5025.mp3'},
-    { id: 'sparkle', name: 'Sparkle', url: 'https://cdn.pixabay.com/audio/2022/03/22/audio_6e53995fe2.mp3'}
+    { id: 'none', name: '无声 (None)', url: '' },
+    { id: 'bell', name: '摇铃 (Bell)', url: '/sounds/reminder/bell.ogg'},
+    { id: 'piano', name: '钢琴 (Piano)', url: '/sounds/reminder/piano.ogg'}
 ];
 
 export const LONG_BREAK_QUOTES: string[] = [

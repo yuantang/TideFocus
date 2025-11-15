@@ -59,6 +59,8 @@ export default function App() {
   const reminderAudioRef = useRef<HTMLAudioElement>(new Audio());
   const intervalRef = useRef<number | null>(null);
   const fadeIntervalRef = useRef<number | null>(null);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
   
   // Persist settings
   useEffect(() => { localStorage.setItem('focusDuration', String(focusDuration)) }, [focusDuration]);
@@ -362,20 +364,50 @@ export default function App() {
   }, [isActive, toggleTimer, handleNext]);
 
 
-  // Audio Management
+  // Audio Management with preloading and error handling
   useEffect(() => {
     const audio = audioRef.current;
     audio.loop = true;
 
+    // Add error handler
+    const handleAudioError = (e: Event) => {
+      console.error("Audio loading error:", e);
+      setAudioError("无法加载音频文件，请检查网络连接或选择其他音频");
+      setIsAudioLoading(false);
+    };
+
+    // Add loaded handler
+    const handleAudioLoaded = () => {
+      setIsAudioLoading(false);
+      setAudioError(null);
+    };
+
+    audio.addEventListener('error', handleAudioError);
+    audio.addEventListener('canplaythrough', handleAudioLoaded);
+
     const changeSound = (newSound: Sound) => {
         fadeAudio(0, 500, () => {
-            audio.src = newSound.url;
-            if (isActive && newSound.url) {
-                audio.volume = 0;
-                audio.play().catch(console.error);
-                fadeAudio(volume, 1000);
-            } else if (!newSound.url) {
+            if (newSound.url) {
+                setIsAudioLoading(true);
+                setAudioError(null);
+                audio.src = newSound.url;
+
+                // Preload the audio
+                audio.load();
+
+                if (isActive) {
+                    audio.volume = 0;
+                    audio.play().catch(error => {
+                        console.error("Audio play failed:", error);
+                        setAudioError("音频播放失败，请尝试重新播放");
+                        setIsAudioLoading(false);
+                    });
+                    fadeAudio(volume, 1000);
+                }
+            } else {
                 audio.removeAttribute('src');
+                setIsAudioLoading(false);
+                setAudioError(null);
             }
         });
     }
@@ -383,6 +415,11 @@ export default function App() {
     if(audio.src !== selectedSound.url) {
         changeSound(selectedSound);
     }
+
+    return () => {
+      audio.removeEventListener('error', handleAudioError);
+      audio.removeEventListener('canplaythrough', handleAudioLoaded);
+    };
   }, [selectedSound, isActive, volume, fadeAudio]);
 
   useEffect(() => {
@@ -393,12 +430,22 @@ export default function App() {
     }
   }, [volume]);
   
+  // Preload completion sound
   useEffect(() => {
-    completionAudioRef.current.src = selectedCompletionSound.url;
+    const audio = completionAudioRef.current;
+    if (selectedCompletionSound.url) {
+      audio.src = selectedCompletionSound.url;
+      audio.load(); // Preload
+    }
   }, [selectedCompletionSound]);
 
+  // Preload reminder sound
   useEffect(() => {
-    reminderAudioRef.current.src = selectedLongBreakReminderSound.url;
+    const audio = reminderAudioRef.current;
+    if (selectedLongBreakReminderSound.url) {
+      audio.src = selectedLongBreakReminderSound.url;
+      audio.load(); // Preload
+    }
   }, [selectedLongBreakReminderSound]);
 
 
@@ -473,6 +520,27 @@ export default function App() {
 
 
       <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-10">
+          {/* Audio error notification */}
+          {audioError && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-800 text-sm flex items-center justify-between">
+              <span>{audioError}</span>
+              <button
+                onClick={() => setAudioError(null)}
+                className="ml-2 text-red-600 hover:text-red-800 font-bold"
+                aria-label="Dismiss error"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Audio loading indicator */}
+          {isAudioLoading && (
+            <div className="mb-4 p-3 bg-blue-100 border border-blue-300 rounded-lg text-blue-800 text-sm">
+              <span>正在加载音频...</span>
+            </div>
+          )}
+
           <Controls
               isActive={isActive}
               onToggle={toggleTimer}

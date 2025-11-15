@@ -76,6 +76,58 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
   const [longBreakBg, setLongBreakBg] = useState(currentSettings.longBreakBg);
   const [longBreakText, setLongBreakText] = useState(currentSettings.longBreakText);
 
+  // Audio preview state
+  const previewAudioRef = React.useRef<HTMLAudioElement>(new Audio());
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [previewingSound, setPreviewingSound] = useState<string | null>(null);
+
+  // Define audio preview functions before useEffect
+  const stopPreview = React.useCallback(() => {
+    const audio = previewAudioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.removeAttribute('src');
+    }
+    setIsPreviewPlaying(false);
+    setPreviewingSound(null);
+  }, []);
+
+  const playPreview = React.useCallback((soundToPreview: Sound, isAmbient: boolean = false) => {
+    const audio = previewAudioRef.current;
+
+    // If clicking the same sound that's playing, stop it
+    if (isPreviewPlaying && previewingSound === soundToPreview.id) {
+      stopPreview();
+      return;
+    }
+
+    // Stop any current preview
+    stopPreview();
+
+    // Don't play if no URL
+    if (!soundToPreview.url) return;
+
+    // Play new sound
+    audio.src = soundToPreview.url;
+    audio.loop = isAmbient; // Loop ambient sounds, play once for others
+    audio.volume = 0.5;
+
+    audio.play().catch(error => {
+      console.error("Preview play failed:", error);
+      stopPreview();
+    });
+
+    setIsPreviewPlaying(true);
+    setPreviewingSound(soundToPreview.id);
+
+    // Auto-stop non-ambient sounds after they finish
+    if (!isAmbient) {
+      audio.onended = () => {
+        stopPreview();
+      };
+    }
+  }, [isPreviewPlaying, previewingSound, stopPreview]);
 
   useEffect(() => {
     if (isOpen) {
@@ -95,15 +147,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
       setBreakText(currentSettings.breakText);
       setLongBreakBg(currentSettings.longBreakBg);
       setLongBreakText(currentSettings.longBreakText);
+    } else {
+      // Stop preview when modal closes
+      stopPreview();
     }
-  }, [currentSettings, isOpen]);
+  }, [currentSettings, isOpen, stopPreview]);
+
+  // Cleanup preview audio on unmount
+  useEffect(() => {
+    return () => {
+      stopPreview();
+    };
+  }, [stopPreview]);
 
   if (!isOpen) return null;
 
   const handleSave = () => {
+    stopPreview();
     onSave({ focus, break: breakTime, longBreak, sessionsPerRound, dailyGoal, sound, isCompletionSoundEnabled, completionSound, isLongBreakReminderSoundEnabled, longBreakReminderSound, focusBg, focusText, breakBg, breakText, longBreakBg, longBreakText });
   };
-  
+
   const applyTheme = (theme: typeof PRESET_THEMES[0]) => {
     setFocusBg(theme.focusBg);
     setFocusText(theme.focusText);
@@ -159,18 +222,40 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
              <div className="space-y-4 bg-black/5 p-4 rounded-lg">
                 <div>
                     <label htmlFor="sound" className="block text-sm font-medium mb-1">Ambient Sound</label>
-                    <select id="sound" value={sound.id} onChange={(e) => setSound(SOUNDS.find(s => s.id === e.target.value) || SOUNDS[0])} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
+                    <div className="flex gap-2">
+                        <select id="sound" value={sound.id} onChange={(e) => setSound(SOUNDS.find(s => s.id === e.target.value) || SOUNDS[0])} className="flex-1 px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
+                            {SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => playPreview(sound, true)}
+                            disabled={!sound.url}
+                            className={`px-4 py-2 rounded-md transition-colors ${!sound.url ? 'opacity-30 cursor-not-allowed' : 'bg-black/10 hover:bg-black/20'} ${isPreviewPlaying && previewingSound === sound.id ? 'bg-black/30' : ''}`}
+                            aria-label="Preview sound"
+                        >
+                            {isPreviewPlaying && previewingSound === sound.id ? '⏸' : '▶️'}
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <div className="flex items-center justify-between">
                         <label htmlFor="completion-sound-toggle" className="block text-sm font-medium">Completion Sound</label>
                         <input type="checkbox" id="completion-sound-toggle" checked={isCompletionSoundEnabled} onChange={e => setIsCompletionSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                     </div>
-                    <select id="completion-sound" value={completionSound.id} onChange={(e) => setCompletionSound(COMPLETION_SOUNDS.find(s => s.id === e.target.value) || COMPLETION_SOUNDS[0])} disabled={!isCompletionSoundEnabled} className={`w-full px-3 py-2 mt-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isCompletionSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {COMPLETION_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
+                    <div className="flex gap-2 mt-2">
+                        <select id="completion-sound" value={completionSound.id} onChange={(e) => setCompletionSound(COMPLETION_SOUNDS.find(s => s.id === e.target.value) || COMPLETION_SOUNDS[0])} disabled={!isCompletionSoundEnabled} className={`flex-1 px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isCompletionSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
+                            {COMPLETION_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => playPreview(completionSound, false)}
+                            disabled={!isCompletionSoundEnabled || !completionSound.url}
+                            className={`px-4 py-2 rounded-md transition-colors ${!isCompletionSoundEnabled || !completionSound.url ? 'opacity-30 cursor-not-allowed' : 'bg-black/10 hover:bg-black/20'} ${isPreviewPlaying && previewingSound === completionSound.id ? 'bg-black/30' : ''}`}
+                            aria-label="Preview completion sound"
+                        >
+                            {isPreviewPlaying && previewingSound === completionSound.id ? '⏸' : '▶️'}
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <div className="flex items-center justify-between">
@@ -178,9 +263,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                         <input type="checkbox" id="reminder-sound-toggle" checked={isLongBreakReminderSoundEnabled} onChange={e => setIsLongBreakReminderSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                     </div>
                     <p className="text-xs opacity-60 mt-1">Plays a sound at the start of the focus session before a long break.</p>
-                    <select id="reminder-sound" value={longBreakReminderSound.id} onChange={(e) => setLongBreakReminderSound(REMINDER_SOUNDS.find(s => s.id === e.target.value) || REMINDER_SOUNDS[0])} disabled={!isLongBreakReminderSoundEnabled} className={`w-full px-3 py-2 mt-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isLongBreakReminderSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {REMINDER_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
+                    <div className="flex gap-2 mt-2">
+                        <select id="reminder-sound" value={longBreakReminderSound.id} onChange={(e) => setLongBreakReminderSound(REMINDER_SOUNDS.find(s => s.id === e.target.value) || REMINDER_SOUNDS[0])} disabled={!isLongBreakReminderSoundEnabled} className={`flex-1 px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isLongBreakReminderSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
+                            {REMINDER_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => playPreview(longBreakReminderSound, false)}
+                            disabled={!isLongBreakReminderSoundEnabled || !longBreakReminderSound.url}
+                            className={`px-4 py-2 rounded-md transition-colors ${!isLongBreakReminderSoundEnabled || !longBreakReminderSound.url ? 'opacity-30 cursor-not-allowed' : 'bg-black/10 hover:bg-black/20'} ${isPreviewPlaying && previewingSound === longBreakReminderSound.id ? 'bg-black/30' : ''}`}
+                            aria-label="Preview reminder sound"
+                        >
+                            {isPreviewPlaying && previewingSound === longBreakReminderSound.id ? '⏸' : '▶️'}
+                        </button>
+                    </div>
                 </div>
              </div>
           </div>
