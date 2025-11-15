@@ -30,6 +30,13 @@
       .animate-gentle-breathe {
         animation: gentle-breathe 5s ease-in-out infinite;
       }
+      @keyframes breathe-guide {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+      .animate-breathe-guide {
+        animation: breathe-guide 10s ease-in-out infinite;
+      }
       @keyframes pulse-opacity {
         0%, 100% { opacity: 0.2; }
         50% { opacity: 0.3; }

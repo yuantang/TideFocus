@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import type { Sound } from '../types';
-import { SOUNDS, COMPLETION_SOUNDS, REMINDER_SOUNDS } from '../constants';
+import type { Sound, ActiveSound } from '../types';
+import { SOUNDS, COMPLETION_SOUNDS } from '../constants';
 import { CloseIcon } from './Icons';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (settings: { 
-    focus: number; break: number; longBreak: number; sessionsPerRound: number; dailyGoal: number;
-    sound: Sound; isCompletionSoundEnabled: boolean; completionSound: Sound;
-    isLongBreakReminderSoundEnabled: boolean; longBreakReminderSound: Sound;
-    focusBg: string; focusText: string; breakBg: string; breakText: string;
-    longBreakBg: string, longBreakText: string,
-  }) => void;
+  onSave: (settings: any) => void;
   currentSettings: {
     focus: number; break: number; longBreak: number; sessionsPerRound: number; dailyGoal: number;
-    sound: Sound; isCompletionSoundEnabled: boolean; completionSound: Sound;
-    isLongBreakReminderSoundEnabled: boolean; longBreakReminderSound: Sound;
+    isBreathingGuideEnabled: boolean; isDesktopNotificationsEnabled: boolean;
+    activeSounds: ActiveSound[]; isCompletionSoundEnabled: boolean; completionSound: Sound;
     focusBg: string; focusText: string; breakBg: string; breakText: string;
     longBreakBg: string, longBreakText: string,
   };
@@ -37,22 +31,10 @@ const ColorInput = ({ label, value, onChange }: { label: string, value: string, 
     <label className="block text-sm font-medium mb-1 text-center">{label}</label>
     <div className="flex items-center border border-black/10 rounded-md bg-white/50 overflow-hidden focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-[#fdf6f6] focus-within:ring-[#6b5a5a]">
       <div className="relative w-10 h-10 flex-shrink-0">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          aria-label={`${label} color picker`}
-        />
+        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label={`${label} color picker`} />
         <div className="w-full h-full" style={{ backgroundColor: value }} />
       </div>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-transparent border-l border-black/10 focus:outline-none"
-        aria-label={`${label} hex code`}
-      />
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 bg-transparent border-l border-black/10 focus:outline-none" aria-label={`${label} hex code`} />
     </div>
   </div>
 );
@@ -64,18 +46,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
   const [longBreak, setLongBreak] = useState(currentSettings.longBreak);
   const [sessionsPerRound, setSessionsPerRound] = useState(currentSettings.sessionsPerRound);
   const [dailyGoal, setDailyGoal] = useState(currentSettings.dailyGoal);
-  const [sound, setSound] = useState(currentSettings.sound);
+  const [isBreathingGuideEnabled, setIsBreathingGuideEnabled] = useState(currentSettings.isBreathingGuideEnabled);
+  const [isDesktopNotificationsEnabled, setIsDesktopNotificationsEnabled] = useState(currentSettings.isDesktopNotificationsEnabled);
+  const [activeSounds, setActiveSounds] = useState<ActiveSound[]>(currentSettings.activeSounds);
   const [isCompletionSoundEnabled, setIsCompletionSoundEnabled] = useState(currentSettings.isCompletionSoundEnabled);
   const [completionSound, setCompletionSound] = useState(currentSettings.completionSound);
-  const [isLongBreakReminderSoundEnabled, setIsLongBreakReminderSoundEnabled] = useState(currentSettings.isLongBreakReminderSoundEnabled);
-  const [longBreakReminderSound, setLongBreakReminderSound] = useState(currentSettings.longBreakReminderSound);
   const [focusBg, setFocusBg] = useState(currentSettings.focusBg);
   const [focusText, setFocusText] = useState(currentSettings.focusText);
   const [breakBg, setBreakBg] = useState(currentSettings.breakBg);
   const [breakText, setBreakText] = useState(currentSettings.breakText);
   const [longBreakBg, setLongBreakBg] = useState(currentSettings.longBreakBg);
   const [longBreakText, setLongBreakText] = useState(currentSettings.longBreakText);
-
 
   useEffect(() => {
     if (isOpen) {
@@ -84,11 +65,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
       setLongBreak(currentSettings.longBreak);
       setSessionsPerRound(currentSettings.sessionsPerRound);
       setDailyGoal(currentSettings.dailyGoal);
-      setSound(currentSettings.sound);
+      setIsBreathingGuideEnabled(currentSettings.isBreathingGuideEnabled);
+      setIsDesktopNotificationsEnabled(currentSettings.isDesktopNotificationsEnabled);
+      setActiveSounds(currentSettings.activeSounds);
       setIsCompletionSoundEnabled(currentSettings.isCompletionSoundEnabled);
       setCompletionSound(currentSettings.completionSound);
-      setIsLongBreakReminderSoundEnabled(currentSettings.isLongBreakReminderSoundEnabled);
-      setLongBreakReminderSound(currentSettings.longBreakReminderSound);
       setFocusBg(currentSettings.focusBg);
       setFocusText(currentSettings.focusText);
       setBreakBg(currentSettings.breakBg);
@@ -97,11 +78,35 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
       setLongBreakText(currentSettings.longBreakText);
     }
   }, [currentSettings, isOpen]);
+  
+  const handleToggleNotification = (enabled: boolean) => {
+      setIsDesktopNotificationsEnabled(enabled);
+      if (enabled && Notification.permission !== 'granted') {
+          Notification.requestPermission().then(permission => {
+              if (permission !== 'granted') {
+                  setIsDesktopNotificationsEnabled(false);
+              }
+          });
+      }
+  };
+
+  const handleSoundToggle = (soundId: string, isEnabled: boolean) => {
+    if (isEnabled) {
+      setActiveSounds(prev => [...prev, { id: soundId, volume: 0.5 }]);
+    } else {
+      setActiveSounds(prev => prev.filter(s => s.id !== soundId));
+    }
+  };
+
+  const handleSoundVolumeChange = (soundId: string, volume: number) => {
+    setActiveSounds(prev => prev.map(s => s.id === soundId ? { ...s, volume } : s));
+  };
+
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    onSave({ focus, break: breakTime, longBreak, sessionsPerRound, dailyGoal, sound, isCompletionSoundEnabled, completionSound, isLongBreakReminderSoundEnabled, longBreakReminderSound, focusBg, focusText, breakBg, breakText, longBreakBg, longBreakText });
+    onSave({ focus, break: breakTime, longBreak, sessionsPerRound, dailyGoal, isBreathingGuideEnabled, isDesktopNotificationsEnabled, activeSounds, isCompletionSoundEnabled, completionSound, focusBg, focusText, breakBg, breakText, longBreakBg, longBreakText });
   };
   
   const applyTheme = (theme: typeof PRESET_THEMES[0]) => {
@@ -122,7 +127,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
         <h2 className="text-2xl font-bold mb-6 text-center">Settings</h2>
         
         <div className="space-y-6">
-          
           <div>
             <h3 className="text-md font-semibold opacity-80 text-center mb-3">Timers & Goals</h3>
             <div className="space-y-4 bg-black/5 p-4 rounded-lg">
@@ -151,35 +155,48 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                      <p className="text-xs opacity-60 mb-1">The number of focus sessions before a long break. Set to 0 to disable long breaks.</p>
                     <input id="sessions-round" type="number" min="0" max="12" value={sessionsPerRound} onChange={(e) => setSessionsPerRound(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                 </div>
+                 <div className="flex items-center justify-between pt-2">
+                    <label htmlFor="breathing-guide-toggle" className="block text-sm font-medium">Breathing Guide</label>
+                    <input type="checkbox" id="breathing-guide-toggle" checked={isBreathingGuideEnabled} onChange={e => setIsBreathingGuideEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                    <label htmlFor="desktop-notifications-toggle" className="block text-sm font-medium">Desktop Notifications</label>
+                    <input type="checkbox" id="desktop-notifications-toggle" checked={isDesktopNotificationsEnabled} onChange={e => handleToggleNotification(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
+                </div>
             </div>
           </div>
           
           <div>
-             <h3 className="text-md font-semibold opacity-80 text-center mb-3">Sounds</h3>
+             <h3 className="text-md font-semibold opacity-80 text-center mb-3">Soundscape Mixer</h3>
              <div className="space-y-4 bg-black/5 p-4 rounded-lg">
-                <div>
-                    <label htmlFor="sound" className="block text-sm font-medium mb-1">Ambient Sound</label>
-                    <select id="sound" value={sound.id} onChange={(e) => setSound(SOUNDS.find(s => s.id === e.target.value) || SOUNDS[0])} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
-                </div>
-                <div>
+                {SOUNDS.map(sound => {
+                    const activeSound = activeSounds.find(s => s.id === sound.id);
+                    const isEnabled = !!activeSound;
+                    return (
+                        <div key={sound.id}>
+                            <div className="flex items-center justify-between">
+                                <label htmlFor={`sound-toggle-${sound.id}`} className="block text-sm font-medium">{sound.name}</label>
+                                <input type="checkbox" id={`sound-toggle-${sound.id}`} checked={isEnabled} onChange={e => handleSoundToggle(sound.id, e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
+                            </div>
+                            {isEnabled && (
+                                <input
+                                    type="range" min="0" max="1" step="0.01"
+                                    value={activeSound.volume}
+                                    onChange={e => handleSoundVolumeChange(sound.id, Number(e.target.value))}
+                                    className="w-full h-1 bg-black/10 rounded-lg appearance-none cursor-pointer mt-2"
+                                    style={{ background: `linear-gradient(to right, ${TEXT_COLOR} ${activeSound.volume * 100}%, rgba(0,0,0,0.1) ${activeSound.volume * 100}%)`}}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
+                <div className="border-t border-black/10 pt-4">
                     <div className="flex items-center justify-between">
                         <label htmlFor="completion-sound-toggle" className="block text-sm font-medium">Completion Sound</label>
                         <input type="checkbox" id="completion-sound-toggle" checked={isCompletionSoundEnabled} onChange={e => setIsCompletionSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                     </div>
                     <select id="completion-sound" value={completionSound.id} onChange={(e) => setCompletionSound(COMPLETION_SOUNDS.find(s => s.id === e.target.value) || COMPLETION_SOUNDS[0])} disabled={!isCompletionSoundEnabled} className={`w-full px-3 py-2 mt-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isCompletionSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
                         {COMPLETION_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
-                </div>
-                <div>
-                    <div className="flex items-center justify-between">
-                        <label htmlFor="reminder-sound-toggle" className="block text-sm font-medium">Long Break Reminder</label>
-                        <input type="checkbox" id="reminder-sound-toggle" checked={isLongBreakReminderSoundEnabled} onChange={e => setIsLongBreakReminderSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
-                    </div>
-                    <p className="text-xs opacity-60 mt-1">Plays a sound at the start of the focus session before a long break.</p>
-                    <select id="reminder-sound" value={longBreakReminderSound.id} onChange={(e) => setLongBreakReminderSound(REMINDER_SOUNDS.find(s => s.id === e.target.value) || REMINDER_SOUNDS[0])} disabled={!isLongBreakReminderSoundEnabled} className={`w-full px-3 py-2 mt-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isLongBreakReminderSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {REMINDER_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
                     </select>
                 </div>
              </div>
@@ -198,26 +215,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                     ))}
                 </div>
                 <div className="text-center mb-4">
-                    <button
-                        onClick={() => applyTheme(PRESET_THEMES[0])}
-                        className="text-xs opacity-70 hover:opacity-100 transition-opacity underline"
-                    >
-                        Reset to Default
-                    </button>
+                    <button onClick={() => applyTheme(PRESET_THEMES[0])} className="text-xs opacity-70 hover:opacity-100 transition-opacity underline">Reset to Default</button>
                 </div>
                 <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-x-4">
-                        <ColorInput label="Focus BG" value={focusBg} onChange={setFocusBg} />
-                        <ColorInput label="Focus Text" value={focusText} onChange={setFocusText} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4">
-                        <ColorInput label="Break BG" value={breakBg} onChange={setBreakBg} />
-                        <ColorInput label="Break Text" value={breakText} onChange={setBreakText} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4">
-                        <ColorInput label="Long Break BG" value={longBreakBg} onChange={setLongBreakBg} />
-                        <ColorInput label="Long Break Text" value={longBreakText} onChange={setLongBreakText} />
-                    </div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Focus BG" value={focusBg} onChange={setFocusBg} /><ColorInput label="Focus Text" value={focusText} onChange={setFocusText} /></div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Break BG" value={breakBg} onChange={setBreakBg} /><ColorInput label="Break Text" value={breakText} onChange={setBreakText} /></div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Long Break BG" value={longBreakBg} onChange={setLongBreakBg} /><ColorInput label="Long Break Text" value={longBreakText} onChange={setLongBreakText} /></div>
                 </div>
             </div>
           </div>

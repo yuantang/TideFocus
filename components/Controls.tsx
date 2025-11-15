@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayIcon, PauseIcon, NextIcon, VolumeIcon, SettingsIcon, FlowerIcon, FullscreenIcon, ExitFullscreenIcon } from './Icons';
+import { PlayIcon, PauseIcon, NextIcon, VolumeIcon, SettingsIcon, FlowerIcon, FullscreenIcon, ExitFullscreenIcon, TaskIcon } from './Icons';
 import { TimerMode } from '../types';
 import { formatTime } from '../utils';
 
@@ -13,6 +13,7 @@ interface ControlsProps {
   sessionsPerRound: number;
   isLongBreakNext: boolean;
   onSettingsClick: () => void;
+  onTasksClick: () => void;
   timeLeft: number;
   totalDuration: number;
   progress: number;
@@ -55,6 +56,7 @@ const Controls: React.FC<ControlsProps> = ({
   sessionsPerRound,
   isLongBreakNext,
   onSettingsClick,
+  onTasksClick,
   timeLeft,
   totalDuration,
   progress,
@@ -111,7 +113,7 @@ const Controls: React.FC<ControlsProps> = ({
                 input[type=range]::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
-                  margin-top: -4px; /* (6px track height - 14px thumb height) / 2 */
+                  margin-top: -4px; 
                   width: 14px;
                   height: 14px;
                   border-radius: 50%;
@@ -141,7 +143,7 @@ const Controls: React.FC<ControlsProps> = ({
                   border: 2px solid rgba(255, 255, 255, 0.7);
                   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                   cursor: pointer;
-                  border: none; /* Reset default */
+                  border: none;
                 }
               `}</style>
             </div>
@@ -159,6 +161,9 @@ const Controls: React.FC<ControlsProps> = ({
         </div>
 
         <div className="flex items-center gap-1 bg-white/50 backdrop-blur-sm rounded-full px-2 py-1">
+             <button onClick={onTasksClick} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label="Open daily tasks">
+                <TaskIcon className="w-5 h-5" />
+            </button>
              <button onClick={onSettingsClick} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label="Open settings">
                 <SettingsIcon className="w-5 h-5" />
             </button>
