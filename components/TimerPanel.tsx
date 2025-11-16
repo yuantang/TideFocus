@@ -3,6 +3,7 @@ import type { TimerMode } from '../types';
 import CircularProgress from './CircularProgress';
 import { FocusIcon, BreakIcon, LongBreakIcon } from './Icons';
 import { formatTime } from '../utils';
+import { getTranslations } from '../i18n';
 
 interface TimerPanelProps {
   mode: TimerMode;
@@ -17,32 +18,34 @@ interface TimerPanelProps {
   intention?: string;
 }
 
-const panelContent = {
-  focus: {
-    title: 'FOCUS',
-    icon: <FocusIcon className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32" />,
-  },
-  break: {
-    title: 'BREAK',
-    icon: <BreakIcon className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32" />,
-  },
-};
-
-const TimerPanel: React.FC<TimerPanelProps> = ({ 
-    mode, 
-    isActive, 
-    timeLeft, 
-    progress, 
-    bgColor, 
-    textColor, 
-    isLongBreak = false, 
+const TimerPanel: React.FC<TimerPanelProps> = ({
+    mode,
+    isActive,
+    timeLeft,
+    progress,
+    bgColor,
+    textColor,
+    isLongBreak = false,
     quote,
     isBreathingGuideEnabled = false,
     intention
 }) => {
+  const t = getTranslations();
   const [breatheText, setBreatheText] = useState('');
+
+  const panelContent = {
+    focus: {
+      title: t.mainUI.focus,
+      icon: <FocusIcon className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32" />,
+    },
+    break: {
+      title: t.mainUI.break,
+      icon: <BreakIcon className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32" />,
+    },
+  };
+
   const content = panelContent[mode];
-  const title = (mode === 'break' && isLongBreak) ? 'LONG BREAK' : content.title;
+  const title = (mode === 'break' && isLongBreak) ? t.mainUI.longBreak : content.title;
   const icon = mode === 'break' && isLongBreak
     ? <LongBreakIcon className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32" />
     : content.icon;

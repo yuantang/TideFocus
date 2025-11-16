@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Sound, ActiveSound } from '../types';
-import { SOUNDS, COMPLETION_SOUNDS, SOUNDSCAPE_PRESETS, SOUND_CATEGORIES } from '../constants';
+import { getLocalizedSounds, getLocalizedCompletionSounds, getLocalizedSoundscapePresets, getLocalizedSoundCategories } from '../constants';
 import { CloseIcon, PlayIcon, PauseIcon } from './Icons';
+import { getTranslations, getCurrentLanguage, setLanguage, type Language } from '../i18n';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -41,6 +42,11 @@ const ColorInput = ({ label, value, onChange }: { label: string, value: string, 
 
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, currentSettings }) => {
+  const t = getTranslations();
+  const SOUNDS = getLocalizedSounds();
+  const COMPLETION_SOUNDS = getLocalizedCompletionSounds();
+  const SOUND_CATEGORIES = getLocalizedSoundCategories();
+
   const [focus, setFocus] = useState(currentSettings.focus);
   const [breakTime, setBreakTime] = useState(currentSettings.break);
   const [longBreak, setLongBreak] = useState(currentSettings.longBreak);
@@ -48,6 +54,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
   const [dailyGoal, setDailyGoal] = useState(currentSettings.dailyGoal);
   const [isBreathingGuideEnabled, setIsBreathingGuideEnabled] = useState(currentSettings.isBreathingGuideEnabled);
   const [isDesktopNotificationsEnabled, setIsDesktopNotificationsEnabled] = useState(currentSettings.isDesktopNotificationsEnabled);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getCurrentLanguage());
   const [activeSounds, setActiveSounds] = useState<ActiveSound[]>(currentSettings.activeSounds);
   const [isCompletionSoundEnabled, setIsCompletionSoundEnabled] = useState(currentSettings.isCompletionSoundEnabled);
   const [completionSound, setCompletionSound] = useState(currentSettings.completionSound);
@@ -112,6 +119,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
 
   // Apply soundscape preset
   const applyPreset = (presetId: string) => {
+    const SOUNDSCAPE_PRESETS = getLocalizedSoundscapePresets();
     const preset = SOUNDSCAPE_PRESETS.find(p => p.id === presetId);
     if (preset) {
       setActiveSounds(preset.sounds);
@@ -190,62 +198,154 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
     setLongBreakText(theme.longBreakText);
   }
 
+  const handleLanguageChange = (lang: Language) => {
+    console.log('🌍 [Language Change] Starting language change to:', lang);
+    console.log('🌍 [Language Change] Current language before change:', getCurrentLanguage());
+    console.log('🌍 [Language Change] localStorage before change:', localStorage.getItem('language'));
+
+    // 保存语言设置
+    setCurrentLanguage(lang);
+    setLanguage(lang);
+
+    console.log('🌍 [Language Change] localStorage after setLanguage:', localStorage.getItem('language'));
+    console.log('🌍 [Language Change] Reloading page in 200ms...');
+
+    // 使用 setTimeout 确保 localStorage 已保存，并使用硬刷新
+    setTimeout(() => {
+      console.log('🌍 [Language Change] Final check - localStorage:', localStorage.getItem('language'));
+      // 使用 location.href 强制刷新，避免 HMR 干扰
+      window.location.href = window.location.href;
+    }, 200);
+  }
+
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 overflow-y-auto p-4" onClick={onClose}>
       <div className="rounded-lg shadow-xl p-6 sm:p-8 w-11/12 max-w-md relative max-h-full overflow-y-auto" style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }} onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-4 right-4 opacity-70 hover:opacity-100" aria-label="Close settings">
           <CloseIcon className="w-6 h-6" />
         </button>
-        <h2 className="text-2xl font-bold mb-6 text-center">Settings</h2>
-        
+        <h2 className="text-2xl font-bold mb-6 text-center">{t.settings.title}</h2>
+
         <div className="space-y-6">
+          {/* Language Selector */}
           <div>
-            <h3 className="text-md font-semibold opacity-80 text-center mb-3">Timers & Goals</h3>
+            <h3 className="text-md font-semibold opacity-80 text-center mb-3">🌍 {t.settings.language}</h3>
+            <div className="bg-black/5 p-4 rounded-lg">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleLanguageChange('zh-CN')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'zh-CN'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇨🇳 简体中文
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('zh-TW')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'zh-TW'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇹🇼 繁體中文
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('en')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'en'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇺🇸 English
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('es')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'es'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇪🇸 Español
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('ja')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'ja'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇯🇵 日本語
+                </button>
+                <button
+                  onClick={() => handleLanguageChange('ko')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentLanguage === 'ko'
+                      ? 'bg-[#6b5a5a] text-white'
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                >
+                  🇰🇷 한국어
+                </button>
+              </div>
+              <p className="text-xs opacity-60 text-center mt-3">
+                {t.settings.languageReloadHint}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.settings.timer}</h3>
             <div className="space-y-4 bg-black/5 p-4 rounded-lg">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label htmlFor="focus-time" className="block text-sm font-medium mb-1">Focus Time</label>
+                        <label htmlFor="focus-time" className="block text-sm font-medium mb-1">{t.settings.focusDuration}</label>
                         <input id="focus-time" type="number" min="1" max="120" value={focus} onChange={(e) => setFocus(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                     </div>
                     <div>
-                    <label htmlFor="break-time" className="block text-sm font-medium mb-1">Short Break</label>
+                    <label htmlFor="break-time" className="block text-sm font-medium mb-1">{t.settings.breakDuration}</label>
                     <input id="break-time" type="number" min="1" max="60" value={breakTime} onChange={(e) => setBreakTime(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                     </div>
                 </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label htmlFor="long-break-time" className="block text-sm font-medium mb-1">Long Break</label>
+                        <label htmlFor="long-break-time" className="block text-sm font-medium mb-1">{t.settings.longBreakDuration}</label>
                         <input id="long-break-time" type="number" min="1" max="60" value={longBreak} onChange={(e) => setLongBreak(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                     </div>
                     <div>
-                        <label htmlFor="daily-goal" className="block text-sm font-medium mb-1">Daily Goal</label>
+                        <label htmlFor="daily-goal" className="block text-sm font-medium mb-1">{t.settings.dailyGoal}</label>
                         <input id="daily-goal" type="number" min="0" max="24" value={dailyGoal} onChange={(e) => setDailyGoal(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                     </div>
                 </div>
                 <div>
-                    <label htmlFor="sessions-round" className="block text-sm font-medium mb-1">Sessions per Round</label>
-                     <p className="text-xs opacity-60 mb-1">The number of focus sessions before a long break. Set to 0 to disable long breaks.</p>
+                    <label htmlFor="sessions-round" className="block text-sm font-medium mb-1">{t.settings.sessionsPerRound}</label>
+                     <p className="text-xs opacity-60 mb-1">{t.settings.sessionsPerRoundHint}</p>
                     <input id="sessions-round" type="number" min="0" max="12" value={sessionsPerRound} onChange={(e) => setSessionsPerRound(Number(e.target.value))} className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]" />
                 </div>
                  <div className="flex items-center justify-between pt-2">
-                    <label htmlFor="breathing-guide-toggle" className="block text-sm font-medium">Breathing Guide</label>
+                    <label htmlFor="breathing-guide-toggle" className="block text-sm font-medium">{t.settings.breathingGuide}</label>
                     <input type="checkbox" id="breathing-guide-toggle" checked={isBreathingGuideEnabled} onChange={e => setIsBreathingGuideEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                    <label htmlFor="desktop-notifications-toggle" className="block text-sm font-medium">Desktop Notifications</label>
+                    <label htmlFor="desktop-notifications-toggle" className="block text-sm font-medium">{t.settings.desktopNotifications}</label>
                     <input type="checkbox" id="desktop-notifications-toggle" checked={isDesktopNotificationsEnabled} onChange={e => handleToggleNotification(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                 </div>
             </div>
           </div>
           
           <div>
-             <h3 className="text-md font-semibold opacity-80 text-center mb-3">Soundscape Mixer</h3>
+             <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.settings.soundscape}</h3>
              <div className="space-y-3 bg-black/5 p-4 rounded-lg">
                 {/* Preset Selector */}
                 <div className="pb-3 border-b border-black/10">
-                  <label className="block text-sm font-medium mb-2 text-center opacity-70">快速预设</label>
+                  <label className="block text-sm font-medium mb-2 text-center opacity-70">{t.settings.presets}</label>
                   <div className="grid grid-cols-2 gap-2">
-                    {SOUNDSCAPE_PRESETS.map(preset => (
+                    {getLocalizedSoundscapePresets().map(preset => (
                       <button
                         key={preset.id}
                         onClick={() => applyPreset(preset.id)}
@@ -261,7 +361,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                 {/* Active Sounds - Quick Access */}
                 {activeSounds.length > 0 && (
                   <div className="pb-3 border-b border-black/10">
-                    <label className="block text-xs font-medium mb-2 opacity-70">当前混合 ({activeSounds.length})</label>
+                    <label className="block text-xs font-medium mb-2 opacity-70">{t.settings.currentMix} ({activeSounds.length})</label>
                     <div className="space-y-2">
                       {activeSounds.map(activeSound => {
                         const sound = SOUNDS.find(s => s.id === activeSound.id);
@@ -309,7 +409,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
-                    <span className="opacity-80">{showCustomMix ? '收起音频库' : '浏览音频库'}</span>
+                    <span className="opacity-80">{showCustomMix ? t.settings.hideLibrary : t.settings.browseLibrary}</span>
                     <svg className={`w-3 h-3 transition-transform ${showCustomMix ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -396,7 +496,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                 {/* Completion Sound */}
                 <div className="border-t border-black/10 pt-3">
                     <div className="flex items-center justify-between gap-2 mb-2">
-                        <label htmlFor="completion-sound-toggle" className="block text-xs font-medium opacity-70">完成提示音</label>
+                        <label htmlFor="completion-sound-toggle" className="block text-xs font-medium opacity-70">{t.settings.completionSound}</label>
                         <input type="checkbox" id="completion-sound-toggle" checked={isCompletionSoundEnabled} onChange={e => setIsCompletionSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                     </div>
                     <div className="flex items-center gap-2">
@@ -418,7 +518,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
           </div>
         
           <div>
-            <h3 className="text-md font-semibold opacity-80 text-center mb-3">Color Themes</h3>
+            <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.settings.theme}</h3>
             <div className="bg-black/5 p-4 rounded-lg">
                 <div className="flex justify-center gap-3 mb-2">
                     {PRESET_THEMES.map(theme => (
@@ -430,12 +530,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                     ))}
                 </div>
                 <div className="text-center mb-4">
-                    <button onClick={() => applyTheme(PRESET_THEMES[0])} className="text-xs opacity-70 hover:opacity-100 transition-opacity underline">Reset to Default</button>
+                    <button onClick={() => applyTheme(PRESET_THEMES[0])} className="text-xs opacity-70 hover:opacity-100 transition-opacity underline">{t.settings.resetTheme}</button>
                 </div>
                 <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Focus BG" value={focusBg} onChange={setFocusBg} /><ColorInput label="Focus Text" value={focusText} onChange={setFocusText} /></div>
-                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Break BG" value={breakBg} onChange={setBreakBg} /><ColorInput label="Break Text" value={breakText} onChange={setBreakText} /></div>
-                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label="Long Break BG" value={longBreakBg} onChange={setLongBreakBg} /><ColorInput label="Long Break Text" value={longBreakText} onChange={setLongBreakText} /></div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label={t.settings.focusBg} value={focusBg} onChange={setFocusBg} /><ColorInput label={t.settings.focusText} value={focusText} onChange={setFocusText} /></div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label={t.settings.breakBg} value={breakBg} onChange={setBreakBg} /><ColorInput label={t.settings.breakText} value={breakText} onChange={setBreakText} /></div>
+                    <div className="grid grid-cols-2 gap-x-4"><ColorInput label={t.settings.longBreakBg} value={longBreakBg} onChange={setLongBreakBg} /><ColorInput label={t.settings.longBreakText} value={longBreakText} onChange={setLongBreakText} /></div>
                 </div>
             </div>
           </div>
@@ -443,7 +543,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
 
         <div className="mt-8 flex justify-end">
           <button onClick={handleSave} className="bg-black/10 text-current font-bold py-2 px-6 rounded-lg hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6b5a5a] focus:ring-offset-[#fdf6f6] transition-colors">
-            Save
+            {t.save}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import type { Sound, Achievement, SoundscapePreset } from './types';
+import { getTranslations } from './i18n';
 import {
   SproutIcon,
   SevenDayIcon,
@@ -21,29 +22,45 @@ export const DEFAULT_LONG_BREAK_MINUTES = 15;
 export const DEFAULT_SESSIONS_PER_ROUND = 4;
 
 
-export const SOUNDS: Sound[] = [
-  { id: 'none', name: '无声 (None)', url: '' },
-  { id: 'rain', name: '雨声 (Rain)', url: '/sounds/ambient/rain.ogg' },
-  { id: 'thunder', name: '雷声 (Thunder)', url: '/sounds/ambient/thunder.ogg' },
-  { id: 'ocean', name: '海洋 (Ocean)', url: '/sounds/ambient/ocean.ogg' },
-  { id: 'waves', name: '海浪 (Waves)', url: '/sounds/ambient/waves.ogg' },
-  { id: 'seagulls', name: '海鸥 (Seagulls)', url: '/sounds/ambient/seagulls.ogg' },
-  { id: 'stream', name: '溪流 (Stream)', url: '/sounds/ambient/stream.ogg' },
-  { id: 'forest', name: '森林 (Forest)', url: '/sounds/ambient/forest.ogg' },
-  { id: 'birds', name: '鸟鸣 (Birds)', url: '/sounds/ambient/birds.ogg' },
-  { id: 'crickets', name: '虫鸣 (Crickets)', url: '/sounds/ambient/crickets.ogg' },
-  { id: 'wind', name: '风声 (Wind)', url: '/sounds/ambient/wind.ogg' },
-  { id: 'fireplace', name: '壁炉 (Fireplace)', url: '/sounds/ambient/fireplace.ogg' },
-  { id: 'campfire', name: '篝火 (Campfire)', url: '/sounds/ambient/campfire.ogg' },
-  { id: 'night', name: '夜晚 (Night)', url: '/sounds/ambient/night.ogg' },
-  { id: 'cafe', name: '咖啡店 (Cafe)', url: '/sounds/ambient/cafe.ogg' },
-  { id: 'library', name: '图书馆 (Library)', url: '/sounds/ambient/library.ogg' },
-  { id: 'wind_chimes', name: '风铃 (Wind Chimes)', url: '/sounds/ambient/wind-chimes.ogg' },
-  { id: 'white_noise', name: '白噪音 (White Noise)', url: '/sounds/ambient/white-noise.ogg' },
+const SOUNDS_BASE: Sound[] = [
+  { id: 'none', name: '无声', url: '' },
+  { id: 'rain', name: '雨声', url: '/sounds/ambient/rain.ogg' },
+  { id: 'thunder', name: '雷声', url: '/sounds/ambient/thunder.ogg' },
+  { id: 'ocean', name: '海洋', url: '/sounds/ambient/ocean.ogg' },
+  { id: 'waves', name: '海浪', url: '/sounds/ambient/waves.ogg' },
+  { id: 'seagulls', name: '海鸥', url: '/sounds/ambient/seagulls.ogg' },
+  { id: 'stream', name: '溪流', url: '/sounds/ambient/stream.ogg' },
+  { id: 'forest', name: '森林', url: '/sounds/ambient/forest.ogg' },
+  { id: 'birds', name: '鸟鸣', url: '/sounds/ambient/birds.ogg' },
+  { id: 'crickets', name: '虫鸣', url: '/sounds/ambient/crickets.ogg' },
+  { id: 'wind', name: '风声', url: '/sounds/ambient/wind.ogg' },
+  { id: 'fireplace', name: '壁炉', url: '/sounds/ambient/fireplace.ogg' },
+  { id: 'campfire', name: '篝火', url: '/sounds/ambient/campfire.ogg' },
+  { id: 'night', name: '夜晚', url: '/sounds/ambient/night.ogg' },
+  { id: 'cafe', name: '咖啡店', url: '/sounds/ambient/cafe.ogg' },
+  { id: 'library', name: '图书馆', url: '/sounds/ambient/library.ogg' },
+  { id: 'wind_chimes', name: '风铃', url: '/sounds/ambient/wind-chimes.ogg' },
+  { id: 'white_noise', name: '白噪音', url: '/sounds/ambient/white-noise.ogg' },
 ];
 
+export const getLocalizedSounds = (): Sound[] => {
+  const t = getTranslations();
+  return SOUNDS_BASE.map(sound => ({
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  }));
+};
+
+export const SOUNDS = SOUNDS_BASE.map(sound => {
+  const t = getTranslations();
+  return {
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  };
+});
+
 // Sound categories for better organization
-export const SOUND_CATEGORIES = [
+const SOUND_CATEGORIES_BASE = [
   {
     id: 'water',
     name: '💧 水声',
@@ -76,20 +93,68 @@ export const SOUND_CATEGORIES = [
   }
 ];
 
-export const COMPLETION_SOUNDS: Sound[] = [
-    { id: 'none', name: '无声 (None)', url: '' },
-    { id: 'singing_bowl', name: '颂钵 (Singing Bowl)', url: '/sounds/completion/singing-bowl.ogg'},
-    { id: 'bamboo_chime', name: '竹风铃 (Bamboo Chime)', url: '/sounds/completion/bamboo-chime.ogg'},
-    { id: 'music_box', name: '音乐盒 (Music Box)', url: '/sounds/completion/music-box.ogg'}
+export const getLocalizedSoundCategories = () => {
+  const t = getTranslations();
+  return SOUND_CATEGORIES_BASE.map(category => ({
+    ...category,
+    name: t.soundCategoryNames[category.id] || category.name,
+  }));
+};
+
+export const SOUND_CATEGORIES = SOUND_CATEGORIES_BASE.map(category => {
+  const t = getTranslations();
+  return {
+    ...category,
+    name: t.soundCategoryNames[category.id] || category.name,
+  };
+});
+
+const COMPLETION_SOUNDS_BASE: Sound[] = [
+    { id: 'none', name: '无声', url: '' },
+    { id: 'singing_bowl', name: '颂钵', url: '/sounds/completion/singing-bowl.ogg'},
+    { id: 'bamboo_chime', name: '竹风铃', url: '/sounds/completion/bamboo-chime.ogg'},
+    { id: 'music_box', name: '音乐盒', url: '/sounds/completion/music-box.ogg'}
 ];
 
-export const REMINDER_SOUNDS: Sound[] = [
-    { id: 'none', name: '无声 (None)', url: '' },
-    { id: 'bell', name: '摇铃 (Bell)', url: '/sounds/reminder/bell.ogg'},
-    { id: 'piano', name: '钢琴 (Piano)', url: '/sounds/reminder/piano.ogg'}
+export const getLocalizedCompletionSounds = (): Sound[] => {
+  const t = getTranslations();
+  return COMPLETION_SOUNDS_BASE.map(sound => ({
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  }));
+};
+
+export const COMPLETION_SOUNDS = COMPLETION_SOUNDS_BASE.map(sound => {
+  const t = getTranslations();
+  return {
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  };
+});
+
+const REMINDER_SOUNDS_BASE: Sound[] = [
+    { id: 'none', name: '无声', url: '' },
+    { id: 'bell', name: '摇铃', url: '/sounds/reminder/bell.ogg'},
+    { id: 'piano', name: '钢琴', url: '/sounds/reminder/piano.ogg'}
 ];
 
-export const SOUNDSCAPE_PRESETS: SoundscapePreset[] = [
+export const getLocalizedReminderSounds = (): Sound[] => {
+  const t = getTranslations();
+  return REMINDER_SOUNDS_BASE.map(sound => ({
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  }));
+};
+
+export const REMINDER_SOUNDS = REMINDER_SOUNDS_BASE.map(sound => {
+  const t = getTranslations();
+  return {
+    ...sound,
+    name: t.soundNames[sound.id] || sound.name,
+  };
+});
+
+const SOUNDSCAPE_PRESETS_BASE: SoundscapePreset[] = [
   {
     id: 'rainy_forest',
     name: '🌧️ 雨夜森林',
@@ -170,6 +235,25 @@ export const SOUNDSCAPE_PRESETS: SoundscapePreset[] = [
   },
 ];
 
+export const getLocalizedSoundscapePresets = (): SoundscapePreset[] => {
+  const t = getTranslations();
+
+  return SOUNDSCAPE_PRESETS_BASE.map(preset => ({
+    ...preset,
+    name: t.soundscapeNames[preset.id] || preset.name,
+    description: t.soundscapeDescriptions[preset.id] || preset.description,
+  }));
+};
+
+export const SOUNDSCAPE_PRESETS = SOUNDSCAPE_PRESETS_BASE.map(preset => {
+  const t = getTranslations();
+  return {
+    ...preset,
+    name: t.soundscapeNames[preset.id] || preset.name,
+    description: t.soundscapeDescriptions[preset.id] || preset.description,
+  };
+});
+
 export const LONG_BREAK_QUOTES: string[] = [
     'Rest is not idleness.',
     'A pause is a part of the rhythm.',
@@ -179,7 +263,8 @@ export const LONG_BREAK_QUOTES: string[] = [
     'Time relaxing is time well spent.'
 ];
 
-export const ACHIEVEMENTS: Achievement[] = [
+// 基础成就定义（不含翻译）
+const ACHIEVEMENTS_BASE: Achievement[] = [
   // 基础成就
   {
     id: 'first_session',
@@ -210,6 +295,19 @@ export const ACHIEVEMENTS: Achievement[] = [
     })
   },
   {
+    id: 'blooming',
+    name: '🌸 Blooming',
+    description: '完成 25 次专注',
+    icon: '🌸',
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 25,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 25),
+      total: 25,
+      percentage: (Math.min(stats.totalSessions, 25) / 25) * 100
+    })
+  },
+  {
     id: 'flourishing',
     name: '🌿 Flourishing',
     description: '完成 50 次专注',
@@ -233,6 +331,32 @@ export const ACHIEVEMENTS: Achievement[] = [
       current: Math.min(stats.totalSessions, 100),
       total: 100,
       percentage: (Math.min(stats.totalSessions, 100) / 100) * 100
+    })
+  },
+  {
+    id: 'full_bloom',
+    name: '🌺 Full Bloom',
+    description: '完成 200 次专注',
+    icon: '🌺',
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 200,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 200),
+      total: 200,
+      percentage: (Math.min(stats.totalSessions, 200) / 200) * 100
+    })
+  },
+  {
+    id: 'ancient_tree',
+    name: '🌲 Ancient Tree',
+    description: '完成 500 次专注',
+    icon: '🌲',
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 500,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 500),
+      total: 500,
+      percentage: (Math.min(stats.totalSessions, 500) / 500) * 100
     })
   },
 
@@ -264,6 +388,19 @@ export const ACHIEVEMENTS: Achievement[] = [
     })
   },
   {
+    id: 'power_week',
+    name: '⚡ Power Week',
+    description: '连续 14 天专注',
+    icon: '⚡',
+    category: 'streak',
+    condition: (stats) => stats.focusStreak >= 14,
+    progress: (stats) => ({
+      current: Math.min(stats.focusStreak, 14),
+      total: 14,
+      percentage: (Math.min(stats.focusStreak, 14) / 14) * 100
+    })
+  },
+  {
     id: 'monthly_master',
     name: '💎 Monthly Master',
     description: '连续 30 天专注',
@@ -274,6 +411,19 @@ export const ACHIEVEMENTS: Achievement[] = [
       current: Math.min(stats.focusStreak, 30),
       total: 30,
       percentage: (Math.min(stats.focusStreak, 30) / 30) * 100
+    })
+  },
+  {
+    id: 'dedication',
+    name: '🌟 Dedication',
+    description: '连续 60 天专注',
+    icon: '🌟',
+    category: 'streak',
+    condition: (stats) => stats.focusStreak >= 60,
+    progress: (stats) => ({
+      current: Math.min(stats.focusStreak, 60),
+      total: 60,
+      percentage: (Math.min(stats.focusStreak, 60) / 60) * 100
     })
   },
 
@@ -320,6 +470,19 @@ export const ACHIEVEMENTS: Achievement[] = [
       percentage: Math.min(stats.perfectWeeks, 1) * 100
     })
   },
+  {
+    id: 'unstoppable',
+    name: '💪 Unstoppable',
+    description: '连续 30 天达成每日目标',
+    icon: '💪',
+    category: 'streak',
+    condition: (stats) => stats.goalStreakDays >= 30,
+    progress: (stats) => ({
+      current: Math.min(stats.goalStreakDays, 30),
+      total: 30,
+      percentage: (Math.min(stats.goalStreakDays, 30) / 30) * 100
+    })
+  },
 
   // 时段成就
   {
@@ -336,6 +499,19 @@ export const ACHIEVEMENTS: Achievement[] = [
     })
   },
   {
+    id: 'midnight_scholar',
+    name: '🌙 Midnight Scholar',
+    description: '在深夜完成 10 次专注',
+    icon: '🌙',
+    category: 'time',
+    condition: (stats) => stats.nightSessions >= 10,
+    progress: (stats) => ({
+      current: Math.min(stats.nightSessions, 10),
+      total: 10,
+      percentage: (Math.min(stats.nightSessions, 10) / 10) * 100
+    })
+  },
+  {
     id: 'early_bird',
     name: '🐦 Early Bird',
     description: '在 05:00-07:00 完成专注',
@@ -348,19 +524,45 @@ export const ACHIEVEMENTS: Achievement[] = [
       percentage: Math.min(stats.morningSessions, 1) * 100
     })
   },
+  {
+    id: 'dawn_warrior',
+    name: '🌅 Dawn Warrior',
+    description: '在清晨完成 10 次专注',
+    icon: '🌅',
+    category: 'time',
+    condition: (stats) => stats.morningSessions >= 10,
+    progress: (stats) => ({
+      current: Math.min(stats.morningSessions, 10),
+      total: 10,
+      percentage: (Math.min(stats.morningSessions, 10) / 10) * 100
+    })
+  },
 
   // 时长成就
   {
-    id: 'marathon',
-    name: '🏃 Marathon',
-    description: '单次专注 2 小时以上',
-    icon: RunnerIcon,
+    id: 'time_keeper',
+    name: '⏰ Time Keeper',
+    description: '累计专注 10 小时',
+    icon: '⏰',
     category: 'time',
-    condition: (stats) => stats.longestSession >= 120,
+    condition: (stats) => stats.totalFocusMinutes >= 600, // 10小时 = 600分钟
     progress: (stats) => ({
-      current: Math.min(stats.longestSession, 120),
-      total: 120,
-      percentage: (Math.min(stats.longestSession, 120) / 120) * 100
+      current: Math.min(stats.totalFocusMinutes, 600),
+      total: 600,
+      percentage: (Math.min(stats.totalFocusMinutes, 600) / 600) * 100
+    })
+  },
+  {
+    id: 'time_master',
+    name: '🕐 Time Master',
+    description: '累计专注 50 小时',
+    icon: '🕐',
+    category: 'time',
+    condition: (stats) => stats.totalFocusMinutes >= 3000, // 50小时 = 3000分钟
+    progress: (stats) => ({
+      current: Math.min(stats.totalFocusMinutes, 3000),
+      total: 3000,
+      percentage: (Math.min(stats.totalFocusMinutes, 3000) / 3000) * 100
     })
   },
   {
@@ -376,8 +578,47 @@ export const ACHIEVEMENTS: Achievement[] = [
       percentage: (Math.min(stats.totalFocusMinutes, 6000) / 6000) * 100
     })
   },
+  {
+    id: 'marathon',
+    name: '🏃 Marathon',
+    description: '单次专注 2 小时以上',
+    icon: RunnerIcon,
+    category: 'time',
+    condition: (stats) => stats.longestSession >= 120,
+    progress: (stats) => ({
+      current: Math.min(stats.longestSession, 120),
+      total: 120,
+      percentage: (Math.min(stats.longestSession, 120) / 120) * 100
+    })
+  },
+  {
+    id: 'ultra_marathon',
+    name: '⏳ Ultra Marathon',
+    description: '单次专注 5 小时以上',
+    icon: '⏳',
+    category: 'time',
+    condition: (stats) => stats.longestSession >= 300,
+    progress: (stats) => ({
+      current: Math.min(stats.longestSession, 300),
+      total: 300,
+      percentage: (Math.min(stats.longestSession, 300) / 300) * 100
+    })
+  },
 
   // 任务成就
+  {
+    id: 'task_starter',
+    name: '📝 Task Starter',
+    description: '完成 10 个任务',
+    icon: '📝',
+    category: 'task',
+    condition: (stats) => stats.completedTasks >= 10,
+    progress: (stats) => ({
+      current: Math.min(stats.completedTasks, 10),
+      total: 10,
+      percentage: (Math.min(stats.completedTasks, 10) / 10) * 100
+    })
+  },
   {
     id: 'task_master',
     name: '✅ Task Master',
@@ -391,4 +632,51 @@ export const ACHIEVEMENTS: Achievement[] = [
       percentage: (Math.min(stats.completedTasks, 50) / 50) * 100
     })
   },
+  {
+    id: 'task_champion',
+    name: '🎯 Task Champion',
+    description: '完成 100 个任务',
+    icon: '🎯',
+    category: 'task',
+    condition: (stats) => stats.completedTasks >= 100,
+    progress: (stats) => ({
+      current: Math.min(stats.completedTasks, 100),
+      total: 100,
+      percentage: (Math.min(stats.completedTasks, 100) / 100) * 100
+    })
+  },
+  {
+    id: 'task_legend',
+    name: '🏆 Task Legend',
+    description: '完成 500 个任务',
+    icon: '🏆',
+    category: 'task',
+    condition: (stats) => stats.completedTasks >= 500,
+    progress: (stats) => ({
+      current: Math.min(stats.completedTasks, 500),
+      total: 500,
+      percentage: (Math.min(stats.completedTasks, 500) / 500) * 100
+    })
+  },
 ];
+
+// 获取本地化的成就列表（每次调用时都会获取当前语言的翻译）
+export const getLocalizedAchievements = (): Achievement[] => {
+  const t = getTranslations();
+
+  return ACHIEVEMENTS_BASE.map(achievement => ({
+    ...achievement,
+    name: t.achievementNames[achievement.id] || achievement.name,
+    description: t.achievementDescriptions[achievement.id] || achievement.description,
+  }));
+};
+
+// 导出本地化的成就列表（为了向后兼容）
+export const ACHIEVEMENTS = ACHIEVEMENTS_BASE.map(achievement => {
+  const t = getTranslations();
+  return {
+    ...achievement,
+    name: t.achievementNames[achievement.id] || achievement.name,
+    description: t.achievementDescriptions[achievement.id] || achievement.description,
+  };
+});

@@ -2,6 +2,7 @@ import React from 'react';
 import { PlayIcon, PauseIcon, NextIcon, VolumeIcon, VolumeMuteIcon, SettingsIcon, FlowerIcon, FullscreenIcon, ExitFullscreenIcon, TaskIcon } from './Icons';
 import { TimerMode } from '../types';
 import { formatTime } from '../utils';
+import { getTranslations } from '../i18n';
 
 interface ControlsProps {
   isActive: boolean;
@@ -69,12 +70,9 @@ const Controls: React.FC<ControlsProps> = ({
   onToggleFullscreen,
   textColor
 }) => {
+  const t = getTranslations();
   const elapsedTime = totalDuration - timeLeft;
   const sessionsInCurrentRound = sessionsPerRound > 0 ? sessionCount % sessionsPerRound : 0;
-  
-  const nextButtonText = mode === 'focus' 
-    ? (isLongBreakNext ? 'Long Break' : 'Break')
-    : 'Focus';
 
 
   return (
@@ -165,7 +163,7 @@ const Controls: React.FC<ControlsProps> = ({
               <SessionIndicator count={sessionsInCurrentRound} total={sessionsPerRound} color={textColor} />
             </div>
             <button onClick={onNext} className="px-3 py-1.5 bg-black/10 rounded-full hover:bg-black/20 transition-colors flex items-center gap-2 whitespace-nowrap">
-              <span>Skip to {nextButtonText}</span>
+              <span>{mode === 'focus' ? (isLongBreakNext ? t.mainUI.skipToLongBreak : t.mainUI.skipToBreak) : t.mainUI.skipToFocus}</span>
               <NextIcon className="w-4 h-4"/>
             </button>
         </div>

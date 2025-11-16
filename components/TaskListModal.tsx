@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { Task } from '../types';
 import { CloseIcon, CheckCircleIcon } from './Icons';
 import ConfirmDialog from './ConfirmDialog';
+import { getTranslations } from '../i18n';
 
 interface TaskListModalProps {
   isOpen: boolean;
@@ -90,6 +91,7 @@ type SortOption = 'priority' | 'created' | 'status';
 type FilterOption = 'all' | 'active' | 'completed';
 
 const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, onAddTask, onUpdateTask, onDeleteTask }) => {
+  const t = getTranslations();
   const [newTaskText, setNewTaskText] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [sortBy, setSortBy] = useState<SortOption>('priority');
@@ -165,14 +167,14 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
 
         {/* 标题 */}
         <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Today's Tasks</h2>
+            <h2 className="text-2xl font-bold">{t.tasks.title}</h2>
             {tasks.length > 0 && (
               <div className="flex items-center justify-center gap-4 text-sm opacity-70 mt-1">
-                <span>{completedCount} / {tasks.length} 已完成</span>
+                <span>{completedCount} / {tasks.length} {t.tasks.completed}</span>
                 {totalPomodoros > 0 && (
                   <span className="flex items-center gap-1">
                     <span>🍅</span>
-                    <span>{totalPomodoros} 个番茄钟</span>
+                    <span>{totalPomodoros} {t.tasks.totalPomodoros}</span>
                   </span>
                 )}
               </div>
@@ -188,9 +190,9 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
               onChange={(e) => setFilterBy(e.target.value as FilterOption)}
               className="flex-1 px-3 py-2 bg-white/50 border border-black/10 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6b5a5a]"
             >
-              <option value="all">全部任务</option>
-              <option value="active">未完成</option>
-              <option value="completed">已完成</option>
+              <option value="all">{t.tasks.filterAll}</option>
+              <option value="active">{t.tasks.filterActive}</option>
+              <option value="completed">{t.tasks.filterCompleted}</option>
             </select>
 
             {/* 排序 */}
@@ -199,9 +201,9 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="flex-1 px-3 py-2 bg-white/50 border border-black/10 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6b5a5a]"
             >
-              <option value="priority">按优先级</option>
-              <option value="created">按创建时间</option>
-              <option value="status">按完成状态</option>
+              <option value="priority">{t.tasks.sortByPriority}</option>
+              <option value="created">{t.tasks.sortByCreated}</option>
+              <option value="status">{t.tasks.sortByStatus}</option>
             </select>
           </div>
         )}
@@ -239,7 +241,7 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
                     : 'bg-white/30 hover:bg-white/50'
                 }`}
               >
-                高优先级
+                {t.tasks.highPriority}
               </button>
               <button
                 onClick={() => setNewTaskPriority('medium')}
@@ -249,7 +251,7 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
                     : 'bg-white/30 hover:bg-white/50'
                 }`}
               >
-                中优先级
+                {t.tasks.mediumPriority}
               </button>
               <button
                 onClick={() => setNewTaskPriority('low')}
@@ -259,7 +261,7 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
                     : 'bg-white/30 hover:bg-white/50'
                 }`}
               >
-                低优先级
+                {t.tasks.lowPriority}
               </button>
             </div>
 
@@ -269,7 +271,7 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
                 value={newTaskText}
                 onChange={(e) => setNewTaskText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
-                placeholder="Add a new task..."
+                placeholder={t.tasks.placeholder}
                 className="w-full px-4 py-3 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
             />
         </div>
@@ -278,10 +280,10 @@ const TaskListModal: React.FC<TaskListModalProps> = ({ isOpen, onClose, tasks, o
       {/* 删除确认对话框 */}
       <ConfirmDialog
         isOpen={taskToDelete !== null}
-        title="删除任务"
-        message="确定要删除这个任务吗？此操作无法撤销。"
-        confirmText="删除"
-        cancelText="取消"
+        title={t.tasks.deleteConfirm}
+        message={t.tasks.deleteMessage}
+        confirmText={t.delete}
+        cancelText={t.cancel}
         type="danger"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}

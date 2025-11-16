@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { TimerMode, Sound, Task, ActiveSound, Achievement, Stats } from './types';
-import { SOUNDS, COMPLETION_SOUNDS, REMINDER_SOUNDS, DEFAULT_FOCUS_MINUTES, DEFAULT_BREAK_MINUTES, DEFAULT_LONG_BREAK_MINUTES, DEFAULT_SESSIONS_PER_ROUND, LONG_BREAK_QUOTES, ACHIEVEMENTS } from './constants';
+import { SOUNDS, COMPLETION_SOUNDS, REMINDER_SOUNDS, DEFAULT_FOCUS_MINUTES, DEFAULT_BREAK_MINUTES, DEFAULT_LONG_BREAK_MINUTES, DEFAULT_SESSIONS_PER_ROUND, LONG_BREAK_QUOTES, getLocalizedAchievements } from './constants';
 import TimerPanel from './components/TimerPanel';
 import Controls from './components/Controls';
 import SettingsModal from './components/SettingsModal';
@@ -12,6 +12,7 @@ import AchievementUnlockModal from './components/AchievementUnlockModal';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
+import { getWeekdayName } from './i18n';
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -169,7 +170,7 @@ export default function App() {
         date.setDate(new Date().getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
         progressData.push({
-            day: date.toLocaleString('en-US', { weekday: 'short' }),
+            day: getWeekdayName(date.getDay(), true),
             count: history[dateStr] || 0,
             isToday: i === 0,
         });
@@ -235,6 +236,7 @@ export default function App() {
   }, [isDesktopNotificationsEnabled]);
   
   const checkAchievements = useCallback((stats: Stats) => {
+    const ACHIEVEMENTS = getLocalizedAchievements();
     const newUnlocks: string[] = [];
     ACHIEVEMENTS.forEach(ach => {
         if (!unlockedAchievements.includes(ach.id) && ach.condition(stats)) {

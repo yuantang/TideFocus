@@ -1,5 +1,6 @@
 import React from 'react';
 import { Achievement, Stats } from '../types';
+import { getTranslations } from '../i18n';
 
 interface AchievementCardProps {
   achievement: Achievement;
@@ -9,8 +10,9 @@ interface AchievementCardProps {
 }
 
 const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isUnlocked, stats, unlockedAt }) => {
+  const t = getTranslations();
   const progress = achievement.progress ? achievement.progress(stats) : null;
-  
+
   // 获取分类颜色
   const getCategoryColor = () => {
     switch (achievement.category) {
@@ -31,13 +33,13 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isUnlock
   const getCategoryLabel = () => {
     switch (achievement.category) {
       case 'focus':
-        return '专注';
+        return t.achievementCategories.focus;
       case 'streak':
-        return '连续';
+        return t.achievementCategories.streak;
       case 'time':
-        return '时长';
+        return t.achievementCategories.time;
       case 'task':
-        return '任务';
+        return t.achievementCategories.task;
       default:
         return '';
     }
@@ -100,7 +102,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isUnlock
       {progress && !isUnlocked && (
         <div className="mt-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-black/60">进度</span>
+            <span className="text-xs text-black/60">{t.achievementProgress}</span>
             <span className="text-xs font-medium text-black/80">
               {progress.current} / {progress.total}
             </span>
@@ -123,7 +125,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isUnlock
       {isUnlocked && unlockedAt && (
         <div className="mt-3 pt-3 border-t border-black/10">
           <p className="text-xs text-center text-black/50">
-            解锁于 {new Date(unlockedAt).toLocaleDateString('zh-CN', {
+            {t.unlockedOn} {new Date(unlockedAt).toLocaleDateString('zh-CN', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'

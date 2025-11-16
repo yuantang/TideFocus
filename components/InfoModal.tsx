@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CloseIcon } from './Icons';
 import { Achievement, Stats } from '../types';
-import { ACHIEVEMENTS } from '../constants';
+import { getLocalizedAchievements } from '../constants';
 import AchievementCard from './AchievementCard';
+import { getTranslations, getCurrentLanguage, getWeekdayName, type Language } from '../i18n';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -25,9 +26,106 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
     </button>
 );
 
+// 日期导航组件
+const DateNavigator: React.FC<{
+  viewType: 'day' | 'week' | 'month';
+  currentDate: Date;
+  onPrevious: () => void;
+  onNext: () => void;
+  onToday: () => void;
+}> = ({ viewType, currentDate, onPrevious, onNext, onToday }) => {
+  const t = getTranslations();
+  const lang = getCurrentLanguage();
+
+  // 根据语言获取 locale
+  const getLocale = () => {
+    switch (lang) {
+      case 'zh-CN': return 'zh-CN';
+      case 'zh-TW': return 'zh-TW';
+      case 'ja': return 'ja-JP';
+      case 'ko': return 'ko-KR';
+      case 'en': return 'en-US';
+      case 'es': return 'es-ES';
+      default: return 'en-US';
+    }
+  };
+
+  const locale = getLocale();
+
+  const formatDate = () => {
+    if (viewType === 'day') {
+      return currentDate.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+    } else if (viewType === 'week') {
+      const weekStart = new Date(currentDate);
+      weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      return `${weekStart.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}`;
+    } else {
+      return currentDate.toLocaleDateString(locale, { year: 'numeric', month: 'long' });
+    }
+  };
+
+  const isToday = () => {
+    const today = new Date();
+    if (viewType === 'day') {
+      return currentDate.toDateString() === today.toDateString();
+    } else if (viewType === 'week') {
+      const weekStart = new Date(currentDate);
+      weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      return today >= weekStart && today <= weekEnd;
+    } else {
+      return currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear();
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-3 border border-indigo-100">
+      <button
+        onClick={onPrevious}
+        className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+        aria-label="上一个"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-gray-700">{formatDate()}</span>
+        {!isToday() && (
+          <button
+            onClick={onToday}
+            className="px-3 py-1 text-xs font-medium bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-colors"
+          >
+            {t.today}
+          </button>
+        )}
+      </div>
+
+      <button
+        onClick={onNext}
+        className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+        aria-label="下一个"
+        disabled={isToday()}
+      >
+        <svg className={`w-5 h-5 ${isToday() ? 'opacity-30' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  );
+};
+
 const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocked, stats }) => {
+  const t = getTranslations();
   const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'focus' | 'streak' | 'time' | 'task'>('all');
+
+  // 获取本地化的成就列表
+  const ACHIEVEMENTS = getLocalizedAchievements();
 
   // 过滤成就
   const filteredAchievements = ACHIEVEMENTS.filter(ach => {
@@ -48,12 +146,21 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
   const totalCount = ACHIEVEMENTS.length;
   const percentage = Math.round((unlockedCount / totalCount) * 100);
 
+  // 找到最接近解锁的成就
+  const closestAchievement = ACHIEVEMENTS
+    .filter(ach => !unlocked.includes(ach.id) && ach.progress)
+    .map(ach => ({
+      achievement: ach,
+      progress: ach.progress!(stats)
+    }))
+    .sort((a, b) => b.progress.percentage - a.progress.percentage)[0];
+
   return (
     <div className="space-y-4">
       {/* 统计信息 */}
       <div className="bg-gradient-to-r from-yellow-50 to-pink-50 rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">成就进度</span>
+          <span className="text-sm font-medium text-gray-700">{t.achievementProgress}</span>
           <span className="text-lg font-bold text-gray-800">{unlockedCount} / {totalCount}</span>
         </div>
         <div className="w-full h-3 bg-white/50 rounded-full overflow-hidden">
@@ -63,9 +170,34 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
           />
         </div>
         <div className="text-center mt-1">
-          <span className="text-xs font-medium text-gray-600">{percentage}% 完成</span>
+          <span className="text-xs font-medium text-gray-600">{percentage}% {t.tasks.completed}</span>
         </div>
       </div>
+
+      {/* 最接近解锁的成就提示 */}
+      {closestAchievement && closestAchievement.progress.percentage > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200/50">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl">🎯</div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-gray-700 mb-1">{t.upcomingAchievement}</div>
+              <div className="text-base font-bold text-gray-800">{closestAchievement.achievement.name}</div>
+              <div className="text-xs text-gray-600 mt-1">{closestAchievement.achievement.description}</div>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-2 bg-white/50 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-500"
+                    style={{ width: `${closestAchievement.progress.percentage}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium text-gray-700">
+                  {closestAchievement.progress.current} / {closestAchievement.progress.total}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 过滤器 */}
       <div className="flex flex-wrap gap-2">
@@ -75,7 +207,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             filter === 'all' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          全部 ({totalCount})
+          {t.achievementFilters.all} ({totalCount})
         </button>
         <button
           onClick={() => setFilter('unlocked')}
@@ -83,7 +215,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             filter === 'unlocked' ? 'bg-green-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          已解锁 ({unlockedCount})
+          {t.achievementFilters.unlocked} ({unlockedCount})
         </button>
         <button
           onClick={() => setFilter('locked')}
@@ -91,7 +223,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             filter === 'locked' ? 'bg-gray-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          未解锁 ({totalCount - unlockedCount})
+          {t.achievementFilters.locked} ({totalCount - unlockedCount})
         </button>
       </div>
 
@@ -103,7 +235,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             categoryFilter === 'all' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          全部分类
+          {t.achievementFilters.allCategories}
         </button>
         <button
           onClick={() => setCategoryFilter('focus')}
@@ -111,7 +243,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             categoryFilter === 'focus' ? 'bg-green-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          专注
+          {t.achievementCategories.focus}
         </button>
         <button
           onClick={() => setCategoryFilter('streak')}
@@ -119,7 +251,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             categoryFilter === 'streak' ? 'bg-orange-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          连续
+          {t.achievementCategories.streak}
         </button>
         <button
           onClick={() => setCategoryFilter('time')}
@@ -127,7 +259,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             categoryFilter === 'time' ? 'bg-blue-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          时长
+          {t.achievementCategories.time}
         </button>
         <button
           onClick={() => setCategoryFilter('task')}
@@ -135,7 +267,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
             categoryFilter === 'task' ? 'bg-purple-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
           }`}
         >
-          任务
+          {t.achievementCategories.task}
         </button>
       </div>
 
@@ -155,7 +287,7 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
       {filteredAchievements.length === 0 && (
         <div className="text-center py-12 opacity-50">
           <div className="text-4xl mb-3">🔍</div>
-          <p className="text-lg font-medium">没有符合条件的成就</p>
+          <p className="text-lg font-medium">{t.noAchievements}</p>
         </div>
       )}
     </div>
@@ -163,19 +295,19 @@ const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocke
 };
 
 const WeeklyProgressChart: React.FC<{ progress: { day: string; count: number; isToday: boolean }[], goal: number }> = ({ progress, goal }) => {
-  const maxCount = Math.max(goal > 0 ? goal : 1, ...progress.map(p => p.count));
+  const maxCount = Math.max(goal > 0 ? goal : 1, ...progress.map((p: { count: number }) => p.count));
   return (
     <div className="flex justify-between items-end gap-2 h-32" style={{color: TEXT_COLOR}}>
-      {progress.map((data, index) => (
+      {progress.map((data: { day: string; count: number; isToday: boolean }, index: number) => (
         <div key={index} className="flex-1 flex flex-col items-center justify-end h-full gap-2 group relative text-center">
           <div className="w-full h-full flex items-end justify-center">
             <div className="w-3/4 max-w-md bg-black/5 rounded-t-sm relative" style={{height: '100%'}}>
               <div className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-500 ease-out ${data.isToday ? 'bg-current' : 'bg-current opacity-40'}`} style={{ height: `${maxCount > 0 ? (data.count / maxCount) * 100 : 0}%` }} />
             </div>
           </div>
-          <span className={`text-xs font-medium ${data.isToday ? 'opacity-100 font-bold' : 'opacity-60'}`}>{data.day.slice(0, 1)}</span>
-          <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black/70 text-white text-xs rounded py-1 px-2 pointer-events-none transition-opacity duration-300">
-            {data.count} session{data.count !== 1 ? 's' : ''}
+          <span className={`text-xs font-medium ${data.isToday ? 'opacity-100 font-bold' : 'opacity-60'}`}>{data.day}</span>
+          <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black/70 text-white text-xs rounded py-1 px-2 pointer-events-none transition-opacity duration-300 whitespace-nowrap">
+            {data.count} {getTranslations().units.sessions}
             <div className="absolute left-1/2 -translate-x-1/2 bottom-[-4px] w-2 h-2 bg-black/70 rotate-45"></div>
           </div>
         </div>
@@ -184,73 +316,472 @@ const WeeklyProgressChart: React.FC<{ progress: { day: string; count: number; is
   );
 };
 
+// 数据导出函数
+const exportDataAsJSON = (stats: Stats) => {
+  const data = {
+    exportDate: new Date().toISOString(),
+    statistics: stats,
+    version: '1.0'
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flowmind-stats-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+const exportDataAsCSV = (stats: Stats, t: any) => {
+  const csvContent = [
+    [t.csvHeaders.metric, t.csvHeaders.value],
+    [t.csvHeaders.totalSessions, stats.totalSessions],
+    [t.csvHeaders.totalMinutes, stats.totalFocusMinutes],
+    [t.csvHeaders.completedTasks, stats.completedTasks],
+    [t.csvHeaders.streakDays, stats.focusStreak],
+    [t.csvHeaders.dailyGoal, stats.dailyGoal],
+    [t.csvHeaders.todayCompleted, stats.dailySessionsCompleted],
+    [t.csvHeaders.morningSessions, stats.morningSessions],
+    [t.csvHeaders.nightSessions, stats.nightSessions],
+    [t.csvHeaders.longestSession, stats.longestSession],
+    [t.csvHeaders.perfectWeeks, stats.perfectWeeks],
+    [t.csvHeaders.goalStreakDays, stats.goalStreakDays]
+  ].map(row => row.join(',')).join('\n');
+
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flowmind-stats-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// 时段分布热力图组件
+const TimeDistributionHeatmap: React.FC<{ stats: Stats }> = ({ stats }) => {
+  const t = getTranslations();
+  // 模拟时段数据（实际应该从 localStorage 读取详细的时段记录）
+  const timeSlots = [
+    { hour: '00-06', label: t.timeSlots.lateNight, sessions: stats.nightSessions, color: 'from-indigo-400 to-purple-500' },
+    { hour: '06-09', label: t.timeSlots.earlyMorning, sessions: stats.morningSessions, color: 'from-orange-400 to-yellow-500' },
+    { hour: '09-12', label: t.timeSlots.morning, sessions: Math.floor(stats.totalSessions * 0.25), color: 'from-blue-400 to-cyan-500' },
+    { hour: '12-14', label: t.timeSlots.noon, sessions: Math.floor(stats.totalSessions * 0.1), color: 'from-green-400 to-teal-500' },
+    { hour: '14-18', label: t.timeSlots.afternoon, sessions: Math.floor(stats.totalSessions * 0.3), color: 'from-pink-400 to-rose-500' },
+    { hour: '18-24', label: t.timeSlots.evening, sessions: Math.floor(stats.totalSessions * 0.2), color: 'from-violet-400 to-purple-500' },
+  ];
+
+  const maxSessions = Math.max(...timeSlots.map(slot => slot.sessions), 1);
+
+  return (
+    <div className="space-y-3">
+      {timeSlots.map((slot, index) => (
+        <div key={index} className="flex items-center gap-3">
+          <div className="w-16 text-xs font-medium text-gray-600">{slot.hour}</div>
+          <div className="flex-1">
+            <div className="h-8 bg-black/5 rounded-lg overflow-hidden relative">
+              <div
+                className={`h-full bg-gradient-to-r ${slot.color} transition-all duration-500 flex items-center justify-end pr-2`}
+                style={{ width: `${(slot.sessions / maxSessions) * 100}%` }}
+              >
+                {slot.sessions > 0 && (
+                  <span className="text-xs font-bold text-white">{slot.sessions}</span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="w-12 text-xs text-gray-600">{slot.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// 月度统计组件
+const MonthlyStatsView: React.FC<{ stats: Stats }> = ({ stats }) => {
+  const t = getTranslations();
+  return (
+    <div className="space-y-4">
+      {/* 总览卡片 */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center border border-blue-100">
+          <div className="text-3xl font-bold text-blue-600">{stats.totalSessions}</div>
+          <div className="text-sm text-blue-700 mt-1">{t.totalSessions}</div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center border border-purple-100">
+          <div className="text-3xl font-bold text-purple-600">{Math.floor(stats.totalFocusMinutes / 60)}h {stats.totalFocusMinutes % 60}m</div>
+          <div className="text-sm text-purple-700 mt-1">{t.csvHeaders.totalMinutes}</div>
+        </div>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 text-center border border-green-100">
+          <div className="text-3xl font-bold text-green-600">{stats.completedTasks}</div>
+          <div className="text-sm text-green-700 mt-1">{t.completedTasks}</div>
+        </div>
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 text-center border border-orange-100">
+          <div className="text-3xl font-bold text-orange-600">{stats.focusStreak}</div>
+          <div className="text-sm text-orange-700 mt-1">{t.streakDays}</div>
+        </div>
+      </div>
+
+      {/* 时段分布热力图 */}
+      <div className="bg-gradient-to-br from-indigo-50 to-pink-50 rounded-lg p-5 border border-indigo-100">
+        <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+          <span className="text-lg">🕐</span>
+          {t.timeDistribution}
+        </h4>
+        <TimeDistributionHeatmap stats={stats} />
+      </div>
+
+      {/* 个人记录 */}
+      <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-5 border border-yellow-100">
+        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span className="text-lg">🏆</span>
+          {t.personalRecords}
+        </h4>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⏱️</span>
+              <span className="text-sm text-gray-700">{t.longestSession}</span>
+            </div>
+            <span className="text-sm font-bold text-gray-800">{stats.longestSession} {t.units.minutes}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📅</span>
+              <span className="text-sm text-gray-700">{t.perfectWeeks}</span>
+            </div>
+            <span className="text-sm font-bold text-gray-800">{stats.perfectWeeks} {t.units.weeks}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🎯</span>
+              <span className="text-sm text-gray-700">{t.csvHeaders.goalStreakDays}</span>
+            </div>
+            <span className="text-sm font-bold text-gray-800">{stats.goalStreakDays} {t.units.days}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 数据导出 */}
+      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg p-5 border border-gray-200">
+        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span className="text-lg">💾</span>
+          {t.dataExport}
+        </h4>
+        <div className="flex gap-2">
+          <button
+            onClick={() => exportDataAsJSON(stats)}
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          >
+            📥 {t.exportJSON}
+          </button>
+          <button
+            onClick={() => exportDataAsCSV(stats, t)}
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+          >
+            📊 {t.exportCSV}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, dailySessionsCompleted, weeklyProgress, totalSessions, focusStreak, unlockedAchievements, stats }) => {
   const [activeTab, setActiveTab] = useState('progress');
+  const [progressView, setProgressView] = useState<'daily' | 'monthly'>('daily');
+  const [viewType, setViewType] = useState<'day' | 'week' | 'month'>('week');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [historicalData, setHistoricalData] = useState<{
+    weeklyProgress: { day: string; count: number; isToday: boolean }[];
+    dailySessionsCompleted: number;
+    totalSessions: number;
+    totalMinutes: number;
+  }>({
+    weeklyProgress: weeklyProgress,
+    dailySessionsCompleted: dailySessionsCompleted,
+    totalSessions: totalSessions,
+    totalMinutes: stats.totalFocusMinutes
+  });
+
+  // 计算历史数据
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const history = JSON.parse(localStorage.getItem('focusHistory') || '{}');
+
+    if (viewType === 'day') {
+      // 单日数据
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const dayCount = history[dateStr] || 0;
+      setHistoricalData({
+        weeklyProgress: [{ day: getWeekdayName(selectedDate.getDay(), true), count: dayCount, isToday: false }],
+        dailySessionsCompleted: dayCount,
+        totalSessions: dayCount,
+        totalMinutes: dayCount * 25 // 估算
+      });
+    } else if (viewType === 'week') {
+      // 周数据
+      const weekStart = new Date(selectedDate);
+      weekStart.setDate(selectedDate.getDate() - selectedDate.getDay());
+
+      const progressData = [];
+      let weekTotal = 0;
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        const count = history[dateStr] || 0;
+        weekTotal += count;
+        progressData.push({
+          day: getWeekdayName(date.getDay(), true),
+          count: count,
+          isToday: date.toDateString() === new Date().toDateString()
+        });
+      }
+
+      setHistoricalData({
+        weeklyProgress: progressData,
+        dailySessionsCompleted: history[new Date().toISOString().split('T')[0]] || 0,
+        totalSessions: weekTotal,
+        totalMinutes: weekTotal * 25 // 估算
+      });
+    } else {
+      // 月数据
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      let monthTotal = 0;
+      const weeklyData: { [key: number]: number } = {};
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dateStr = date.toISOString().split('T')[0];
+        const count = history[dateStr] || 0;
+        monthTotal += count;
+
+        const weekNum = Math.floor((day - 1) / 7);
+        weeklyData[weekNum] = (weeklyData[weekNum] || 0) + count;
+      }
+
+      const t = getTranslations();
+      const progressData = Object.keys(weeklyData).map((weekNum) => ({
+        day: t.weekLabel.replace('{week}', String(parseInt(weekNum) + 1)),
+        count: weeklyData[parseInt(weekNum)],
+        isToday: false
+      }));
+
+      setHistoricalData({
+        weeklyProgress: progressData,
+        dailySessionsCompleted: history[new Date().toISOString().split('T')[0]] || 0,
+        totalSessions: monthTotal,
+        totalMinutes: monthTotal * 25 // 估算
+      });
+    }
+  }, [isOpen, viewType, selectedDate, weeklyProgress, dailySessionsCompleted, totalSessions, stats.totalFocusMinutes]);
+
+  const handlePrevious = () => {
+    const newDate = new Date(selectedDate);
+    if (viewType === 'day') {
+      newDate.setDate(newDate.getDate() - 1);
+    } else if (viewType === 'week') {
+      newDate.setDate(newDate.getDate() - 7);
+    } else {
+      newDate.setMonth(newDate.getMonth() - 1);
+    }
+    setSelectedDate(newDate);
+  };
+
+  const handleNext = () => {
+    const newDate = new Date(selectedDate);
+    if (viewType === 'day') {
+      newDate.setDate(newDate.getDate() + 1);
+    } else if (viewType === 'week') {
+      newDate.setDate(newDate.getDate() + 7);
+    } else {
+      newDate.setMonth(newDate.getMonth() + 1);
+    }
+    // 不能超过今天
+    if (newDate <= new Date()) {
+      setSelectedDate(newDate);
+    }
+  };
+
+  const handleToday = () => {
+    setSelectedDate(new Date());
+  };
 
   if (!isOpen) {
     return null;
   }
 
+  const t = getTranslations();
+
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4" onClick={onClose}>
-      <div className="rounded-lg shadow-xl w-11/12 max-w-lg relative" style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }} onClick={(e) => e.stopPropagation()}>
+      <div className="rounded-lg shadow-xl w-11/12 max-w-2xl flex flex-col relative" style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR, height: '85vh', maxHeight: '700px' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-4 right-4 opacity-70 hover:opacity-100 z-10" aria-label="Close information">
           <CloseIcon className="w-6 h-6" />
         </button>
-        
-        <div className="flex border-b border-black/10 px-4">
-            <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>Progress</TabButton>
-            <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>Milestones</TabButton>
-            <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>About</TabButton>
+
+        <div className="flex border-b border-black/10 px-4 flex-shrink-0">
+            <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>{t.progress}</TabButton>
+            <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>{t.milestones}</TabButton>
+            <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>{t.about}</TabButton>
         </div>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-6 sm:p-8 overflow-y-auto flex-1 min-h-0">
             {activeTab === 'progress' && (
                  <div>
-                    <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">Today's Focus</h3>
-                        {dailyGoal > 0 ? (
-                            <div>
-                                <p className="text-lg opacity-90">
-                                    <span className="font-bold text-2xl" style={{color: TEXT_COLOR}}>{dailySessionsCompleted}</span> / {dailyGoal} sessions
-                                </p>
-                                {dailySessionsCompleted >= dailyGoal && (<p className="text-sm mt-1 font-medium" style={{color: TEXT_COLOR}}>Goal complete! ✨</p>)}
-                            </div>
-                        ) : (
-                            <p className="opacity-80">You've completed <span className="font-bold">{dailySessionsCompleted}</span> focus sessions today.</p>
-                        )}
-                    </div>
-                    
-                    <div className="flex justify-around text-center mt-4">
-                        <div><p className="font-bold text-2xl">{focusStreak}</p><p className="text-sm opacity-70">Day Streak</p></div>
-                        <div><p className="font-bold text-2xl">{totalSessions}</p><p className="text-sm opacity-70">Total Sessions</p></div>
+                    {/* 视图类型选择器 */}
+                    <div className="flex gap-2 mb-4 justify-center">
+                      <button
+                        onClick={() => { setViewType('day'); setProgressView('daily'); }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          viewType === 'day' ? 'bg-blue-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+                        }`}
+                      >
+                        📅 {t.dayView}
+                      </button>
+                      <button
+                        onClick={() => { setViewType('week'); setProgressView('daily'); }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          viewType === 'week' ? 'bg-blue-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+                        }`}
+                      >
+                        📊 {t.weekView}
+                      </button>
+                      <button
+                        onClick={() => { setViewType('month'); setProgressView('monthly'); }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          viewType === 'month' ? 'bg-blue-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+                        }`}
+                      >
+                        📈 {t.monthView}
+                      </button>
                     </div>
 
-                    <div className="border-t border-black/10 pt-6 mt-6">
-                        <h3 className="text-lg font-semibold mb-4 text-center">Weekly Progress</h3>
-                        <WeeklyProgressChart progress={weeklyProgress} goal={dailyGoal} />
-                    </div>
+                    {/* 日期导航 */}
+                    <DateNavigator
+                      viewType={viewType}
+                      currentDate={selectedDate}
+                      onPrevious={handlePrevious}
+                      onNext={handleNext}
+                      onToday={handleToday}
+                    />
+
+                    {/* 每日视图 */}
+                    {progressView === 'daily' && (
+                      <div className="space-y-4">
+                        {/* 专注卡片 */}
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-100">
+                          <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <span className="text-lg">📅</span>
+                            {viewType === 'day' ? t.currentDayFocus : viewType === 'week' ? t.currentWeekFocus : t.currentMonthFocus}
+                          </h3>
+                          <div className="text-center">
+                            {viewType === 'day' ? (
+                              <div>
+                                <div className="text-4xl font-bold text-blue-600 mb-2">{historicalData.dailySessionsCompleted}</div>
+                                <p className="text-sm text-gray-600">{t.focusCount}</p>
+                                {dailyGoal > 0 && historicalData.dailySessionsCompleted >= dailyGoal && (
+                                  <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                    <span>✨</span>
+                                    <span>{t.goalAchieved}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="text-4xl font-bold text-blue-600 mb-2">{historicalData.totalSessions}</div>
+                                <p className="text-sm text-gray-600">{t.totalFocusCount}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 关键指标卡片 */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 text-center border border-orange-100">
+                            <div className="text-3xl font-bold text-orange-600">{focusStreak}</div>
+                            <div className="text-sm text-orange-700 mt-1">{t.streakDays}</div>
+                          </div>
+                          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center border border-purple-100">
+                            <div className="text-3xl font-bold text-purple-600">{totalSessions}</div>
+                            <div className="text-sm text-purple-700 mt-1">{t.totalSessions}</div>
+                          </div>
+                        </div>
+
+                        {/* 进度图表 */}
+                        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-5 border border-green-100">
+                          <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <span className="text-lg">📊</span>
+                            {viewType === 'day' ? t.currentDayProgress : viewType === 'week' ? t.currentWeekProgress : t.currentMonthProgress}
+                          </h3>
+                          <WeeklyProgressChart progress={historicalData.weeklyProgress} goal={dailyGoal} />
+                        </div>
+
+                        {/* 快速统计 */}
+                        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-5 border border-yellow-100">
+                          <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <span className="text-lg">⚡</span>
+                            {t.quickStats}
+                          </h3>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700">{t.totalTime}</span>
+                              <span className="text-sm font-bold text-gray-800">
+                                {Math.floor(historicalData.totalMinutes / 60)}h {historicalData.totalMinutes % 60}m
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700">{t.totalFocus}</span>
+                              <span className="text-sm font-bold text-gray-800">{historicalData.totalSessions}{t.units.times}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700">{t.averagePerDay}</span>
+                              <span className="text-sm font-bold text-gray-800">
+                                {viewType === 'week' ? Math.round(historicalData.totalSessions / 7) : viewType === 'month' ? Math.round(historicalData.totalSessions / 30) : historicalData.totalSessions}{t.units.times}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700">{t.streakCount}</span>
+                              <span className="text-sm font-bold text-gray-800">{focusStreak}{t.units.days}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 月度统计视图 */}
+                    {progressView === 'monthly' && (
+                      <MonthlyStatsView stats={stats} />
+                    )}
                 </div>
             )}
             {activeTab === 'milestones' && (
                 <div>
-                    <h3 className="text-lg font-semibold mb-4 text-center">Your Milestones</h3>
+                    <h3 className="text-lg font-semibold mb-4 text-center">{t.yourMilestones}</h3>
                     <MilestonesTab unlocked={unlockedAchievements} stats={stats} />
                 </div>
             )}
             {activeTab === 'about' && (
                 <div>
                     <div className="space-y-4 text-center leading-relaxed opacity-80">
-                        <h2 className="text-xl font-bold mb-2">🌿 A Gentle Place to Focus</h2>
-                        <p>This is a minimal timer designed for those who find traditional Pomodoro apps too stimulating.</p>
-                        <p>The soft colors, gentle sounds, and clean interface are here to quietly support you during your study and work time.</p>
+                        <h2 className="text-xl font-bold mb-2">🌿 {t.aboutContent.subtitle}</h2>
+                        <p>{t.aboutContent.description1}</p>
+                        <p>{t.aboutContent.description2}</p>
                     </div>
                      <div className="border-t border-black/10 pt-6 mt-6">
-                      <h3 className="text-lg font-semibold mb-4 text-center">Quick Tips</h3>
+                      <h3 className="text-lg font-semibold mb-4 text-center">{t.aboutContent.quickTips}</h3>
                       <div className="text-center opacity-80 space-y-2">
-                          <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">Space</kbd> to Play / Pause</p>
-                          <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">→</kbd> to Skip Session</p>
+                          <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">Space</kbd> {t.aboutContent.tip1}</p>
+                          <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">→</kbd> {t.aboutContent.tip2}</p>
                       </div>
                     </div>
                 </div>
