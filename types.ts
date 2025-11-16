@@ -31,3 +31,13 @@ export interface Achievement {
   icon: React.FC<{ className?: string }>;
   condition: (stats: Stats) => boolean;
 }
+
+export interface SoundscapePreset {
+  id: string;
+  name: string;
+  description: string;
+  sounds: Array<{
+    id: string;
+    volume: number;
+  }>;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Sound, ActiveSound } from '../types';
-import { SOUNDS, COMPLETION_SOUNDS } from '../constants';
+import { SOUNDS, COMPLETION_SOUNDS, SOUNDSCAPE_PRESETS, SOUND_CATEGORIES } from '../constants';
 import { CloseIcon, PlayIcon, PauseIcon } from './Icons';
 
 interface SettingsModalProps {
@@ -62,6 +62,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
   const [previewingSound, setPreviewingSound] = useState<string | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Category expansion state
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [showCustomMix, setShowCustomMix] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       setFocus(currentSettings.focus);
@@ -104,6 +108,27 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
 
   const handleSoundVolumeChange = (soundId: string, volume: number) => {
     setActiveSounds(prev => prev.map(s => s.id === soundId ? { ...s, volume } : s));
+  };
+
+  // Apply soundscape preset
+  const applyPreset = (presetId: string) => {
+    const preset = SOUNDSCAPE_PRESETS.find(p => p.id === presetId);
+    if (preset) {
+      setActiveSounds(preset.sounds);
+    }
+  };
+
+  // Toggle category expansion
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
   };
 
   // Audio preview functions
@@ -215,55 +240,179 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
           
           <div>
              <h3 className="text-md font-semibold opacity-80 text-center mb-3">Soundscape Mixer</h3>
-             <div className="space-y-4 bg-black/5 p-4 rounded-lg">
-                {SOUNDS.map(sound => {
-                    const activeSound = activeSounds.find(s => s.id === sound.id);
-                    const isEnabled = !!activeSound;
-                    const isPreviewing = previewingSound === sound.id;
-                    return (
-                        <div key={sound.id}>
-                            <div className="flex items-center justify-between gap-2">
-                                <label htmlFor={`sound-toggle-${sound.id}`} className="block text-sm font-medium flex-grow">{sound.name}</label>
-                                {sound.url && (
-                                    <button
-                                        onClick={() => togglePreview(sound, true)}
-                                        className="p-1.5 hover:bg-black/10 rounded-full transition-colors"
-                                        aria-label={isPreviewing ? 'Stop preview' : 'Preview sound'}
-                                    >
-                                        {isPreviewing ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
-                                    </button>
-                                )}
-                                <input type="checkbox" id={`sound-toggle-${sound.id}`} checked={isEnabled} onChange={e => handleSoundToggle(sound.id, e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
+             <div className="space-y-3 bg-black/5 p-4 rounded-lg">
+                {/* Preset Selector */}
+                <div className="pb-3 border-b border-black/10">
+                  <label className="block text-sm font-medium mb-2 text-center opacity-70">快速预设</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {SOUNDSCAPE_PRESETS.map(preset => (
+                      <button
+                        key={preset.id}
+                        onClick={() => applyPreset(preset.id)}
+                        className="px-2 py-1.5 text-xs bg-white/50 hover:bg-white/80 border border-black/10 rounded-md transition-colors text-left"
+                        title={preset.description}
+                      >
+                        <div className="font-medium text-[11px]">{preset.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Active Sounds - Quick Access */}
+                {activeSounds.length > 0 && (
+                  <div className="pb-3 border-b border-black/10">
+                    <label className="block text-xs font-medium mb-2 opacity-70">当前混合 ({activeSounds.length})</label>
+                    <div className="space-y-2">
+                      {activeSounds.map(activeSound => {
+                        const sound = SOUNDS.find(s => s.id === activeSound.id);
+                        if (!sound || sound.id === 'none') return null;
+                        const isPreviewing = previewingSound === sound.id;
+                        return (
+                          <div key={sound.id} className="bg-white/30 rounded-md p-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <button
+                                onClick={() => togglePreview(sound, true)}
+                                className="p-1 hover:bg-black/10 rounded transition-colors flex-shrink-0"
+                                aria-label={isPreviewing ? 'Stop' : 'Play'}
+                              >
+                                {isPreviewing ? <PauseIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
+                              </button>
+                              <span className="text-xs font-medium flex-grow">{sound.name}</span>
+                              <button
+                                onClick={() => handleSoundToggle(sound.id, false)}
+                                className="text-xs opacity-60 hover:opacity-100 px-1"
+                                aria-label="Remove"
+                              >
+                                ✕
+                              </button>
                             </div>
-                            {isEnabled && (
-                                <input
-                                    type="range" min="0" max="1" step="0.01"
-                                    value={activeSound.volume}
-                                    onChange={e => handleSoundVolumeChange(sound.id, Number(e.target.value))}
-                                    className="w-full h-1 bg-black/10 rounded-lg appearance-none cursor-pointer mt-2"
-                                    style={{ background: `linear-gradient(to right, ${TEXT_COLOR} ${activeSound.volume * 100}%, rgba(0,0,0,0.1) ${activeSound.volume * 100}%)`}}
-                                />
+                            <input
+                              type="range" min="0" max="1" step="0.01"
+                              value={activeSound.volume}
+                              onChange={e => handleSoundVolumeChange(sound.id, Number(e.target.value))}
+                              className="w-full h-1 bg-black/10 rounded-lg appearance-none cursor-pointer"
+                              style={{ background: `linear-gradient(to right, ${TEXT_COLOR} ${activeSound.volume * 100}%, rgba(0,0,0,0.1) ${activeSound.volume * 100}%)`}}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Add More Sounds - Categorized */}
+                <div>
+                  <button
+                    onClick={() => setShowCustomMix(!showCustomMix)}
+                    className="w-full flex items-center justify-center gap-2 text-xs font-medium py-2.5 px-3 bg-white/40 hover:bg-white/60 border border-black/10 rounded-lg transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <span className="opacity-80">{showCustomMix ? '收起音频库' : '浏览音频库'}</span>
+                    <svg className={`w-3 h-3 transition-transform ${showCustomMix ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showCustomMix && (
+                    <div className="mt-2 space-y-2">
+                      {SOUND_CATEGORIES.map(category => {
+                        const categorySounds = SOUNDS.filter(s => category.sounds.includes(s.id));
+                        const isExpanded = expandedCategories.has(category.id);
+                        const activeCategoryCount = categorySounds.filter(s => activeSounds.some(as => as.id === s.id)).length;
+
+                        return (
+                          <div key={category.id} className="border border-black/10 rounded-lg overflow-hidden bg-white/20">
+                            <button
+                              onClick={() => toggleCategory(category.id)}
+                              className="w-full flex items-center justify-between px-3 py-2.5 bg-white/30 hover:bg-white/50 transition-colors text-left"
+                            >
+                              <span className="text-xs font-medium flex items-center gap-1.5">
+                                <span className="text-base">{category.emoji}</span>
+                                <span>{category.name.split(' ')[1]}</span>
+                                {activeCategoryCount > 0 && (
+                                  <span className="ml-0.5 px-1.5 py-0.5 bg-black/15 rounded-full text-[9px] font-semibold">
+                                    {activeCategoryCount}
+                                  </span>
+                                )}
+                              </span>
+                              <svg className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+
+                            {isExpanded && (
+                              <div className="p-2.5 bg-white/10 grid grid-cols-2 gap-2">
+                                {categorySounds.map(sound => {
+                                  const isEnabled = activeSounds.some(s => s.id === sound.id);
+                                  const isPreviewing = previewingSound === sound.id;
+                                  return (
+                                    <button
+                                      key={sound.id}
+                                      onClick={() => handleSoundToggle(sound.id, !isEnabled)}
+                                      className={`flex items-center gap-1.5 px-2.5 py-2 rounded-md text-left transition-all ${
+                                        isEnabled
+                                          ? 'bg-[#6b5a5a]/20 border border-[#6b5a5a]/30 shadow-sm'
+                                          : 'bg-white/60 hover:bg-white/80 border border-black/5 hover:border-black/10'
+                                      }`}
+                                    >
+                                      {sound.url && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            togglePreview(sound, true);
+                                          }}
+                                          className={`p-1 rounded-full flex-shrink-0 transition-colors ${
+                                            isPreviewing
+                                              ? 'bg-[#6b5a5a]/20 hover:bg-[#6b5a5a]/30'
+                                              : 'hover:bg-black/10'
+                                          }`}
+                                          aria-label={isPreviewing ? 'Stop' : 'Play'}
+                                        >
+                                          {isPreviewing ? <PauseIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
+                                        </button>
+                                      )}
+                                      <span className="text-[10px] leading-tight flex-grow font-medium">
+                                        {sound.name.split('(')[0].trim()}
+                                      </span>
+                                      {isEnabled && (
+                                        <svg className="w-3 h-3 text-[#6b5a5a]" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             )}
-                        </div>
-                    );
-                })}
-                <div className="border-t border-black/10 pt-4">
-                    <div className="flex items-center justify-between gap-2">
-                        <label htmlFor="completion-sound-toggle" className="block text-sm font-medium flex-grow">Completion Sound</label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Completion Sound */}
+                <div className="border-t border-black/10 pt-3">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <label htmlFor="completion-sound-toggle" className="block text-xs font-medium opacity-70">完成提示音</label>
+                        <input type="checkbox" id="completion-sound-toggle" checked={isCompletionSoundEnabled} onChange={e => setIsCompletionSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <select id="completion-sound" value={completionSound.id} onChange={(e) => setCompletionSound(COMPLETION_SOUNDS.find(s => s.id === e.target.value) || COMPLETION_SOUNDS[0])} disabled={!isCompletionSoundEnabled} className={`flex-grow px-2 py-1.5 text-xs bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isCompletionSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
+                            {COMPLETION_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
+                        </select>
                         {completionSound.url && isCompletionSoundEnabled && (
                             <button
                                 onClick={() => togglePreview(completionSound, false)}
-                                className="p-1.5 hover:bg-black/10 rounded-full transition-colors"
-                                aria-label={previewingSound === completionSound.id ? 'Stop preview' : 'Preview sound'}
+                                className="p-1.5 hover:bg-black/10 rounded-full transition-colors flex-shrink-0"
+                                aria-label={previewingSound === completionSound.id ? 'Stop' : 'Play'}
                             >
                                 {previewingSound === completionSound.id ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
                             </button>
                         )}
-                        <input type="checkbox" id="completion-sound-toggle" checked={isCompletionSoundEnabled} onChange={e => setIsCompletionSoundEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-[#6b5a5a] focus:ring-[#6b5a5a]" />
                     </div>
-                    <select id="completion-sound" value={completionSound.id} onChange={(e) => setCompletionSound(COMPLETION_SOUNDS.find(s => s.id === e.target.value) || COMPLETION_SOUNDS[0])} disabled={!isCompletionSoundEnabled} className={`w-full px-3 py-2 mt-2 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none transition-opacity ${!isCompletionSoundEnabled && 'opacity-50'}`} style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}>
-                        {COMPLETION_SOUNDS.map(s => <option key={s.id} value={s.id} style={{ backgroundColor: BG_COLOR, color: TEXT_COLOR }}>{s.name}</option>)}
-                    </select>
                 </div>
              </div>
           </div>

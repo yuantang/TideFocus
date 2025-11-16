@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayIcon, PauseIcon, NextIcon, VolumeIcon, SettingsIcon, FlowerIcon, FullscreenIcon, ExitFullscreenIcon, TaskIcon } from './Icons';
+import { PlayIcon, PauseIcon, NextIcon, VolumeIcon, VolumeMuteIcon, SettingsIcon, FlowerIcon, FullscreenIcon, ExitFullscreenIcon, TaskIcon } from './Icons';
 import { TimerMode } from '../types';
 import { formatTime } from '../utils';
 
@@ -9,6 +9,8 @@ interface ControlsProps {
   onNext: () => void;
   volume: number;
   onVolumeChange: (volume: number) => void;
+  isMuted: boolean;
+  onToggleMute: () => void;
   sessionCount: number;
   sessionsPerRound: number;
   isLongBreakNext: boolean;
@@ -52,6 +54,8 @@ const Controls: React.FC<ControlsProps> = ({
   onNext,
   volume,
   onVolumeChange,
+  isMuted,
+  onToggleMute,
   sessionCount,
   sessionsPerRound,
   isLongBreakNext,
@@ -76,14 +80,20 @@ const Controls: React.FC<ControlsProps> = ({
   return (
     <div className="w-full relative" style={{ color: textColor }}>
         <ProgressBar progress={progress} color={textColor} />
-        <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="w-full flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <button onClick={onToggle} className="p-3 bg-white/50 backdrop-blur-sm rounded-full hover:bg-white/80 transition-colors" aria-label={isActive ? 'Pause timer' : 'Start timer'}>
             {isActive ? <PauseIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
             </button>
             <div className="flex items-center gap-2 group py-3 px-2 bg-white/50 backdrop-blur-sm rounded-full">
-              <VolumeIcon className="w-6 h-6" />
-              <div className="w-0 group-hover:w-24 transition-[width] duration-300 flex items-center">
+              <button
+                onClick={onToggleMute}
+                className="hover:bg-black/10 rounded-full p-1 transition-colors flex-shrink-0"
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <VolumeMuteIcon className="w-6 h-6" /> : <VolumeIcon className="w-6 h-6" />}
+              </button>
+              <div className="w-0 group-hover:w-24 transition-[width] duration-300 flex items-center overflow-hidden">
                 <input
                     type="range"
                     min="0"
@@ -104,7 +114,7 @@ const Controls: React.FC<ControlsProps> = ({
                   appearance: none;
                   background-color: transparent;
                 }
-                
+
                 /***** Webkit styles *****/
                 input[type=range]::-webkit-slider-runnable-track {
                   height: 6px;
@@ -113,7 +123,7 @@ const Controls: React.FC<ControlsProps> = ({
                 input[type=range]::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
-                  margin-top: -4px; 
+                  margin-top: -4px;
                   width: 14px;
                   height: 14px;
                   border-radius: 50%;
@@ -149,18 +159,18 @@ const Controls: React.FC<ControlsProps> = ({
             </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-4 text-sm font-medium bg-white/50 backdrop-blur-sm rounded-full px-4 py-3">
-            <div className="flex flex-col items-center">
-              <span>{formatTime(elapsedTime)} / {formatTime(totalDuration)}</span>
+        <div className="hidden md:flex items-center gap-4 text-sm font-medium bg-white/50 backdrop-blur-sm rounded-full px-4 py-3 flex-shrink-0 absolute left-1/2 -translate-x-1/2">
+            <div className="flex flex-col items-center min-w-[120px]">
+              <span className="whitespace-nowrap">{formatTime(elapsedTime)} / {formatTime(totalDuration)}</span>
               <SessionIndicator count={sessionsInCurrentRound} total={sessionsPerRound} color={textColor} />
             </div>
-            <button onClick={onNext} className="px-3 py-1.5 bg-black/10 rounded-full hover:bg-black/20 transition-colors flex items-center gap-2">
+            <button onClick={onNext} className="px-3 py-1.5 bg-black/10 rounded-full hover:bg-black/20 transition-colors flex items-center gap-2 whitespace-nowrap">
               <span>Skip to {nextButtonText}</span>
               <NextIcon className="w-4 h-4"/>
             </button>
         </div>
 
-        <div className="flex items-center gap-1 bg-white/50 backdrop-blur-sm rounded-full px-2 py-1">
+        <div className="flex items-center gap-1 bg-white/50 backdrop-blur-sm rounded-full px-2 py-1 flex-shrink-0">
              <button onClick={onTasksClick} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label="Open daily tasks">
                 <TaskIcon className="w-5 h-5" />
             </button>

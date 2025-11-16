@@ -76,7 +76,7 @@ const TimerPanel: React.FC<TimerPanelProps> = ({
 
   return (
     <div
-      className="h-full w-full flex flex-col justify-center items-center p-4 transition-colors duration-500 relative"
+      className="h-full w-full flex flex-col justify-center items-center p-4 pb-24 sm:pb-28 md:pb-32 transition-colors duration-500 relative"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
       <div className={`flex flex-col items-center transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-40'}`}>

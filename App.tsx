@@ -31,6 +31,8 @@ export default function App() {
   const [isDesktopNotificationsEnabled, setIsDesktopNotificationsEnabled] = useState(() => localStorage.getItem('isDesktopNotificationsEnabled') === 'true');
   
   const [masterVolume, setMasterVolume] = useState(() => Number(localStorage.getItem('masterVolume') ?? 0.5));
+  const [isMuted, setIsMuted] = useState(() => localStorage.getItem('isMuted') === 'true');
+  const [volumeBeforeMute, setVolumeBeforeMute] = useState(0.5);
   const [activeSounds, setActiveSounds] = useState<ActiveSound[]>(() => {
     const saved = localStorage.getItem('activeSounds');
     return saved ? JSON.parse(saved) : [{ id: 'rain', volume: 0.5 }];
@@ -90,6 +92,7 @@ export default function App() {
   useEffect(() => { localStorage.setItem('isBreathingGuideEnabled', String(isBreathingGuideEnabled)) }, [isBreathingGuideEnabled]);
   useEffect(() => { localStorage.setItem('isDesktopNotificationsEnabled', String(isDesktopNotificationsEnabled))}, [isDesktopNotificationsEnabled]);
   useEffect(() => { localStorage.setItem('masterVolume', String(masterVolume)) }, [masterVolume]);
+  useEffect(() => { localStorage.setItem('isMuted', String(isMuted)) }, [isMuted]);
   useEffect(() => { localStorage.setItem('activeSounds', JSON.stringify(activeSounds)) }, [activeSounds]);
   useEffect(() => { localStorage.setItem('isCompletionSoundEnabled', String(isCompletionSoundEnabled)) }, [isCompletionSoundEnabled]);
   useEffect(() => { localStorage.setItem('selectedCompletionSoundId', selectedCompletionSound.id) }, [selectedCompletionSound]);
@@ -398,6 +401,19 @@ export default function App() {
       completionAudioRef.current.volume = masterVolume;
   }, [isActive, activeSounds, masterVolume]);
 
+  const toggleMute = () => {
+    if (isMuted) {
+      // Unmute: restore previous volume
+      setMasterVolume(volumeBeforeMute);
+      setIsMuted(false);
+    } else {
+      // Mute: save current volume and set to 0
+      setVolumeBeforeMute(masterVolume);
+      setMasterVolume(0);
+      setIsMuted(true);
+    }
+  };
+
   const addTask = (text: string) => {
       const newTask: Task = { id: Date.now().toString(), text, completed: false };
       setTasks(prev => {
@@ -454,7 +470,7 @@ export default function App() {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-10">
-          <Controls isActive={isActive} onToggle={toggleTimer} onNext={handleNext} volume={masterVolume} onVolumeChange={setMasterVolume} sessionCount={sessionCount} onSettingsClick={() => setShowSettings(true)} timeLeft={timeLeft} totalDuration={totalDuration} progress={progress} mode={mode} isFullscreen={isFullscreen} onToggleFullscreen={handleToggleFullscreen} textColor={controlsTextColor} sessionsPerRound={sessionsPerRound} isLongBreakNext={mode === 'focus' && sessionsPerRound > 0 && (sessionCount + 1) % sessionsPerRound === 0} onTasksClick={() => setShowTaskList(true)}/>
+          <Controls isActive={isActive} onToggle={toggleTimer} onNext={handleNext} volume={masterVolume} onVolumeChange={setMasterVolume} isMuted={isMuted} onToggleMute={toggleMute} sessionCount={sessionCount} onSettingsClick={() => setShowSettings(true)} timeLeft={timeLeft} totalDuration={totalDuration} progress={progress} mode={mode} isFullscreen={isFullscreen} onToggleFullscreen={handleToggleFullscreen} textColor={controlsTextColor} sessionsPerRound={sessionsPerRound} isLongBreakNext={mode === 'focus' && sessionsPerRound > 0 && (sessionCount + 1) % sessionsPerRound === 0} onTasksClick={() => setShowTaskList(true)}/>
       </div>
 
        <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} onSave={handleSaveSettings}
