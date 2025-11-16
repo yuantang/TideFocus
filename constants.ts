@@ -1,5 +1,19 @@
 import type { Sound, Achievement, SoundscapePreset } from './types';
-import { SproutIcon, SevenDayIcon, MoonCycleIcon } from './components/Icons';
+import {
+  SproutIcon,
+  SevenDayIcon,
+  MoonCycleIcon,
+  TreeIcon,
+  FlameIcon,
+  DiamondIcon,
+  TargetIcon,
+  OwlIcon,
+  BirdIcon,
+  RunnerIcon,
+  CalendarCheckIcon,
+  CheckSquareIcon,
+  BrainIcon
+} from './components/Icons';
 
 export const DEFAULT_FOCUS_MINUTES = 25;
 export const DEFAULT_BREAK_MINUTES = 5;
@@ -166,25 +180,215 @@ export const LONG_BREAK_QUOTES: string[] = [
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [
+  // 基础成就
   {
     id: 'first_session',
     name: 'First Bloom',
-    description: 'Complete your first focus session.',
+    description: '完成第一次专注',
     icon: SproutIcon,
+    category: 'focus',
     condition: (stats) => stats.totalSessions >= 1,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 1),
+      total: 1,
+      percentage: Math.min(stats.totalSessions, 1) * 100
+    })
+  },
+
+  // 专注次数成就
+  {
+    id: 'growing_strong',
+    name: '🌱 Growing Strong',
+    description: '完成 10 次专注',
+    icon: '🌱',
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 10,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 10),
+      total: 10,
+      percentage: (Math.min(stats.totalSessions, 10) / 10) * 100
+    })
+  },
+  {
+    id: 'flourishing',
+    name: '🌿 Flourishing',
+    description: '完成 50 次专注',
+    icon: '🌿',
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 50,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 50),
+      total: 50,
+      percentage: (Math.min(stats.totalSessions, 50) / 50) * 100
+    })
+  },
+  {
+    id: 'century',
+    name: '🌳 Century',
+    description: '完成 100 次专注',
+    icon: TreeIcon,
+    category: 'focus',
+    condition: (stats) => stats.totalSessions >= 100,
+    progress: (stats) => ({
+      current: Math.min(stats.totalSessions, 100),
+      total: 100,
+      percentage: (Math.min(stats.totalSessions, 100) / 100) * 100
+    })
+  },
+
+  // 连续专注成就
+  {
+    id: 'three_day_streak',
+    name: '🔥 Three Days',
+    description: '连续 3 天专注',
+    icon: FlameIcon,
+    category: 'streak',
+    condition: (stats) => stats.focusStreak >= 3,
+    progress: (stats) => ({
+      current: Math.min(stats.focusStreak, 3),
+      total: 3,
+      percentage: (Math.min(stats.focusStreak, 3) / 3) * 100
+    })
   },
   {
     id: 'seven_day_streak',
     name: 'Weekly Ritual',
-    description: 'Maintain a 7-day focus streak.',
+    description: '连续 7 天专注',
     icon: SevenDayIcon,
+    category: 'streak',
     condition: (stats) => stats.focusStreak >= 7,
+    progress: (stats) => ({
+      current: Math.min(stats.focusStreak, 7),
+      total: 7,
+      percentage: (Math.min(stats.focusStreak, 7) / 7) * 100
+    })
   },
+  {
+    id: 'monthly_master',
+    name: '💎 Monthly Master',
+    description: '连续 30 天专注',
+    icon: DiamondIcon,
+    category: 'streak',
+    condition: (stats) => stats.focusStreak >= 30,
+    progress: (stats) => ({
+      current: Math.min(stats.focusStreak, 30),
+      total: 30,
+      percentage: (Math.min(stats.focusStreak, 30) / 30) * 100
+    })
+  },
+
+  // 目标达成成就
   {
     id: 'daily_goal_met',
     name: 'Goal Achieved',
-    description: 'Meet your daily goal for the first time.',
+    description: '首次达成每日目标',
     icon: MoonCycleIcon,
+    category: 'streak',
     condition: (stats) => stats.dailyGoal > 0 && stats.dailySessionsCompleted >= stats.dailyGoal,
+    progress: (stats) => {
+      if (stats.dailyGoal === 0) return { current: 0, total: 1, percentage: 0 };
+      return {
+        current: Math.min(stats.dailySessionsCompleted, stats.dailyGoal),
+        total: stats.dailyGoal,
+        percentage: (Math.min(stats.dailySessionsCompleted, stats.dailyGoal) / stats.dailyGoal) * 100
+      };
+    }
+  },
+  {
+    id: 'consistent',
+    name: '🎯 Consistent',
+    description: '连续 7 天达成每日目标',
+    icon: TargetIcon,
+    category: 'streak',
+    condition: (stats) => stats.goalStreakDays >= 7,
+    progress: (stats) => ({
+      current: Math.min(stats.goalStreakDays, 7),
+      total: 7,
+      percentage: (Math.min(stats.goalStreakDays, 7) / 7) * 100
+    })
+  },
+  {
+    id: 'perfect_week',
+    name: '📅 Perfect Week',
+    description: '一周内每天都达成目标',
+    icon: CalendarCheckIcon,
+    category: 'streak',
+    condition: (stats) => stats.perfectWeeks >= 1,
+    progress: (stats) => ({
+      current: Math.min(stats.perfectWeeks, 1),
+      total: 1,
+      percentage: Math.min(stats.perfectWeeks, 1) * 100
+    })
+  },
+
+  // 时段成就
+  {
+    id: 'night_owl',
+    name: '🦉 Night Owl',
+    description: '在 23:00-05:00 完成专注',
+    icon: OwlIcon,
+    category: 'time',
+    condition: (stats) => stats.nightSessions >= 1,
+    progress: (stats) => ({
+      current: Math.min(stats.nightSessions, 1),
+      total: 1,
+      percentage: Math.min(stats.nightSessions, 1) * 100
+    })
+  },
+  {
+    id: 'early_bird',
+    name: '🐦 Early Bird',
+    description: '在 05:00-07:00 完成专注',
+    icon: BirdIcon,
+    category: 'time',
+    condition: (stats) => stats.morningSessions >= 1,
+    progress: (stats) => ({
+      current: Math.min(stats.morningSessions, 1),
+      total: 1,
+      percentage: Math.min(stats.morningSessions, 1) * 100
+    })
+  },
+
+  // 时长成就
+  {
+    id: 'marathon',
+    name: '🏃 Marathon',
+    description: '单次专注 2 小时以上',
+    icon: RunnerIcon,
+    category: 'time',
+    condition: (stats) => stats.longestSession >= 120,
+    progress: (stats) => ({
+      current: Math.min(stats.longestSession, 120),
+      total: 120,
+      percentage: (Math.min(stats.longestSession, 120) / 120) * 100
+    })
+  },
+  {
+    id: 'focused_mind',
+    name: '🧠 Focused Mind',
+    description: '累计专注 100 小时',
+    icon: BrainIcon,
+    category: 'time',
+    condition: (stats) => stats.totalFocusMinutes >= 6000, // 100小时 = 6000分钟
+    progress: (stats) => ({
+      current: Math.min(stats.totalFocusMinutes, 6000),
+      total: 6000,
+      percentage: (Math.min(stats.totalFocusMinutes, 6000) / 6000) * 100
+    })
+  },
+
+  // 任务成就
+  {
+    id: 'task_master',
+    name: '✅ Task Master',
+    description: '完成 50 个任务',
+    icon: CheckSquareIcon,
+    category: 'task',
+    condition: (stats) => stats.completedTasks >= 50,
+    progress: (stats) => ({
+      current: Math.min(stats.completedTasks, 50),
+      total: 50,
+      percentage: (Math.min(stats.completedTasks, 50) / 50) * 100
+    })
   },
 ];

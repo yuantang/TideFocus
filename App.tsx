@@ -8,6 +8,7 @@ import InfoModal from './components/InfoModal';
 import IntentionModal from './components/IntentionModal';
 import TaskListModal from './components/TaskListModal';
 import ToastContainer from './components/ToastContainer';
+import AchievementUnlockModal from './components/AchievementUnlockModal';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
@@ -60,6 +61,15 @@ export default function App() {
   const [totalSessions, setTotalSessions] = useState(0);
   const [focusStreak, setFocusStreak] = useState(0);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
+
+  // 新增统计数据
+  const [totalFocusMinutes, setTotalFocusMinutes] = useState(0);
+  const [completedTasks, setCompletedTasks] = useState(0);
+  const [nightSessions, setNightSessions] = useState(0);
+  const [morningSessions, setMorningSessions] = useState(0);
+  const [longestSession, setLongestSession] = useState(0);
+  const [perfectWeeks, setPerfectWeeks] = useState(0);
+  const [goalStreakDays, setGoalStreakDays] = useState(0);
   
   const [isCurrentBreakLong, setIsCurrentBreakLong] = useState(false);
   const [longBreakQuote, setLongBreakQuote] = useState('');
@@ -74,6 +84,10 @@ export default function App() {
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showTaskList, setShowTaskList] = useState(false);
+
+  // 成就解锁动画
+  const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
+  const [showAchievementUnlock, setShowAchievementUnlock] = useState(false);
 
   const audioRefs = useRef<Record<string, HTMLAudioElement>>(
     SOUNDS.reduce((acc, sound) => {
@@ -111,7 +125,7 @@ export default function App() {
   // Load progress history, achievements, and tasks
   useEffect(() => {
     const todayStr = new Date().toISOString().split('T')[0];
-    
+
     // History & Stats
     const historyRaw = localStorage.getItem('focusHistory');
     let history: Record<string, number> = historyRaw ? JSON.parse(historyRaw) : {};
@@ -126,6 +140,28 @@ export default function App() {
         d.setDate(d.getDate() - 1);
     }
     setFocusStreak(streak);
+
+    // 加载新增统计数据
+    const savedTotalFocusMinutes = Number(localStorage.getItem('totalFocusMinutes') || 0);
+    setTotalFocusMinutes(savedTotalFocusMinutes);
+
+    const savedCompletedTasks = Number(localStorage.getItem('completedTasks') || 0);
+    setCompletedTasks(savedCompletedTasks);
+
+    const savedNightSessions = Number(localStorage.getItem('nightSessions') || 0);
+    setNightSessions(savedNightSessions);
+
+    const savedMorningSessions = Number(localStorage.getItem('morningSessions') || 0);
+    setMorningSessions(savedMorningSessions);
+
+    const savedLongestSession = Number(localStorage.getItem('longestSession') || 0);
+    setLongestSession(savedLongestSession);
+
+    const savedPerfectWeeks = Number(localStorage.getItem('perfectWeeks') || 0);
+    setPerfectWeeks(savedPerfectWeeks);
+
+    const savedGoalStreakDays = Number(localStorage.getItem('goalStreakDays') || 0);
+    setGoalStreakDays(savedGoalStreakDays);
 
     const progressData = [];
     for (let i = 6; i >= 0; i--) {
@@ -209,13 +245,16 @@ export default function App() {
         const allNewUnlocks = [...unlockedAchievements, ...newUnlocks];
         setUnlockedAchievements(allNewUnlocks);
         localStorage.setItem('unlockedAchievements', JSON.stringify(allNewUnlocks));
-        // Optional: show a notification for the new achievement
+
+        // 显示成就解锁动画
         const firstNew = ACHIEVEMENTS.find(a => a.id === newUnlocks[0]);
         if (firstNew) {
-          showNotification('Milestone Unlocked! ✨', `You've earned: ${firstNew.name}`);
+          setUnlockedAchievement(firstNew);
+          setShowAchievementUnlock(true);
+          success(`🎉 成就解锁：${firstNew.name}`);
         }
     }
-  }, [unlockedAchievements, showNotification]);
+  }, [unlockedAchievements, success]);
 
   const switchMode = useCallback(() => {
     const wasFocus = mode === 'focus';
@@ -242,7 +281,35 @@ export default function App() {
       const newTotalSessions = totalSessions + 1;
       setDailySessionsCompleted(newDailyCount);
       setTotalSessions(newTotalSessions);
-      
+
+      // 更新累计专注时长
+      const sessionMinutes = Math.floor(focusDuration / 60);
+      const newTotalFocusMinutes = totalFocusMinutes + sessionMinutes;
+      setTotalFocusMinutes(newTotalFocusMinutes);
+      localStorage.setItem('totalFocusMinutes', String(newTotalFocusMinutes));
+
+      // 更新最长单次专注
+      if (sessionMinutes > longestSession) {
+        setLongestSession(sessionMinutes);
+        localStorage.setItem('longestSession', String(sessionMinutes));
+      }
+
+      // 检查时段并更新统计
+      const now = new Date();
+      const hour = now.getHours();
+
+      if (hour >= 23 || hour < 5) {
+        // 夜间专注 (23:00-05:00)
+        const newNightSessions = nightSessions + 1;
+        setNightSessions(newNightSessions);
+        localStorage.setItem('nightSessions', String(newNightSessions));
+      } else if (hour >= 5 && hour < 7) {
+        // 早晨专注 (05:00-07:00)
+        const newMorningSessions = morningSessions + 1;
+        setMorningSessions(newMorningSessions);
+        localStorage.setItem('morningSessions', String(newMorningSessions));
+      }
+
       const todayStr = new Date().toISOString().split('T')[0];
       const history: Record<string, number> = JSON.parse(localStorage.getItem('focusHistory') || '{}');
       history[todayStr] = newDailyCount;
@@ -259,8 +326,36 @@ export default function App() {
           currentStreak = s;
           setFocusStreak(s);
       }
-      
-      checkAchievements({ totalSessions: newTotalSessions, focusStreak: currentStreak, dailyGoal, dailySessionsCompleted: newDailyCount });
+
+      // 检查是否达成每日目标
+      let newGoalStreakDays = goalStreakDays;
+      if (dailyGoal > 0 && newDailyCount >= dailyGoal) {
+        // 检查昨天是否也达成了目标
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const yesterdayCount = history[yesterdayStr] || 0;
+
+        if (yesterdayCount >= dailyGoal || goalStreakDays === 0) {
+          newGoalStreakDays = goalStreakDays + 1;
+          setGoalStreakDays(newGoalStreakDays);
+          localStorage.setItem('goalStreakDays', String(newGoalStreakDays));
+        }
+      }
+
+      checkAchievements({
+        totalSessions: newTotalSessions,
+        focusStreak: currentStreak,
+        dailyGoal,
+        dailySessionsCompleted: newDailyCount,
+        totalFocusMinutes: newTotalFocusMinutes,
+        completedTasks,
+        nightSessions: hour >= 23 || hour < 5 ? nightSessions + 1 : nightSessions,
+        morningSessions: hour >= 5 && hour < 7 ? morningSessions + 1 : morningSessions,
+        longestSession: Math.max(longestSession, sessionMinutes),
+        perfectWeeks,
+        goalStreakDays: newGoalStreakDays
+      });
 
       setWeeklyProgress(prev => prev.map(d => d.isToday ? { ...d, count: newDailyCount } : d));
 
@@ -466,11 +561,18 @@ export default function App() {
           localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
           return newTasks;
       });
-      // 只在完成状态改变时显示通知
+
+      // 更新完成任务计数
       if (updates.completed !== undefined && wasCompleted !== updates.completed) {
         if (updates.completed) {
+          const newCompletedTasks = completedTasks + 1;
+          setCompletedTasks(newCompletedTasks);
+          localStorage.setItem('completedTasks', String(newCompletedTasks));
           success('任务已完成 ✓');
         } else {
+          const newCompletedTasks = Math.max(0, completedTasks - 1);
+          setCompletedTasks(newCompletedTasks);
+          localStorage.setItem('completedTasks', String(newCompletedTasks));
           info('任务已标记为未完成');
         }
       }
@@ -525,9 +627,41 @@ export default function App() {
           focusBg: focusBgColor, focusText: focusTextColor, breakBg: breakBgColor, breakText: breakTextColor,
           longBreakBg: longBreakBgColor, longBreakText: longBreakTextColor,
         }}/>
-      <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} dailyGoal={dailyGoal} dailySessionsCompleted={dailySessionsCompleted} weeklyProgress={weeklyProgress} totalSessions={totalSessions} focusStreak={focusStreak} unlockedAchievements={unlockedAchievements} />
+      <InfoModal
+        isOpen={showInfo}
+        onClose={() => setShowInfo(false)}
+        dailyGoal={dailyGoal}
+        dailySessionsCompleted={dailySessionsCompleted}
+        weeklyProgress={weeklyProgress}
+        totalSessions={totalSessions}
+        focusStreak={focusStreak}
+        unlockedAchievements={unlockedAchievements}
+        stats={{
+          totalSessions,
+          focusStreak,
+          dailySessionsCompleted,
+          dailyGoal,
+          totalFocusMinutes,
+          completedTasks,
+          nightSessions,
+          morningSessions,
+          longestSession,
+          perfectWeeks,
+          goalStreakDays
+        }}
+      />
       <IntentionModal isOpen={showIntentionPrompt} onStart={handleStartFocus} tasks={tasks.filter(t => !t.completed)} />
       <TaskListModal isOpen={showTaskList} onClose={() => setShowTaskList(false)} tasks={tasks} onAddTask={addTask} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
+
+      {/* 成就解锁动画 */}
+      <AchievementUnlockModal
+        achievement={unlockedAchievement}
+        isOpen={showAchievementUnlock}
+        onClose={() => {
+          setShowAchievementUnlock(false);
+          setUnlockedAchievement(null);
+        }}
+      />
 
       {/* Toast 通知 */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />

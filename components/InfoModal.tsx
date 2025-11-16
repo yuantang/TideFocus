@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { CloseIcon } from './Icons';
-import { Achievement } from '../types';
+import { Achievement, Stats } from '../types';
 import { ACHIEVEMENTS } from '../constants';
+import AchievementCard from './AchievementCard';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface InfoModalProps {
   totalSessions: number;
   focusStreak: number;
   unlockedAchievements: string[];
+  stats: Stats;
 }
 
 const TEXT_COLOR = '#6b5a5a';
@@ -23,21 +25,142 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
     </button>
 );
 
-const MilestonesTab: React.FC<{ unlocked: string[] }> = ({ unlocked }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-        {ACHIEVEMENTS.map(ach => {
-            const isUnlocked = unlocked.includes(ach.id);
-            const Icon = ach.icon;
-            return (
-                <div key={ach.id} className={`p-4 rounded-lg bg-black/5 transition-opacity ${isUnlocked ? 'opacity-100' : 'opacity-50'}`}>
-                    <Icon className={`w-10 h-10 mx-auto mb-2 ${isUnlocked ? '' : 'text-current/50'}`} />
-                    <h4 className="font-semibold">{ach.name}</h4>
-                    <p className="text-xs opacity-70 mt-1">{ach.description}</p>
-                </div>
-            )
-        })}
+const MilestonesTab: React.FC<{ unlocked: string[]; stats: Stats }> = ({ unlocked, stats }) => {
+  const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'focus' | 'streak' | 'time' | 'task'>('all');
+
+  // 过滤成就
+  const filteredAchievements = ACHIEVEMENTS.filter(ach => {
+    const isUnlocked = unlocked.includes(ach.id);
+
+    // 解锁状态过滤
+    if (filter === 'unlocked' && !isUnlocked) return false;
+    if (filter === 'locked' && isUnlocked) return false;
+
+    // 分类过滤
+    if (categoryFilter !== 'all' && ach.category !== categoryFilter) return false;
+
+    return true;
+  });
+
+  // 统计信息
+  const unlockedCount = ACHIEVEMENTS.filter(ach => unlocked.includes(ach.id)).length;
+  const totalCount = ACHIEVEMENTS.length;
+  const percentage = Math.round((unlockedCount / totalCount) * 100);
+
+  return (
+    <div className="space-y-4">
+      {/* 统计信息 */}
+      <div className="bg-gradient-to-r from-yellow-50 to-pink-50 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">成就进度</span>
+          <span className="text-lg font-bold text-gray-800">{unlockedCount} / {totalCount}</span>
+        </div>
+        <div className="w-full h-3 bg-white/50 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 transition-all duration-500"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <div className="text-center mt-1">
+          <span className="text-xs font-medium text-gray-600">{percentage}% 完成</span>
+        </div>
+      </div>
+
+      {/* 过滤器 */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setFilter('all')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            filter === 'all' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          全部 ({totalCount})
+        </button>
+        <button
+          onClick={() => setFilter('unlocked')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            filter === 'unlocked' ? 'bg-green-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          已解锁 ({unlockedCount})
+        </button>
+        <button
+          onClick={() => setFilter('locked')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            filter === 'locked' ? 'bg-gray-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          未解锁 ({totalCount - unlockedCount})
+        </button>
+      </div>
+
+      {/* 分类过滤 */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setCategoryFilter('all')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            categoryFilter === 'all' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          全部分类
+        </button>
+        <button
+          onClick={() => setCategoryFilter('focus')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            categoryFilter === 'focus' ? 'bg-green-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          专注
+        </button>
+        <button
+          onClick={() => setCategoryFilter('streak')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            categoryFilter === 'streak' ? 'bg-orange-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          连续
+        </button>
+        <button
+          onClick={() => setCategoryFilter('time')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            categoryFilter === 'time' ? 'bg-blue-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          时长
+        </button>
+        <button
+          onClick={() => setCategoryFilter('task')}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            categoryFilter === 'task' ? 'bg-purple-500 text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+          }`}
+        >
+          任务
+        </button>
+      </div>
+
+      {/* 成就列表 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredAchievements.map(ach => (
+          <AchievementCard
+            key={ach.id}
+            achievement={ach}
+            isUnlocked={unlocked.includes(ach.id)}
+            stats={stats}
+          />
+        ))}
+      </div>
+
+      {/* 空状态 */}
+      {filteredAchievements.length === 0 && (
+        <div className="text-center py-12 opacity-50">
+          <div className="text-4xl mb-3">🔍</div>
+          <p className="text-lg font-medium">没有符合条件的成就</p>
+        </div>
+      )}
     </div>
-);
+  );
+};
 
 const WeeklyProgressChart: React.FC<{ progress: { day: string; count: number; isToday: boolean }[], goal: number }> = ({ progress, goal }) => {
   const maxCount = Math.max(goal > 0 ? goal : 1, ...progress.map(p => p.count));
@@ -62,7 +185,7 @@ const WeeklyProgressChart: React.FC<{ progress: { day: string; count: number; is
 };
 
 
-const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, dailySessionsCompleted, weeklyProgress, totalSessions, focusStreak, unlockedAchievements }) => {
+const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, dailySessionsCompleted, weeklyProgress, totalSessions, focusStreak, unlockedAchievements, stats }) => {
   const [activeTab, setActiveTab] = useState('progress');
 
   if (!isOpen) {
@@ -113,7 +236,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
             {activeTab === 'milestones' && (
                 <div>
                     <h3 className="text-lg font-semibold mb-4 text-center">Your Milestones</h3>
-                    <MilestonesTab unlocked={unlockedAchievements} />
+                    <MilestonesTab unlocked={unlockedAchievements} stats={stats} />
                 </div>
             )}
             {activeTab === 'about' && (
