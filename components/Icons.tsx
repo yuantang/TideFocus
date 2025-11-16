@@ -87,3 +87,42 @@ export const ExitFullscreenIcon: React.FC<IconProps> = ({ className, style }) =>
         <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" />
     </svg>
 );
+
+export const TaskIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M15 6.5l-1.5-1.5-1.5 1.5"></path><path d="M15 17.5l-1.5 1.5-1.5-1.5"></path>
+        <path d="M3 12v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2"></path><path d="M3 12v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4v-2"></path>
+    </svg>
+);
+
+export const CheckCircleIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 12l2 2 4-4"></path>
+        <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+    </svg>
+);
+
+export const SproutIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path>
+        <path d="M9.5 9.4c1.1.8 1.8 2.2 1.5 3.6-1-1.5-3-1-3.5-2.5-1.5-4.5 2-8 6-6"></path>
+    </svg>
+);
+
+export const SevenDayIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+        <path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path>
+        <path d="M10 14h4l-2 3-2-3z"></path>
+    </svg>
+);
+
+export const MoonCycleIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="6"></circle>
+        <path d="M12 2v2"></path><path d="M12 20v2"></path>
+        <path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path>
+        <path d="M2 12h2"></path><path d="M20 12h2"></path>
+        <path d="m4.93 19.07 1.41-1.41"></path><path d="m17.66 6.34 1.41-1.41"></path>
+    </svg>
+);

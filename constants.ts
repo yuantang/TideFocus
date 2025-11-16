@@ -1,4 +1,5 @@
-import type { Sound } from './types';
+import type { Sound, Achievement } from './types';
+import { SproutIcon, SevenDayIcon, MoonCycleIcon } from './components/Icons';
 
 export const DEFAULT_FOCUS_MINUTES = 25;
 export const DEFAULT_BREAK_MINUTES = 5;
@@ -38,4 +39,28 @@ export const LONG_BREAK_QUOTES: string[] = [
     'Stillness is a form of action.',
     'Almost everything will work again if you unplug it for a few minutes, including you.',
     'Time relaxing is time well spent.'
+];
+
+export const ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'first_session',
+    name: 'First Bloom',
+    description: 'Complete your first focus session.',
+    icon: SproutIcon,
+    condition: (stats) => stats.totalSessions >= 1,
+  },
+  {
+    id: 'seven_day_streak',
+    name: 'Weekly Ritual',
+    description: 'Maintain a 7-day focus streak.',
+    icon: SevenDayIcon,
+    condition: (stats) => stats.focusStreak >= 7,
+  },
+  {
+    id: 'daily_goal_met',
+    name: 'Goal Achieved',
+    description: 'Meet your daily goal for the first time.',
+    icon: MoonCycleIcon,
+    condition: (stats) => stats.dailyGoal > 0 && stats.dailySessionsCompleted >= stats.dailyGoal,
+  },
 ];
