@@ -7,8 +7,10 @@ import SettingsModal from './components/SettingsModal';
 import InfoModal from './components/InfoModal';
 import IntentionModal from './components/IntentionModal';
 import TaskListModal from './components/TaskListModal';
+import ToastContainer from './components/ToastContainer';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
+import { useToast } from './hooks/useToast';
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -20,8 +22,11 @@ const DEFAULT_LONG_BREAK_TEXT = '#6b5a5a';
 
 
 export default function App() {
+  // Toast hook
+  const { toasts, removeToast, success, error, warning, info } = useToast();
+
   const [mode, setMode] = useState<TimerMode>('focus');
-  
+
   const [focusDuration, setFocusDuration] = useState(() => Number(localStorage.getItem('focusDuration')) || DEFAULT_FOCUS_MINUTES * 60);
   const [breakDuration, setBreakDuration] = useState(() => Number(localStorage.getItem('breakDuration')) || DEFAULT_BREAK_MINUTES * 60);
   const [longBreakDuration, setLongBreakDuration] = useState(() => Number(localStorage.getItem('longBreakDuration')) || DEFAULT_LONG_BREAK_MINUTES * 60);
@@ -214,11 +219,17 @@ export default function App() {
 
   const switchMode = useCallback(() => {
     const wasFocus = mode === 'focus';
-    
+
     if (wasFocus) {
       if (linkedTaskId) {
         setTasks(prevTasks => {
-            const newTasks = prevTasks.map(t => t.id === linkedTaskId ? { ...t, completed: true } : t);
+            const newTasks = prevTasks.map(t => {
+              if (t.id === linkedTaskId) {
+                // 增加番茄钟计数
+                return { ...t, pomodoroCount: t.pomodoroCount + 1 };
+              }
+              return t;
+            });
             const todayStr = new Date().toISOString().split('T')[0];
             localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
             return newTasks;
@@ -414,23 +425,55 @@ export default function App() {
     }
   };
 
-  const addTask = (text: string) => {
-      const newTask: Task = { id: Date.now().toString(), text, completed: false };
+  const addTask = (text: string, priority: 'high' | 'medium' | 'low' = 'medium') => {
+      const newTask: Task = {
+        id: Date.now().toString(),
+        text,
+        completed: false,
+        priority,
+        tags: [],
+        pomodoroCount: 0,
+        createdAt: Date.now()
+      };
       setTasks(prev => {
           const newTasks = [...prev, newTask];
           const todayStr = new Date().toISOString().split('T')[0];
           localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
           return newTasks;
       });
+      success('任务已添加');
   };
 
-  const updateTask = (id: string, text: string, completed: boolean) => {
+  const updateTask = (id: string, updates: Partial<Task>) => {
+      const wasCompleted = tasks.find(t => t.id === id)?.completed;
       setTasks(prev => {
-          const newTasks = prev.map(t => t.id === id ? { ...t, text, completed } : t);
+          const newTasks = prev.map(t => {
+            if (t.id === id) {
+              const updatedTask = { ...t, ...updates };
+              // 如果任务被标记为完成，记录完成时间
+              if (updates.completed && !t.completed) {
+                updatedTask.completedAt = Date.now();
+              }
+              // 如果任务被标记为未完成，清除完成时间
+              if (updates.completed === false && t.completed) {
+                updatedTask.completedAt = undefined;
+              }
+              return updatedTask;
+            }
+            return t;
+          });
            const todayStr = new Date().toISOString().split('T')[0];
           localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
           return newTasks;
       });
+      // 只在完成状态改变时显示通知
+      if (updates.completed !== undefined && wasCompleted !== updates.completed) {
+        if (updates.completed) {
+          success('任务已完成 ✓');
+        } else {
+          info('任务已标记为未完成');
+        }
+      }
   };
 
   const deleteTask = (id: string) => {
@@ -440,6 +483,7 @@ export default function App() {
           localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
           return newTasks;
       });
+      info('任务已删除');
   };
   
   const controlsTextColor = isLongBreakMode ? longBreakTextColor : (mode === 'focus' ? focusTextColor : breakTextColor);
@@ -484,6 +528,9 @@ export default function App() {
       <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} dailyGoal={dailyGoal} dailySessionsCompleted={dailySessionsCompleted} weeklyProgress={weeklyProgress} totalSessions={totalSessions} focusStreak={focusStreak} unlockedAchievements={unlockedAchievements} />
       <IntentionModal isOpen={showIntentionPrompt} onStart={handleStartFocus} tasks={tasks.filter(t => !t.completed)} />
       <TaskListModal isOpen={showTaskList} onClose={() => setShowTaskList(false)} tasks={tasks} onAddTask={addTask} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
+
+      {/* Toast 通知 */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

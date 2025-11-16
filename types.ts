@@ -6,10 +6,17 @@ export interface Sound {
   url: string;
 }
 
+export type TaskPriority = 'high' | 'medium' | 'low';
+
 export interface Task {
   id: string;
   text: string;
   completed: boolean;
+  priority: TaskPriority;
+  tags: string[];
+  pomodoroCount: number;
+  createdAt: number;
+  completedAt?: number;
 }
 
 export interface ActiveSound {
