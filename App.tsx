@@ -652,7 +652,12 @@ export default function App() {
           goalStreakDays
         }}
       />
-      <IntentionModal isOpen={showIntentionPrompt} onStart={handleStartFocus} tasks={tasks.filter(t => !t.completed)} />
+      <IntentionModal
+        isOpen={showIntentionPrompt}
+        onStart={handleStartFocus}
+        onClose={() => setShowIntentionPrompt(false)}
+        tasks={tasks.filter(t => !t.completed)}
+      />
       <TaskListModal isOpen={showTaskList} onClose={() => setShowTaskList(false)} tasks={tasks} onAddTask={addTask} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
 
       {/* 成就解锁动画 */}
