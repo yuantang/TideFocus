@@ -1,0 +1,60 @@
+{
+  "name": "TideFocus - 心流时刻",
+  "short_name": "TideFocus",
+  "description": "专业的番茄钟专注计时器，集成白噪音、任务管理、成就系统，帮助你进入心流状态，提升工作学习效率。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf6f6",
+  "theme_color": "#6b5a5a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "productivity",
+    "utilities",
+    "lifestyle"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "TideFocus 主界面"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始专注",
+      "short_name": "专注",
+      "description": "快速开始一个番茄钟专注会话",
+      "url": "/?action=start",
+      "icons": [
+        {
+          "src": "/logo.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
+

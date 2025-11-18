@@ -1,5 +1,7 @@
 {
-  "name": "FlowMind",
-  "description": "A minimal and calming Pomodoro timer to help you focus. Now with a customizable soundscape mixer, gentle achievements to track your progress, desktop notifications, and an integrated minimalist task list to link your focus sessions to your daily goals.",
+  "name": "TideFocus",
+  "description": "TideFocus - 心流时刻 | A professional Pomodoro focus timer with white noise mixer, task management, achievement system, and comprehensive statistics. Help you enter flow state and boost productivity.",
+  "version": "1.0.0",
+  "author": "TideFocus Team <moreless1024@gmail.com>",
   "requestFramePermissions": []
 }

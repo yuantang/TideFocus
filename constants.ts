@@ -24,23 +24,31 @@ export const DEFAULT_SESSIONS_PER_ROUND = 4;
 
 const SOUNDS_BASE: Sound[] = [
   { id: 'none', name: '无声', url: '' },
+  // 色彩噪音 - 不同频率的噪音，适合屏蔽干扰
+  { id: 'white_noise', name: '白噪音', url: '/sounds/ambient/white-noise.ogg' },
+  { id: 'pink_noise', name: '粉噪音', url: '/sounds/ambient/pink-noise.ogg' },
+  { id: 'brown_noise', name: '棕噪音', url: '/sounds/ambient/brown-noise.ogg' },
+  { id: 'violet_noise', name: '紫噪音', url: '/sounds/ambient/violet-noise.ogg' },
+  // 水声 - 流动的水声，舒缓放松
   { id: 'rain', name: '雨声', url: '/sounds/ambient/rain.ogg' },
-  { id: 'thunder', name: '雷声', url: '/sounds/ambient/thunder.ogg' },
-  { id: 'ocean', name: '海洋', url: '/sounds/ambient/ocean.ogg' },
   { id: 'waves', name: '海浪', url: '/sounds/ambient/waves.ogg' },
-  { id: 'seagulls', name: '海鸥', url: '/sounds/ambient/seagulls.ogg' },
   { id: 'stream', name: '溪流', url: '/sounds/ambient/stream.ogg' },
+  { id: 'ocean', name: '海洋', url: '/sounds/ambient/ocean.ogg' },
+  // 火焰 - 温暖的火焰声，深度专注
+  { id: 'fireplace', name: '壁炉', url: '/sounds/ambient/fireplace.ogg' },
+  { id: 'campfire', name: '篝火', url: '/sounds/ambient/campfire.ogg' },
+  { id: 'thunder', name: '雷声', url: '/sounds/ambient/thunder.ogg' },
+  { id: 'wind', name: '风声', url: '/sounds/ambient/wind.ogg' },
+  // 自然 - 自然环境声，放松心情
   { id: 'forest', name: '森林', url: '/sounds/ambient/forest.ogg' },
   { id: 'birds', name: '鸟鸣', url: '/sounds/ambient/birds.ogg' },
   { id: 'crickets', name: '虫鸣', url: '/sounds/ambient/crickets.ogg' },
-  { id: 'wind', name: '风声', url: '/sounds/ambient/wind.ogg' },
-  { id: 'fireplace', name: '壁炉', url: '/sounds/ambient/fireplace.ogg' },
-  { id: 'campfire', name: '篝火', url: '/sounds/ambient/campfire.ogg' },
-  { id: 'night', name: '夜晚', url: '/sounds/ambient/night.ogg' },
+  { id: 'wind_chimes', name: '风铃', url: '/sounds/ambient/wind-chimes.ogg' },
+  // 环境 - 工作学习环境氛围
   { id: 'cafe', name: '咖啡店', url: '/sounds/ambient/cafe.ogg' },
   { id: 'library', name: '图书馆', url: '/sounds/ambient/library.ogg' },
-  { id: 'wind_chimes', name: '风铃', url: '/sounds/ambient/wind-chimes.ogg' },
-  { id: 'white_noise', name: '白噪音', url: '/sounds/ambient/white-noise.ogg' },
+  { id: 'air_conditioner', name: '空调', url: '/sounds/ambient/air-conditioner.ogg' },
+  { id: 'city_ambient', name: '城市氛围', url: '/sounds/ambient/city-ambient.ogg' },
 ];
 
 export const getLocalizedSounds = (): Sound[] => {
@@ -62,34 +70,34 @@ export const SOUNDS = SOUNDS_BASE.map(sound => {
 // Sound categories for better organization
 const SOUND_CATEGORIES_BASE = [
   {
+    id: 'white_noise',
+    name: '🎚️ 白噪音',
+    emoji: '🎚️',
+    sounds: ['white_noise', 'pink_noise', 'brown_noise', 'violet_noise']
+  },
+  {
     id: 'water',
     name: '💧 水声',
     emoji: '💧',
-    sounds: ['rain', 'thunder', 'ocean', 'waves', 'seagulls', 'stream']
+    sounds: ['rain', 'waves', 'stream', 'ocean']
+  },
+  {
+    id: 'atmosphere',
+    name: '🔥 氛围',
+    emoji: '🔥',
+    sounds: ['fireplace', 'campfire', 'thunder', 'wind']
   },
   {
     id: 'nature',
     name: '🌿 自然',
     emoji: '🌿',
-    sounds: ['forest', 'birds', 'crickets', 'wind', 'night']
+    sounds: ['forest', 'birds', 'crickets', 'wind_chimes']
   },
   {
-    id: 'fire',
-    name: '🔥 火焰',
-    emoji: '🔥',
-    sounds: ['fireplace', 'campfire']
-  },
-  {
-    id: 'urban',
-    name: '🏙️ 城市',
-    emoji: '🏙️',
-    sounds: ['cafe', 'library']
-  },
-  {
-    id: 'other',
-    name: '🎵 其他',
-    emoji: '🎵',
-    sounds: ['wind_chimes', 'white_noise']
+    id: 'ambient',
+    name: '☕ 环境',
+    emoji: '☕',
+    sounds: ['cafe', 'library', 'air_conditioner', 'city_ambient']
   }
 ];
 
@@ -156,81 +164,80 @@ export const REMINDER_SOUNDS = REMINDER_SOUNDS_BASE.map(sound => {
 
 const SOUNDSCAPE_PRESETS_BASE: SoundscapePreset[] = [
   {
-    id: 'rainy_forest',
-    name: '🌧️ 雨夜森林',
-    description: '雨声、雷声与森林的自然交响',
+    id: 'deep_focus',
+    name: '🎯 深度专注',
+    description: '棕噪音与白噪音的完美平衡，屏蔽一切干扰',
     sounds: [
-      { id: 'rain', volume: 0.7 },
-      { id: 'thunder', volume: 0.3 },
-      { id: 'forest', volume: 0.5 },
+      { id: 'brown_noise', volume: 0.7 },
+      { id: 'white_noise', volume: 0.4 },
     ]
   },
   {
-    id: 'ocean_breeze',
-    name: '🌊 海边微风',
-    description: '海浪、海鸥与轻柔的风声',
+    id: 'rainy_study',
+    name: '🌧️ 雨中学习',
+    description: '雨声与粉噪音，营造舒适的学习氛围',
     sounds: [
-      { id: 'waves', volume: 0.8 },
-      { id: 'seagulls', volume: 0.4 },
-      { id: 'wind', volume: 0.3 },
+      { id: 'rain', volume: 0.6 },
+      { id: 'pink_noise', volume: 0.5 },
+      { id: 'thunder', volume: 0.2 },
     ]
   },
   {
-    id: 'peaceful_stream',
-    name: '🏞️ 溪边静谧',
-    description: '溪流、鸟鸣与森林的和谐',
+    id: 'ocean_calm',
+    name: '🌊 海洋宁静',
+    description: '海浪与棕噪音，深沉而平静',
     sounds: [
-      { id: 'stream', volume: 0.7 },
-      { id: 'birds', volume: 0.5 },
-      { id: 'forest', volume: 0.4 },
+      { id: 'ocean', volume: 0.7 },
+      { id: 'waves', volume: 0.4 },
+      { id: 'brown_noise', volume: 0.3 },
     ]
   },
   {
-    id: 'cozy_evening',
-    name: '🔥 温馨夜晚',
-    description: '壁炉、虫鸣与夜晚的宁静',
+    id: 'cozy_fireplace',
+    name: '🔥 温暖壁炉',
+    description: '壁炉与粉噪音，温馨舒适的工作环境',
     sounds: [
       { id: 'fireplace', volume: 0.7 },
-      { id: 'crickets', volume: 0.5 },
-      { id: 'night', volume: 0.3 },
+      { id: 'pink_noise', volume: 0.4 },
+      { id: 'wind', volume: 0.2 },
     ]
   },
   {
-    id: 'deep_ocean',
-    name: '🐋 深海宁静',
-    description: '海洋的深邃与平静',
+    id: 'forest_retreat',
+    name: '🌿 森林静修',
+    description: '森林、鸟鸣与白噪音的自然和谐',
     sounds: [
-      { id: 'ocean', volume: 0.8 },
-      { id: 'waves', volume: 0.4 },
+      { id: 'forest', volume: 0.6 },
+      { id: 'birds', volume: 0.4 },
+      { id: 'white_noise', volume: 0.3 },
     ]
   },
   {
-    id: 'summer_night',
-    name: '🌙 夏夜星空',
-    description: '虫鸣、夜晚与轻柔的风',
-    sounds: [
-      { id: 'crickets', volume: 0.7 },
-      { id: 'night', volume: 0.6 },
-      { id: 'wind', volume: 0.3 },
-    ]
-  },
-  {
-    id: 'mountain_camp',
-    name: '⛺ 山间营地',
-    description: '篝火、溪流与夜晚的自然',
-    sounds: [
-      { id: 'campfire', volume: 0.7 },
-      { id: 'stream', volume: 0.5 },
-      { id: 'crickets', volume: 0.4 },
-    ]
-  },
-  {
-    id: 'urban_calm',
-    name: '☕ 都市静谧',
-    description: '咖啡店的温馨氛围',
+    id: 'cafe_work',
+    name: '☕ 咖啡馆工作',
+    description: '咖啡店氛围与粉噪音，模拟理想工作环境',
     sounds: [
       { id: 'cafe', volume: 0.7 },
-      { id: 'rain', volume: 0.3 },
+      { id: 'pink_noise', volume: 0.3 },
+    ]
+  },
+  {
+    id: 'library_silence',
+    name: '📚 图书馆静谧',
+    description: '图书馆与棕噪音，极致安静的专注空间',
+    sounds: [
+      { id: 'library', volume: 0.6 },
+      { id: 'brown_noise', volume: 0.5 },
+    ]
+  },
+  {
+    id: 'night_work',
+    name: '🌙 深夜工作',
+    description: '虫鸣、风铃与紫噪音，适合夜间专注',
+    sounds: [
+      { id: 'crickets', volume: 0.5 },
+      { id: 'wind_chimes', volume: 0.3 },
+      { id: 'violet_noise', volume: 0.4 },
     ]
   },
 ];

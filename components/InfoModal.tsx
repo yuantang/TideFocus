@@ -772,17 +772,69 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
             )}
             {activeTab === 'about' && (
                 <div>
-                    <div className="space-y-4 text-center leading-relaxed opacity-80">
-                        <h2 className="text-xl font-bold mb-2">🌿 {t.aboutContent.subtitle}</h2>
-                        <p>{t.aboutContent.description1}</p>
-                        <p>{t.aboutContent.description2}</p>
+                    <div className="space-y-4 text-center leading-relaxed">
+                        <h1 className="text-3xl font-bold mb-1">{t.aboutTitle}</h1>
+                        <h2 className="text-xl font-semibold mb-4 opacity-70">🌊 {t.aboutContent.subtitle}</h2>
+                        <p className="opacity-80">{t.aboutContent.description1}</p>
+                        <p className="opacity-80">{t.aboutContent.description2}</p>
+
+                        {/* 版本信息 */}
+                        <div className="inline-block bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-2 rounded-full border border-indigo-100 mt-4">
+                          <span className="text-sm font-semibold text-indigo-700">
+                            {t.aboutContent.version} {t.aboutContent.versionNumber}
+                          </span>
+                        </div>
                     </div>
-                     <div className="border-t border-black/10 pt-6 mt-6">
+
+                    {/* 核心特性 */}
+                    <div className="border-t border-black/10 pt-6 mt-6">
+                      <h3 className="text-lg font-semibold mb-4 text-center">{t.aboutContent.features}</h3>
+                      <div className="space-y-3 text-left opacity-90">
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{t.aboutContent.feature1.split(' - ')[0]}</span>
+                          <span className="flex-1">{t.aboutContent.feature1.split(' - ')[1]}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{t.aboutContent.feature2.split(' - ')[0]}</span>
+                          <span className="flex-1">{t.aboutContent.feature2.split(' - ')[1]}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{t.aboutContent.feature3.split(' - ')[0]}</span>
+                          <span className="flex-1">{t.aboutContent.feature3.split(' - ')[1]}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{t.aboutContent.feature4.split(' - ')[0]}</span>
+                          <span className="flex-1">{t.aboutContent.feature4.split(' - ')[1]}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{t.aboutContent.feature5.split(' - ')[0]}</span>
+                          <span className="flex-1">{t.aboutContent.feature5.split(' - ')[1]}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 快捷提示 */}
+                    <div className="border-t border-black/10 pt-6 mt-6">
                       <h3 className="text-lg font-semibold mb-4 text-center">{t.aboutContent.quickTips}</h3>
                       <div className="text-center opacity-80 space-y-2">
                           <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">Space</kbd> {t.aboutContent.tip1}</p>
                           <p><kbd className="font-sans font-semibold bg-black/10 rounded-md px-2 py-1 mx-1">→</kbd> {t.aboutContent.tip2}</p>
                       </div>
+                    </div>
+
+                    {/* 联系方式 */}
+                    <div className="border-t border-black/10 pt-6 mt-6 text-center">
+                      <h3 className="text-lg font-semibold mb-3">{t.aboutContent.contact}</h3>
+                      <a
+                        href={`mailto:${t.aboutContent.email}`}
+                        className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span className="font-medium">{t.aboutContent.email}</span>
+                      </a>
+                      <p className="mt-4 text-sm opacity-60">{t.aboutContent.madeWith}</p>
                     </div>
                 </div>
             )}

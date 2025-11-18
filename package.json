@@ -1,14 +1,17 @@
 {
-  "name": "flowmind",
+  "name": "tidefocus",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "TideFocus - 心流时刻 | 专业的番茄钟专注计时器",
+  "author": "TideFocus Team <moreless1024@gmail.com>",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "firebase": "^11.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

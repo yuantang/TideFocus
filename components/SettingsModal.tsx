@@ -250,7 +250,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSave, 
                       : 'bg-white/50 hover:bg-white/70'
                   }`}
                 >
-                  🇹🇼 繁體中文
+                  🏝️ 繁體中文
                 </button>
                 <button
                   onClick={() => handleLanguageChange('en')}

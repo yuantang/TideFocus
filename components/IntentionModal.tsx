@@ -44,10 +44,7 @@ const IntentionModal: React.FC<IntentionModalProps> = ({ isOpen, onStart, onClos
   if (!isOpen) return null;
 
   const handleStart = () => {
-    // 检查是否有有效的输入
-    const hasValidInput = selectedTaskId || intention.trim();
-    if (!hasValidInput) return;
-
+    // 允许不填写任何内容也可以开始专注
     if (selectedTaskId) {
       const task = tasks.find(t => t.id === selectedTaskId);
       onStart(task ? task.text : '', selectedTaskId);
@@ -58,10 +55,7 @@ const IntentionModal: React.FC<IntentionModalProps> = ({ isOpen, onStart, onClos
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      const hasValidInput = selectedTaskId || intention.trim();
-      if (hasValidInput) {
-        handleStart();
-      }
+      handleStart();
     }
   };
 
@@ -77,9 +71,6 @@ const IntentionModal: React.FC<IntentionModalProps> = ({ isOpen, onStart, onClos
       onClose();
     }
   };
-
-  // 检查是否可以开始（有任务选择或有输入内容）
-  const canStart = selectedTaskId || intention.trim();
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4" onClick={handleBackgroundClick}>
@@ -101,40 +92,60 @@ const IntentionModal: React.FC<IntentionModalProps> = ({ isOpen, onStart, onClos
 
           <div className="space-y-4">
              {tasks.length > 0 && (
-                <select
-                    value={selectedTaskId}
-                    onChange={handleTaskSelection}
-                    className="w-full px-4 py-3 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-                >
-                    <option value="">{t.intention.selectTask}</option>
-                    {tasks.map(task => (
-                        <option key={task.id} value={task.id}>{task.text}</option>
-                    ))}
-                </select>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium opacity-70 mb-2 text-center">
+                      {t.intention.selectTask}
+                    </label>
+                    <select
+                        value={selectedTaskId}
+                        onChange={handleTaskSelection}
+                        className="w-full px-4 py-3 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] appearance-none cursor-pointer hover:bg-white/70 transition-colors"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b5a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                    >
+                        <option value="">-- {t.tasks.selectTask} --</option>
+                        {tasks.map(task => (
+                            <option key={task.id} value={task.id}>{task.text}</option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* 分隔线 - "或" */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-black/10"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-4 bg-[#fdf6f6] opacity-60 font-medium">{t.intention.orDivider}</span>
+                    </div>
+                  </div>
+                </>
             )}
-            <input
-                ref={inputRef}
-                type="text"
-                value={intention}
-                onChange={(e) => {
-                    setIntention(e.target.value);
-                    if (selectedTaskId) setSelectedTaskId('');
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder={t.intention.placeholder}
-                className="w-full px-4 py-3 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] text-center"
-            />
+
+            <div>
+              {tasks.length > 0 && (
+                <label className="block text-sm font-medium opacity-70 mb-2 text-center">
+                  {t.intention.inputLabel}
+                </label>
+              )}
+              <input
+                  ref={inputRef}
+                  type="text"
+                  value={intention}
+                  onChange={(e) => {
+                      setIntention(e.target.value);
+                      if (selectedTaskId) setSelectedTaskId('');
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t.intention.placeholder}
+                  className="w-full px-4 py-3 bg-white/50 border border-black/10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a] text-center"
+              />
+            </div>
           </div>
           <div className="mt-6 flex justify-center gap-4">
             <button
               onClick={handleStart}
-              disabled={!canStart}
-              className={`font-bold py-2 px-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6b5a5a] focus:ring-offset-[#fdf6f6] transition-all ${
-                canStart
-                  ? 'bg-black/10 text-current hover:bg-black/20 cursor-pointer'
-                  : 'bg-black/5 text-current/40 cursor-not-allowed'
-              }`}
+              className="font-bold py-2 px-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6b5a5a] focus:ring-offset-[#fdf6f6] transition-all bg-black/10 text-current hover:bg-black/20 cursor-pointer"
             >
               {t.intention.start}
             </button>

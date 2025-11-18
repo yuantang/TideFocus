@@ -195,6 +195,9 @@ export interface Translations {
   intention: {
     title: string;
     subtitle: string;
+    selectTask: string;
+    orDivider: string;
+    inputLabel: string;
     placeholder: string;
     skip: string;
     start: string;
@@ -251,9 +254,20 @@ export interface Translations {
     subtitle: string;
     description1: string;
     description2: string;
+    version: string;
+    versionNumber: string;
+    features: string;
+    feature1: string;
+    feature2: string;
+    feature3: string;
+    feature4: string;
+    feature5: string;
+    contact: string;
+    email: string;
     quickTips: string;
     tip1: string;
     tip2: string;
+    madeWith: string;
   };
 
   // CSV 导出列标题
@@ -457,46 +471,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ 雨夜森林',
-      ocean_breeze: '🌊 海边微风',
-      peaceful_stream: '🏞️ 溪边静谧',
-      cozy_evening: '🔥 温馨夜晚',
-      deep_ocean: '🐋 深海宁静',
-      summer_night: '🌙 夏夜星空',
-      mountain_camp: '⛺ 山间营地',
-      urban_calm: '☕ 都市静谧',
+      deep_focus: '🎯 深度专注',
+      rainy_study: '🌧️ 雨中学习',
+      ocean_calm: '🌊 海洋宁静',
+      cozy_fireplace: '🔥 温暖壁炉',
+      forest_retreat: '🌿 森林静修',
+      cafe_work: '☕ 咖啡馆工作',
+      library_silence: '📚 图书馆静谧',
+      night_work: '🌙 深夜工作',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: '雨声、雷声与森林的自然交响',
-      ocean_breeze: '海浪、海鸥与轻柔的风声',
-      peaceful_stream: '溪流、鸟鸣与森林的和谐',
-      cozy_evening: '壁炉、虫鸣与夜晚的宁静',
-      deep_ocean: '海洋的深邃与平静',
-      summer_night: '虫鸣、夜晚与轻柔的风',
-      mountain_camp: '篝火、溪流与夜晚的自然',
-      urban_calm: '咖啡店的温馨氛围',
+      deep_focus: '棕噪音与白噪音的完美平衡，屏蔽一切干扰',
+      rainy_study: '雨声与粉噪音，营造舒适的学习氛围',
+      ocean_calm: '海浪与棕噪音，深沉而平静',
+      cozy_fireplace: '壁炉与粉噪音，温馨舒适的工作环境',
+      forest_retreat: '森林、鸟鸣与白噪音的自然和谐',
+      cafe_work: '咖啡店氛围与粉噪音，模拟理想工作环境',
+      library_silence: '图书馆与棕噪音，极致安静的专注空间',
+      night_work: '虫鸣、风铃与紫噪音，适合夜间专注',
     },
 
     soundNames: {
       none: '无声',
+      // 色彩噪音
+      white_noise: '白噪音',
+      pink_noise: '粉噪音',
+      brown_noise: '棕噪音',
+      violet_noise: '紫噪音',
+      // 水声
       rain: '雨声',
-      thunder: '雷声',
-      ocean: '海洋',
       waves: '海浪',
-      seagulls: '海鸥',
       stream: '溪流',
+      ocean: '海洋',
+      // 火焰
+      fireplace: '壁炉',
+      campfire: '篝火',
+      thunder: '雷声',
+      wind: '风声',
+      // 自然
       forest: '森林',
       birds: '鸟鸣',
       crickets: '虫鸣',
-      wind: '风声',
-      fireplace: '壁炉',
-      campfire: '篝火',
-      night: '夜晚',
+      wind_chimes: '风铃',
+      // 环境
       cafe: '咖啡店',
       library: '图书馆',
-      wind_chimes: '风铃',
-      white_noise: '白噪音',
+      air_conditioner: '空调',
+      city_ambient: '城市氛围',
+      // 完成音效
       singing_bowl: '颂钵',
       bamboo_chime: '竹风铃',
       music_box: '音乐盒',
@@ -505,15 +528,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ 白噪音',
       water: '💧 水声',
+      atmosphere: '🔥 氛围',
       nature: '🌿 自然',
-      fire: '🔥 火焰',
-      urban: '🏙️ 城市',
-      other: '🎵 其他',
+      ambient: '☕ 环境',
     },
 
-    aboutTitle: '关于 FlowMind',
-    aboutDescription: 'FlowMind 是一个专注于提升专注力的番茄钟应用。',
+    aboutTitle: '关于 TideFocus',
+    aboutDescription: 'TideFocus（心流时刻）是一款专业的番茄钟专注计时器，帮助你进入心流状态，提升工作学习效率。',
     version: '版本',
     
     units: {
@@ -551,6 +574,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: '设定你的意图',
       subtitle: '在开始之前，想一想你想要完成什么',
+      selectTask: '选择一个任务（点击下拉）',
+      orDivider: '或',
+      inputLabel: '直接输入你的意图',
       placeholder: '我想要...',
       skip: '跳过',
       start: '开始专注',
@@ -600,12 +626,23 @@ export const translations: Record<Language, Translations> = {
     confirm: '确认',
 
     aboutContent: {
-      subtitle: '一个温柔的专注空间',
-      description1: '这是一个为那些觉得传统番茄钟应用过于刺激的人设计的极简计时器。',
-      description2: '柔和的色彩、轻柔的声音和简洁的界面，在你学习和工作时静静地支持你。',
+      subtitle: '心流时刻',
+      description1: 'TideFocus 是一款专业的番茄钟专注计时器，像潮汐一样有节奏地帮助你进入心流状态。',
+      description2: '集成白噪音、任务管理、成就系统，让专注成为习惯，提升工作学习效率。',
+      version: '版本',
+      versionNumber: 'v1.0.0',
+      features: '核心特性',
+      feature1: '🎯 番茄钟计时器 - 专注、短休息、长休息',
+      feature2: '🎵 白噪音混音器 - 20种环境音可自由组合',
+      feature3: '✅ 任务管理 - 将专注会话与任务关联',
+      feature4: '🏆 成就系统 - 29个成就追踪你的进步',
+      feature5: '📊 数据统计 - 详细的专注数据和可视化图表',
+      contact: '联系我们',
+      email: 'moreless1024@gmail.com',
       quickTips: '快捷提示',
       tip1: '播放 / 暂停',
       tip2: '跳过当前阶段',
+      madeWith: '用 ❤️ 制作',
     },
 
     csvHeaders: {
@@ -806,46 +843,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ 雨夜森林',
-      ocean_breeze: '🌊 海邊微風',
-      peaceful_stream: '🏞️ 溪邊靜謐',
-      cozy_evening: '🔥 溫馨夜晚',
-      deep_ocean: '🐋 深海寧靜',
-      summer_night: '🌙 夏夜星空',
-      mountain_camp: '⛺ 山間營地',
-      urban_calm: '☕ 都市靜謐',
+      deep_focus: '🎯 深度專注',
+      rainy_study: '🌧️ 雨中學習',
+      ocean_calm: '🌊 海洋寧靜',
+      cozy_fireplace: '🔥 溫暖壁爐',
+      forest_retreat: '🌿 森林靜修',
+      cafe_work: '☕ 咖啡館工作',
+      library_silence: '📚 圖書館靜謐',
+      night_work: '🌙 深夜工作',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: '雨聲、雷聲與森林的自然交響',
-      ocean_breeze: '海浪、海鷗與輕柔的風聲',
-      peaceful_stream: '溪流、鳥鳴與森林的和諧',
-      cozy_evening: '壁爐、蟲鳴與夜晚的寧靜',
-      deep_ocean: '海洋的深邃與平靜',
-      summer_night: '蟲鳴、夜晚與輕柔的風',
-      mountain_camp: '篝火、溪流與夜晚的自然',
-      urban_calm: '咖啡店的溫馨氛圍',
+      deep_focus: '棕噪音與白噪音的完美平衡，屏蔽一切干擾',
+      rainy_study: '雨聲與粉噪音，營造舒適的學習氛圍',
+      ocean_calm: '海浪與棕噪音，深沉而平靜',
+      cozy_fireplace: '壁爐與粉噪音，溫馨舒適的工作環境',
+      forest_retreat: '森林、鳥鳴與白噪音的自然和諧',
+      cafe_work: '咖啡店氛圍與粉噪音，模擬理想工作環境',
+      library_silence: '圖書館與棕噪音，極致安靜的專注空間',
+      night_work: '蟲鳴、風鈴與紫噪音，適合夜間專注',
     },
 
     soundNames: {
       none: '無聲',
+      // 色彩噪音
+      white_noise: '白噪音',
+      pink_noise: '粉噪音',
+      brown_noise: '棕噪音',
+      violet_noise: '紫噪音',
+      // 水聲
       rain: '雨聲',
-      thunder: '雷聲',
-      ocean: '海洋',
       waves: '海浪',
-      seagulls: '海鷗',
       stream: '溪流',
+      ocean: '海洋',
+      // 火焰
+      fireplace: '壁爐',
+      campfire: '篝火',
+      thunder: '雷聲',
+      wind: '風聲',
+      // 自然
       forest: '森林',
       birds: '鳥鳴',
       crickets: '蟲鳴',
-      wind: '風聲',
-      fireplace: '壁爐',
-      campfire: '篝火',
-      night: '夜晚',
+      wind_chimes: '風鈴',
+      // 環境
       cafe: '咖啡店',
       library: '圖書館',
-      wind_chimes: '風鈴',
-      white_noise: '白噪音',
+      air_conditioner: '空調',
+      city_ambient: '城市氛圍',
+      // 完成音效
       singing_bowl: '頌缽',
       bamboo_chime: '竹風鈴',
       music_box: '音樂盒',
@@ -854,15 +900,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ 白噪音',
       water: '💧 水聲',
+      atmosphere: '🔥 氛圍',
       nature: '🌿 自然',
-      fire: '🔥 火焰',
-      urban: '🏙️ 城市',
-      other: '🎵 其他',
+      ambient: '☕ 環境',
     },
 
-    aboutTitle: '關於 FlowMind',
-    aboutDescription: 'FlowMind 是一個專注於提升專注力的番茄鐘應用。',
+    aboutTitle: '關於 TideFocus',
+    aboutDescription: 'TideFocus（心流時刻）是一款專業的番茄鐘專注計時器，幫助你進入心流狀態，提升工作學習效率。',
     version: '版本',
     
     units: {
@@ -900,6 +946,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: '設定你的意圖',
       subtitle: '在開始之前，想一想你想要完成什麼',
+      selectTask: '選擇一個任務（點擊下拉）',
+      orDivider: '或',
+      inputLabel: '直接輸入你的意圖',
       placeholder: '我想要...',
       skip: '跳過',
       start: '開始專注',
@@ -949,12 +998,23 @@ export const translations: Record<Language, Translations> = {
     confirm: '確認',
 
     aboutContent: {
-      subtitle: '一個溫柔的專注空間',
-      description1: '這是一個為那些覺得傳統番茄鐘應用過於刺激的人設計的極簡計時器。',
-      description2: '柔和的色彩、輕柔的聲音和簡潔的介面，在你學習和工作時靜靜地支持你。',
+      subtitle: '心流時刻',
+      description1: 'TideFocus 是一款專業的番茄鐘專注計時器，像潮汐一樣有節奏地幫助你進入心流狀態。',
+      description2: '集成白噪音、任務管理、成就系統，讓專注成為習慣，提升工作學習效率。',
+      version: '版本',
+      versionNumber: 'v1.0.0',
+      features: '核心特性',
+      feature1: '🎯 番茄鐘計時器 - 專注、短休息、長休息',
+      feature2: '🎵 白噪音混音器 - 20種環境音可自由組合',
+      feature3: '✅ 任務管理 - 將專注會話與任務關聯',
+      feature4: '🏆 成就系統 - 29個成就追蹤你的進步',
+      feature5: '📊 數據統計 - 詳細的專注數據和可視化圖表',
+      contact: '聯繫我們',
+      email: 'moreless1024@gmail.com',
       quickTips: '快捷提示',
       tip1: '播放 / 暫停',
       tip2: '跳過當前階段',
+      madeWith: '用 ❤️ 製作',
     },
 
     csvHeaders: {
@@ -1155,46 +1215,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ Rainy Forest',
-      ocean_breeze: '🌊 Ocean Breeze',
-      peaceful_stream: '🏞️ Peaceful Stream',
-      cozy_evening: '🔥 Cozy Evening',
-      deep_ocean: '🐋 Deep Ocean',
-      summer_night: '🌙 Summer Night',
-      mountain_camp: '⛺ Mountain Camp',
-      urban_calm: '☕ Urban Calm',
+      deep_focus: '🎯 Deep Focus',
+      rainy_study: '🌧️ Rainy Study',
+      ocean_calm: '🌊 Ocean Calm',
+      cozy_fireplace: '🔥 Cozy Fireplace',
+      forest_retreat: '🌿 Forest Retreat',
+      cafe_work: '☕ Cafe Work',
+      library_silence: '📚 Library Silence',
+      night_work: '🌙 Night Work',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: 'Rain, thunder and forest symphony',
-      ocean_breeze: 'Waves, seagulls and gentle wind',
-      peaceful_stream: 'Stream, birds and forest harmony',
-      cozy_evening: 'Fireplace, crickets and night serenity',
-      deep_ocean: 'Deep and peaceful ocean',
-      summer_night: 'Crickets, night and gentle breeze',
-      mountain_camp: 'Campfire, stream and nature at night',
-      urban_calm: 'Cozy cafe atmosphere',
+      deep_focus: 'Perfect balance of brown and white noise, blocking all distractions',
+      rainy_study: 'Rain and pink noise, creating a comfortable study atmosphere',
+      ocean_calm: 'Waves and brown noise, deep and peaceful',
+      cozy_fireplace: 'Fireplace and pink noise, warm and comfortable work environment',
+      forest_retreat: 'Forest, birds and white noise in natural harmony',
+      cafe_work: 'Cafe ambiance and pink noise, simulating ideal work environment',
+      library_silence: 'Library and brown noise, ultimate quiet focus space',
+      night_work: 'Crickets, wind chimes and violet noise, perfect for night focus',
     },
 
     soundNames: {
       none: 'None',
+      // Colored Noise
+      white_noise: 'White Noise',
+      pink_noise: 'Pink Noise',
+      brown_noise: 'Brown Noise',
+      violet_noise: 'Violet Noise',
+      // Water
       rain: 'Rain',
-      thunder: 'Thunder',
-      ocean: 'Ocean',
       waves: 'Waves',
-      seagulls: 'Seagulls',
       stream: 'Stream',
+      ocean: 'Ocean',
+      // Fire
+      fireplace: 'Fireplace',
+      campfire: 'Campfire',
+      thunder: 'Thunder',
+      wind: 'Wind',
+      // Nature
       forest: 'Forest',
       birds: 'Birds',
       crickets: 'Crickets',
-      wind: 'Wind',
-      fireplace: 'Fireplace',
-      campfire: 'Campfire',
-      night: 'Night',
+      wind_chimes: 'Wind Chimes',
+      // Ambient
       cafe: 'Cafe',
       library: 'Library',
-      wind_chimes: 'Wind Chimes',
-      white_noise: 'White Noise',
+      air_conditioner: 'Air Conditioner',
+      city_ambient: 'City Ambient',
+      // Completion Sounds
       singing_bowl: 'Singing Bowl',
       bamboo_chime: 'Bamboo Chime',
       music_box: 'Music Box',
@@ -1203,15 +1272,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ White Noise',
       water: '💧 Water',
+      atmosphere: '🔥 Atmosphere',
       nature: '🌿 Nature',
-      fire: '🔥 Fire',
-      urban: '🏙️ Urban',
-      other: '🎵 Other',
+      ambient: '☕ Ambient',
     },
 
-    aboutTitle: 'About FlowMind',
-    aboutDescription: 'FlowMind is a Pomodoro timer app focused on improving focus.',
+    aboutTitle: 'About TideFocus',
+    aboutDescription: 'TideFocus is a professional Pomodoro focus timer that helps you enter flow state and boost productivity.',
     version: 'Version',
     
     units: {
@@ -1249,6 +1318,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: 'Set Your Intention',
       subtitle: 'Before you begin, think about what you want to accomplish',
+      selectTask: 'Select a task (click dropdown)',
+      orDivider: 'OR',
+      inputLabel: 'Or type your intention directly',
       placeholder: 'I want to...',
       skip: 'Skip',
       start: 'Start Focusing',
@@ -1298,12 +1370,23 @@ export const translations: Record<Language, Translations> = {
     confirm: 'Confirm',
 
     aboutContent: {
-      subtitle: 'A Gentle Place to Focus',
-      description1: 'This is a minimal timer designed for those who find traditional Pomodoro apps too stimulating.',
-      description2: 'The soft colors, gentle sounds, and clean interface are here to quietly support you during your study and work time.',
+      subtitle: 'Flow Focus Timer',
+      description1: 'TideFocus is a professional Pomodoro focus timer that helps you enter flow state with rhythmic focus sessions like the tide.',
+      description2: 'Integrated with white noise, task management, and achievement system to make focus a habit and boost productivity.',
+      version: 'Version',
+      versionNumber: 'v1.0.0',
+      features: 'Key Features',
+      feature1: '🎯 Pomodoro Timer - Focus, short break, long break',
+      feature2: '🎵 Soundscape Mixer - 20 ambient sounds to mix freely',
+      feature3: '✅ Task Management - Link focus sessions to tasks',
+      feature4: '🏆 Achievement System - 29 achievements to track progress',
+      feature5: '📊 Statistics - Detailed focus data and visualizations',
+      contact: 'Contact Us',
+      email: 'moreless1024@gmail.com',
       quickTips: 'Quick Tips',
       tip1: 'to Play / Pause',
       tip2: 'to Skip',
+      madeWith: 'Made with ❤️',
     },
 
     csvHeaders: {
@@ -1504,46 +1587,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ Bosque Lluvioso',
-      ocean_breeze: '🌊 Brisa Marina',
-      peaceful_stream: '🏞️ Arroyo Tranquilo',
-      cozy_evening: '🔥 Noche Acogedora',
-      deep_ocean: '🐋 Océano Profundo',
-      summer_night: '🌙 Noche de Verano',
-      mountain_camp: '⛺ Campamento de Montaña',
-      urban_calm: '☕ Calma Urbana',
+      deep_focus: '🎯 Enfoque Profundo',
+      rainy_study: '🌧️ Estudio Lluvioso',
+      ocean_calm: '🌊 Calma Oceánica',
+      cozy_fireplace: '🔥 Chimenea Acogedora',
+      forest_retreat: '🌿 Retiro Forestal',
+      cafe_work: '☕ Trabajo en Cafetería',
+      library_silence: '📚 Silencio de Biblioteca',
+      night_work: '🌙 Trabajo Nocturno',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: 'Lluvia, truenos y sinfonía del bosque',
-      ocean_breeze: 'Olas, gaviotas y viento suave',
-      peaceful_stream: 'Arroyo, pájaros y armonía del bosque',
-      cozy_evening: 'Chimenea, grillos y serenidad nocturna',
-      deep_ocean: 'Océano profundo y tranquilo',
-      summer_night: 'Grillos, noche y brisa suave',
-      mountain_camp: 'Fogata, arroyo y naturaleza nocturna',
-      urban_calm: 'Ambiente acogedor de cafetería',
+      deep_focus: 'Equilibrio perfecto de ruido marrón y blanco, bloqueando todas las distracciones',
+      rainy_study: 'Lluvia y ruido rosa, creando una atmósfera de estudio cómoda',
+      ocean_calm: 'Olas y ruido marrón, profundo y tranquilo',
+      cozy_fireplace: 'Chimenea y ruido rosa, ambiente de trabajo cálido y cómodo',
+      forest_retreat: 'Bosque, pájaros y ruido blanco en armonía natural',
+      cafe_work: 'Ambiente de cafetería y ruido rosa, simulando el entorno de trabajo ideal',
+      library_silence: 'Biblioteca y ruido marrón, espacio de enfoque silencioso definitivo',
+      night_work: 'Grillos, campanillas de viento y ruido violeta, perfecto para el enfoque nocturno',
     },
 
     soundNames: {
       none: 'Ninguno',
+      // Ruido de Color
+      white_noise: 'Ruido Blanco',
+      pink_noise: 'Ruido Rosa',
+      brown_noise: 'Ruido Marrón',
+      violet_noise: 'Ruido Violeta',
+      // Agua
       rain: 'Lluvia',
-      thunder: 'Trueno',
-      ocean: 'Océano',
       waves: 'Olas',
-      seagulls: 'Gaviotas',
       stream: 'Arroyo',
+      ocean: 'Océano',
+      // Fuego
+      fireplace: 'Chimenea',
+      campfire: 'Fogata',
+      thunder: 'Trueno',
+      wind: 'Viento',
+      // Naturaleza
       forest: 'Bosque',
       birds: 'Pájaros',
       crickets: 'Grillos',
-      wind: 'Viento',
-      fireplace: 'Chimenea',
-      campfire: 'Fogata',
-      night: 'Noche',
+      wind_chimes: 'Campanillas de Viento',
+      // Ambiente
       cafe: 'Cafetería',
       library: 'Biblioteca',
-      wind_chimes: 'Campanillas de Viento',
-      white_noise: 'Ruido Blanco',
+      air_conditioner: 'Aire Acondicionado',
+      city_ambient: 'Ambiente Urbano',
+      // Sonidos de Finalización
       singing_bowl: 'Cuenco Tibetano',
       bamboo_chime: 'Campanilla de Bambú',
       music_box: 'Caja de Música',
@@ -1552,15 +1644,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ Ruido Blanco',
       water: '💧 Agua',
+      atmosphere: '🔥 Atmósfera',
       nature: '🌿 Naturaleza',
-      fire: '🔥 Fuego',
-      urban: '🏙️ Urbano',
-      other: '🎵 Otro',
+      ambient: '☕ Ambiente',
     },
 
-    aboutTitle: 'Acerca de',
-    aboutDescription: 'Un temporizador minimalista para enfoque profundo',
+    aboutTitle: 'Acerca de TideFocus',
+    aboutDescription: 'TideFocus es un temporizador Pomodoro profesional que te ayuda a entrar en estado de flujo y aumentar la productividad.',
     version: 'Versión',
 
     units: {
@@ -1598,6 +1690,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: 'Establece tu Intención',
       subtitle: 'Antes de comenzar, piensa en lo que quieres lograr',
+      selectTask: 'Selecciona una tarea (haz clic en el menú)',
+      orDivider: 'O',
+      inputLabel: 'O escribe tu intención directamente',
       placeholder: 'Quiero...',
       skip: 'Omitir',
       start: 'Comenzar a Enfocar',
@@ -1647,12 +1742,23 @@ export const translations: Record<Language, Translations> = {
     confirm: 'Confirmar',
 
     aboutContent: {
-      subtitle: 'Un Lugar Tranquilo para Enfocarse',
-      description1: 'Este es un temporizador minimalista diseñado para aquellos que encuentran las aplicaciones Pomodoro tradicionales demasiado estimulantes.',
-      description2: 'Los colores suaves, sonidos gentiles e interfaz limpia están aquí para apoyarte silenciosamente durante tu tiempo de estudio y trabajo.',
+      subtitle: 'Temporizador de Flujo',
+      description1: 'TideFocus es un temporizador Pomodoro profesional que te ayuda a entrar en estado de flujo con sesiones rítmicas como la marea.',
+      description2: 'Integrado con ruido blanco, gestión de tareas y sistema de logros para hacer del enfoque un hábito y aumentar la productividad.',
+      version: 'Versión',
+      versionNumber: 'v1.0.0',
+      features: 'Características Principales',
+      feature1: '🎯 Temporizador Pomodoro - Enfoque, descanso corto, descanso largo',
+      feature2: '🎵 Mezclador de Sonidos - 20 sonidos ambientales para mezclar libremente',
+      feature3: '✅ Gestión de Tareas - Vincula sesiones de enfoque con tareas',
+      feature4: '🏆 Sistema de Logros - 29 logros para seguir tu progreso',
+      feature5: '📊 Estadísticas - Datos detallados de enfoque y visualizaciones',
+      contact: 'Contáctanos',
+      email: 'moreless1024@gmail.com',
       quickTips: 'Consejos Rápidos',
       tip1: 'para Reproducir / Pausar',
       tip2: 'para Saltar',
+      madeWith: 'Hecho con ❤️',
     },
 
     csvHeaders: {
@@ -1853,46 +1959,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ 雨の森',
-      ocean_breeze: '🌊 海風',
-      peaceful_stream: '🏞️ 静かな小川',
-      cozy_evening: '🔥 心地よい夜',
-      deep_ocean: '🐋 深海の静けさ',
-      summer_night: '🌙 夏の夜',
-      mountain_camp: '⛺ 山のキャンプ',
-      urban_calm: '☕ 都会の静けさ',
+      deep_focus: '🎯 深い集中',
+      rainy_study: '🌧️ 雨の勉強',
+      ocean_calm: '🌊 海の静けさ',
+      cozy_fireplace: '🔥 暖かい暖炉',
+      forest_retreat: '🌿 森の隠れ家',
+      cafe_work: '☕ カフェ作業',
+      library_silence: '📚 図書館の静寂',
+      night_work: '🌙 夜の作業',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: '雨、雷、森のシンフォニー',
-      ocean_breeze: '波、カモメ、優しい風',
-      peaceful_stream: '小川、鳥、森のハーモニー',
-      cozy_evening: '暖炉、コオロギ、夜の静けさ',
-      deep_ocean: '深く穏やかな海',
-      summer_night: 'コオロギ、夜、優しいそよ風',
-      mountain_camp: '焚き火、小川、夜の自然',
-      urban_calm: '居心地の良いカフェの雰囲気',
+      deep_focus: 'ブラウンノイズとホワイトノイズの完璧なバランス、すべての邪魔を遮断',
+      rainy_study: '雨とピンクノイズ、快適な勉強の雰囲気を作る',
+      ocean_calm: '波とブラウンノイズ、深く穏やか',
+      cozy_fireplace: '暖炉とピンクノイズ、温かく快適な作業環境',
+      forest_retreat: '森、鳥、ホワイトノイズの自然な調和',
+      cafe_work: 'カフェの雰囲気とピンクノイズ、理想的な作業環境をシミュレート',
+      library_silence: '図書館とブラウンノイズ、究極の静かな集中空間',
+      night_work: 'コオロギ、風鈴、バイオレットノイズ、夜の集中に最適',
     },
 
     soundNames: {
       none: 'なし',
+      // カラーノイズ
+      white_noise: 'ホワイトノイズ',
+      pink_noise: 'ピンクノイズ',
+      brown_noise: 'ブラウンノイズ',
+      violet_noise: 'バイオレットノイズ',
+      // 水
       rain: '雨',
-      thunder: '雷',
-      ocean: '海',
       waves: '波',
-      seagulls: 'カモメ',
       stream: '小川',
+      ocean: '海',
+      // 火
+      fireplace: '暖炉',
+      campfire: '焚き火',
+      thunder: '雷',
+      wind: '風',
+      // 自然
       forest: '森',
       birds: '鳥',
       crickets: 'コオロギ',
-      wind: '風',
-      fireplace: '暖炉',
-      campfire: '焚き火',
-      night: '夜',
+      wind_chimes: '風鈴',
+      // 環境
       cafe: 'カフェ',
       library: '図書館',
-      wind_chimes: '風鈴',
-      white_noise: 'ホワイトノイズ',
+      air_conditioner: 'エアコン',
+      city_ambient: '都市の雰囲気',
+      // 完了音
       singing_bowl: 'シンギングボウル',
       bamboo_chime: '竹風鈴',
       music_box: 'オルゴール',
@@ -1901,15 +2016,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ ホワイトノイズ',
       water: '💧 水',
+      atmosphere: '🔥 雰囲気',
       nature: '🌿 自然',
-      fire: '🔥 火',
-      urban: '🏙️ 都市',
-      other: '🎵 その他',
+      ambient: '☕ 環境',
     },
 
-    aboutTitle: 'FlowMindについて',
-    aboutDescription: 'FlowMindは集中力向上に特化したポモドーロタイマーアプリです。',
+    aboutTitle: 'TideFocusについて',
+    aboutDescription: 'TideFocusはフロー状態に入り、生産性を高めるプロフェッショナルなポモドーロタイマーです。',
     version: 'バージョン',
     
     units: {
@@ -1947,6 +2062,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: '意図を設定',
       subtitle: '始める前に、何を達成したいか考えてみましょう',
+      selectTask: 'タスクを選択（ドロップダウンをクリック）',
+      orDivider: 'または',
+      inputLabel: 'または直接意図を入力',
       placeholder: '私は...',
       skip: 'スキップ',
       start: '集中を開始',
@@ -1996,12 +2114,23 @@ export const translations: Record<Language, Translations> = {
     confirm: '確認',
 
     aboutContent: {
-      subtitle: '優しい集中空間',
-      description1: '従来のポモドーロアプリが刺激的すぎると感じる方のために設計されたミニマルなタイマーです。',
-      description2: '柔らかい色、優しい音、シンプルなインターフェースが、学習や仕事の時間を静かにサポートします。',
+      subtitle: 'フロー集中タイマー',
+      description1: 'TideFocusは、潮の満ち引きのようなリズミカルな集中セッションでフロー状態に入るのを助けるプロフェッショナルなポモドーロタイマーです。',
+      description2: 'ホワイトノイズ、タスク管理、実績システムを統合し、集中を習慣化して生産性を高めます。',
+      version: 'バージョン',
+      versionNumber: 'v1.0.0',
+      features: '主な機能',
+      feature1: '🎯 ポモドーロタイマー - 集中、短い休憩、長い休憩',
+      feature2: '🎵 サウンドスケープミキサー - 20種類の環境音を自由にミックス',
+      feature3: '✅ タスク管理 - 集中セッションをタスクにリンク',
+      feature4: '🏆 実績システム - 29の実績で進捗を追跡',
+      feature5: '📊 統計 - 詳細な集中データと可視化',
+      contact: 'お問い合わせ',
+      email: 'moreless1024@gmail.com',
       quickTips: 'クイックヒント',
       tip1: '再生 / 一時停止',
       tip2: 'スキップ',
+      madeWith: '❤️ を込めて作成',
     },
 
     csvHeaders: {
@@ -2202,46 +2331,55 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundscapeNames: {
-      rainy_forest: '🌧️ 비 오는 숲',
-      ocean_breeze: '🌊 바다 바람',
-      peaceful_stream: '🏞️ 평화로운 시냇물',
-      cozy_evening: '🔥 아늑한 저녁',
-      deep_ocean: '🐋 깊은 바다',
-      summer_night: '🌙 여름밤',
-      mountain_camp: '⛺ 산속 캠프',
-      urban_calm: '☕ 도시의 고요함',
+      deep_focus: '🎯 깊은 집중',
+      rainy_study: '🌧️ 비 오는 공부',
+      ocean_calm: '🌊 바다의 고요함',
+      cozy_fireplace: '🔥 따뜻한 벽난로',
+      forest_retreat: '🌿 숲 속 휴식',
+      cafe_work: '☕ 카페 작업',
+      library_silence: '📚 도서관 정적',
+      night_work: '🌙 밤 작업',
     },
 
     soundscapeDescriptions: {
-      rainy_forest: '비, 천둥, 숲의 교향곡',
-      ocean_breeze: '파도, 갈매기, 부드러운 바람',
-      peaceful_stream: '시냇물, 새, 숲의 조화',
-      cozy_evening: '벽난로, 귀뚜라미, 밤의 고요함',
-      deep_ocean: '깊고 평화로운 바다',
-      summer_night: '귀뚜라미, 밤, 부드러운 산들바람',
-      mountain_camp: '모닥불, 시냇물, 밤의 자연',
-      urban_calm: '아늑한 카페 분위기',
+      deep_focus: '브라운 노이즈와 화이트 노이즈의 완벽한 균형, 모든 방해 차단',
+      rainy_study: '비와 핑크 노이즈, 편안한 학습 분위기 조성',
+      ocean_calm: '파도와 브라운 노이즈, 깊고 평화로움',
+      cozy_fireplace: '벽난로와 핑크 노이즈, 따뜻하고 편안한 작업 환경',
+      forest_retreat: '숲, 새, 화이트 노이즈의 자연스러운 조화',
+      cafe_work: '카페 분위기와 핑크 노이즈, 이상적인 작업 환경 시뮬레이션',
+      library_silence: '도서관과 브라운 노이즈, 궁극의 조용한 집중 공간',
+      night_work: '귀뚜라미, 풍경, 바이올렛 노이즈, 밤 집중에 완벽',
     },
 
     soundNames: {
       none: '없음',
+      // 컬러 노이즈
+      white_noise: '화이트 노이즈',
+      pink_noise: '핑크 노이즈',
+      brown_noise: '브라운 노이즈',
+      violet_noise: '바이올렛 노이즈',
+      // 물
       rain: '비',
-      thunder: '천둥',
-      ocean: '바다',
       waves: '파도',
-      seagulls: '갈매기',
       stream: '시냇물',
+      ocean: '바다',
+      // 불
+      fireplace: '벽난로',
+      campfire: '모닥불',
+      thunder: '천둥',
+      wind: '바람',
+      // 자연
       forest: '숲',
       birds: '새',
       crickets: '귀뚜라미',
-      wind: '바람',
-      fireplace: '벽난로',
-      campfire: '모닥불',
-      night: '밤',
+      wind_chimes: '풍경',
+      // 환경
       cafe: '카페',
       library: '도서관',
-      wind_chimes: '풍경',
-      white_noise: '백색 소음',
+      air_conditioner: '에어컨',
+      city_ambient: '도시 분위기',
+      // 완료 사운드
       singing_bowl: '싱잉볼',
       bamboo_chime: '대나무 풍경',
       music_box: '오르골',
@@ -2250,15 +2388,15 @@ export const translations: Record<Language, Translations> = {
     },
 
     soundCategoryNames: {
+      white_noise: '🎚️ 화이트 노이즈',
       water: '💧 물',
+      atmosphere: '🔥 분위기',
       nature: '🌿 자연',
-      fire: '🔥 불',
-      urban: '🏙️ 도시',
-      other: '🎵 기타',
+      ambient: '☕ 환경',
     },
 
-    aboutTitle: 'FlowMind 정보',
-    aboutDescription: 'FlowMind는 집중력 향상에 초점을 맞춘 포모도로 타이머 앱입니다.',
+    aboutTitle: 'TideFocus 정보',
+    aboutDescription: 'TideFocus는 몰입 상태에 들어가 생산성을 높이는 전문 포모도로 타이머입니다.',
     version: '버전',
     
     units: {
@@ -2296,6 +2434,9 @@ export const translations: Record<Language, Translations> = {
     intention: {
       title: '의도 설정',
       subtitle: '시작하기 전에 무엇을 달성하고 싶은지 생각해보세요',
+      selectTask: '작업 선택 (드롭다운 클릭)',
+      orDivider: '또는',
+      inputLabel: '또는 의도를 직접 입력',
       placeholder: '나는...',
       skip: '건너뛰기',
       start: '집중 시작',
@@ -2345,12 +2486,23 @@ export const translations: Record<Language, Translations> = {
     confirm: '확인',
 
     aboutContent: {
-      subtitle: '부드러운 집중 공간',
-      description1: '전통적인 포모도로 앱이 너무 자극적이라고 느끼는 사람들을 위해 설계된 미니멀 타이머입니다.',
-      description2: '부드러운 색상, 은은한 소리, 깔끔한 인터페이스가 학습과 작업 시간을 조용히 지원합니다.',
+      subtitle: '플로우 집중 타이머',
+      description1: 'TideFocus는 조수의 리듬처럼 리드미컬한 집중 세션으로 몰입 상태에 들어가도록 돕는 전문 포모도로 타이머입니다.',
+      description2: '화이트 노이즈, 작업 관리, 업적 시스템을 통합하여 집중을 습관화하고 생산성을 높입니다.',
+      version: '버전',
+      versionNumber: 'v1.0.0',
+      features: '주요 기능',
+      feature1: '🎯 포모도로 타이머 - 집중, 짧은 휴식, 긴 휴식',
+      feature2: '🎵 사운드스케이프 믹서 - 20가지 환경음을 자유롭게 믹스',
+      feature3: '✅ 작업 관리 - 집중 세션을 작업에 연결',
+      feature4: '🏆 업적 시스템 - 29개의 업적으로 진행 상황 추적',
+      feature5: '📊 통계 - 상세한 집중 데이터 및 시각화',
+      contact: '문의하기',
+      email: 'moreless1024@gmail.com',
       quickTips: '빠른 팁',
       tip1: '재생 / 일시정지',
       tip2: '건너뛰기',
+      madeWith: '❤️ 로 제작',
     },
 
     csvHeaders: {
