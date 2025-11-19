@@ -26,6 +26,20 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   const presetTemplates = templates.filter(t => !t.isCustom);
   const customTemplates = templates.filter(t => t.isCustom);
 
+  // 获取本地化的模板名称
+  const getLocalizedTemplateName = (template: PomodoroTemplate | undefined): string => {
+    if (!template) return '';
+
+    // 如果是自定义模板，直接返回用户输入的名称
+    if (template.isCustom) {
+      return template.name;
+    }
+
+    // 如果是预设模板，返回本地化的名称
+    const templateKey = template.id as keyof typeof t.templates.presetNames;
+    return t.templates.presetNames[templateKey] || template.name;
+  };
+
   return (
     <div className="relative">
       {/* 当前模板按钮 */}
@@ -36,7 +50,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       >
         <span className="text-2xl">{activeTemplate?.icon}</span>
         <div className="flex flex-col items-start">
-          <span className="text-gray-800">{activeTemplate?.name}</span>
+          <span className="text-gray-800">{getLocalizedTemplateName(activeTemplate)}</span>
           <span className="text-xs text-gray-500">
             {activeTemplate?.focusDuration}{t.units.minutes} / {activeTemplate?.breakDuration}{t.units.minutes}
           </span>

@@ -900,6 +900,7 @@ export const translations: Record<Language, Translations> = {
 
     progress: '進度',
     milestones: '成就',
+    account: '帳號',
     about: '關於',
     
     dayView: '日',
@@ -1374,6 +1375,7 @@ export const translations: Record<Language, Translations> = {
     
     progress: 'Progress',
     milestones: 'Milestones',
+    account: 'Account',
     about: 'About',
     
     dayView: 'Day',
@@ -1848,6 +1850,7 @@ export const translations: Record<Language, Translations> = {
 
     progress: 'Progreso',
     milestones: 'Logros',
+    account: 'Cuenta',
     about: 'Acerca de',
 
     dayView: 'Día',
@@ -2322,6 +2325,7 @@ export const translations: Record<Language, Translations> = {
 
     progress: '進捗',
     milestones: '実績',
+    account: 'アカウント',
     about: '情報',
     
     dayView: '日',
@@ -2796,6 +2800,7 @@ export const translations: Record<Language, Translations> = {
 
     progress: '진행',
     milestones: '업적',
+    account: '계정',
     about: '정보',
     
     dayView: '일',
