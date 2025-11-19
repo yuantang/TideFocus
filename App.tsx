@@ -20,7 +20,7 @@ import { useRealtimeSync } from './hooks/useRealtimeSync';
 import { useAutoSync } from './hooks/useAutoSync';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
 import { useTemplates } from './hooks/useTemplates';
-import { getWeekdayName } from './i18n';
+import { getWeekdayName, getTranslations } from './i18n';
 import { PomodoroTemplate } from './types';
 
 
@@ -33,6 +33,9 @@ const DEFAULT_LONG_BREAK_TEXT = '#6b5a5a';
 
 
 export default function App() {
+  // 国际化
+  const t = getTranslations();
+
   // Toast hook
   const { toasts, removeToast, success, error, warning, info } = useToast();
 
@@ -620,11 +623,24 @@ export default function App() {
         }
       }
 
-      success(`已切换到「${template.name}」模板`);
+      // 获取本地化的模板名称
+      const getLocalizedTemplateName = (template: PomodoroTemplate): string => {
+        // 如果是自定义模板，直接返回用户输入的名称
+        if (template.isCustom) {
+          return template.name;
+        }
+
+        // 如果是预设模板，返回本地化的名称
+        const templateKey = template.id as keyof typeof t.templates.presetNames;
+        return t.templates.presetNames[templateKey] || template.name;
+      };
+
+      const localizedName = getLocalizedTemplateName(template);
+      success(`${t.templates.templateApplied}「${localizedName}」`);
     } catch (err) {
-      error(err instanceof Error ? err.message : '切换模板失败');
+      error(err instanceof Error ? err.message : t.templates.templateApplied);
     }
-  }, [applyTemplate, isActive, mode, isCurrentBreakLong, success, error]);
+  }, [applyTemplate, isActive, mode, isCurrentBreakLong, success, error, t]);
 
   const handleCreateTemplate = useCallback(() => {
     setEditingTemplate(undefined);
@@ -641,7 +657,7 @@ export default function App() {
       if (editingTemplate) {
         // 更新现有模板
         updateCustomTemplate(editingTemplate.id, templateData);
-        success(`模板「${templateData.name}」已更新`);
+        success(`${t.templates.templateUpdated}「${templateData.name}」`);
       } else {
         // 创建新模板
         const newTemplate = addCustomTemplate(
@@ -653,21 +669,21 @@ export default function App() {
           templateData.sessionsPerRound,
           templateData.icon
         );
-        success(`模板「${newTemplate.name}」已创建`);
+        success(`${t.templates.templateCreated}「${newTemplate.name}」`);
       }
     } catch (err) {
-      error(err instanceof Error ? err.message : '保存模板失败');
+      error(err instanceof Error ? err.message : t.templates.templateCreated);
     }
-  }, [editingTemplate, addCustomTemplate, updateCustomTemplate, success, error]);
+  }, [editingTemplate, addCustomTemplate, updateCustomTemplate, success, error, t]);
 
   const handleDeleteTemplate = useCallback((templateId: string) => {
     try {
       deleteCustomTemplate(templateId);
-      success('模板已删除');
+      success(t.templates.templateDeleted);
     } catch (err) {
-      error(err instanceof Error ? err.message : '删除模板失败');
+      error(err instanceof Error ? err.message : t.templates.templateDeleted);
     }
-  }, [deleteCustomTemplate, success, error]);
+  }, [deleteCustomTemplate, success, error, t]);
 
   const addTask = (text: string, priority: 'high' | 'medium' | 'low' = 'medium') => {
       const newTask: Task = {
