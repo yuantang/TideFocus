@@ -799,8 +799,8 @@ export default function App() {
           <Controls isActive={isActive} onToggle={toggleTimer} onNext={handleNext} volume={masterVolume} onVolumeChange={setMasterVolume} isMuted={isMuted} onToggleMute={toggleMute} sessionCount={sessionCount} onSettingsClick={() => setShowSettings(true)} timeLeft={timeLeft} totalDuration={totalDuration} progress={progress} mode={mode} isFullscreen={isFullscreen} onToggleFullscreen={handleToggleFullscreen} textColor={controlsTextColor} sessionsPerRound={sessionsPerRound} isLongBreakNext={mode === 'focus' && sessionsPerRound > 0 && (sessionCount + 1) % sessionsPerRound === 0} onTasksClick={() => setShowTaskList(true)}/>
       </div>
 
-      {/* 使用 Suspense 包裹懒加载的组件 */}
-      <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50"><div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div></div>}>
+      {/* 使用 Suspense 包裹懒加载的组件 - 无 fallback，加载更自然 */}
+      <Suspense fallback={null}>
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} onSave={handleSaveSettings}
           currentSettings={{
             focus: focusDuration / 60, break: breakDuration / 60, longBreak: longBreakDuration / 60,
