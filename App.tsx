@@ -9,9 +9,14 @@ import IntentionModal from './components/IntentionModal';
 import TaskListModal from './components/TaskListModal';
 import ToastContainer from './components/ToastContainer';
 import AchievementUnlockModal from './components/AchievementUnlockModal';
+import AuthModal from './components/AuthModal';
+import AccountModal from './components/AccountModal';
+import SyncIndicator from './components/SyncIndicator';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
+import { useAuth } from './hooks/useAuth';
+import { useCloudSync } from './hooks/useCloudSync';
 import { getWeekdayName } from './i18n';
 
 
@@ -26,6 +31,12 @@ const DEFAULT_LONG_BREAK_TEXT = '#6b5a5a';
 export default function App() {
   // Toast hook
   const { toasts, removeToast, success, error, warning, info } = useToast();
+
+  // 认证和云端同步
+  const { isAuthenticated, configured: supabaseConfigured } = useAuth();
+  const { syncAll } = useCloudSync();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   const [mode, setMode] = useState<TimerMode>('focus');
 
@@ -616,9 +627,19 @@ export default function App() {
   
   return (
     <div className="h-screen w-screen flex flex-col font-sans antialiased overflow-hidden">
-      <div className="absolute top-4 right-4 z-20" style={{ color: controlsTextColor }}>
-         <button onClick={() => setShowInfo(true)} className="p-2 rounded-full text-current/70 hover:text-current transition-colors" aria-label="Show app information">
-            <InfoIcon className="w-6 h-6" />
+      {/* 右上角按钮组 */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-3" style={{ color: controlsTextColor }}>
+        {/* 云端同步指示器 */}
+        {supabaseConfigured && (
+          <SyncIndicator
+            onOpenAuth={() => setShowAuthModal(true)}
+            onOpenAccount={() => setShowAccountModal(true)}
+          />
+        )}
+
+        {/* 信息按钮 */}
+        <button onClick={() => setShowInfo(true)} className="p-2 rounded-full text-current/70 hover:text-current transition-colors" aria-label="Show app information">
+          <InfoIcon className="w-6 h-6" />
         </button>
       </div>
 
@@ -694,6 +715,18 @@ export default function App() {
 
       {/* Toast 通知 */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {/* 认证模态框 */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+
+      {/* 账号管理模态框 */}
+      <AccountModal
+        isOpen={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+      />
     </div>
   );
 }
