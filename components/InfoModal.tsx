@@ -555,25 +555,25 @@ const AccountTab: React.FC = () => {
   // 未登录状态 - 显示登录/注册界面
   if (!isAuthenticated || mode !== 'account') {
     return (
-      <div className="space-y-6 max-w-md mx-auto">
+      <div className="space-y-4 max-w-md mx-auto">
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-2">☁️ 云端同步</h3>
-          <p className="text-sm opacity-70">登录以启用多设备数据同步</p>
+          <h3 className="text-md font-semibold opacity-80 mb-2">云端同步</h3>
+          <p className="text-xs opacity-60">登录以启用多设备数据同步</p>
         </div>
 
         {/* 消息提示 */}
         {message && (
-          <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            <p className="text-sm font-medium">{message.text}</p>
+          <div className={`p-3 rounded-lg text-sm ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+            {message.text}
           </div>
         )}
 
         {/* 标签切换 */}
-        <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+        <div className="flex gap-2 p-1 bg-black/5 rounded-lg">
           <button
             onClick={() => setMode('login')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              mode === 'login' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              mode === 'login' ? 'bg-white/80 shadow-sm' : 'hover:bg-white/40'
             }`}
           >
             登录
@@ -581,7 +581,7 @@ const AccountTab: React.FC = () => {
           <button
             onClick={() => setMode('register')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              mode === 'register' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              mode === 'register' ? 'bg-white/80 shadow-sm' : 'hover:bg-white/40'
             }`}
           >
             注册
@@ -589,24 +589,24 @@ const AccountTab: React.FC = () => {
         </div>
 
         {/* 表单 */}
-        <form onSubmit={handleAuth} className="space-y-4">
+        <form onSubmit={handleAuth} className="space-y-3 bg-black/5 p-4 rounded-lg">
           {mode === 'register' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-1">
                 显示名称
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
                 placeholder="输入你的名称"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-1">
               邮箱
             </label>
             <input
@@ -614,14 +614,14 @@ const AccountTab: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
               placeholder="your@email.com"
             />
           </div>
 
           {mode !== 'reset' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-1">
                 密码
               </label>
               <input
@@ -629,7 +629,7 @@ const AccountTab: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
                 placeholder="至少 6 个字符"
               />
             </div>
@@ -638,7 +638,7 @@ const AccountTab: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-[#6b5a5a] text-white rounded-md font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
           >
             {loading ? '处理中...' : mode === 'login' ? '登录' : mode === 'register' ? '注册' : '发送重置邮件'}
           </button>
@@ -649,7 +649,7 @@ const AccountTab: React.FC = () => {
           {mode === 'login' && (
             <button
               onClick={() => setMode('reset')}
-              className="text-blue-600 hover:text-blue-700"
+              className="opacity-60 hover:opacity-100 transition-opacity"
             >
               忘记密码？
             </button>
@@ -657,7 +657,7 @@ const AccountTab: React.FC = () => {
           {mode === 'reset' && (
             <button
               onClick={() => setMode('login')}
-              className="text-blue-600 hover:text-blue-700"
+              className="opacity-60 hover:opacity-100 transition-opacity"
             >
               返回登录
             </button>
@@ -669,73 +669,67 @@ const AccountTab: React.FC = () => {
 
   // 已登录状态 - 显示账号管理界面
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold mb-2">👤 账号管理</h3>
-        <p className="text-sm opacity-70">管理你的账号和云端数据</p>
-      </div>
-
+    <div className="space-y-4 max-w-2xl mx-auto">
       {/* 消息提示 */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          <p className="text-sm font-medium">{message.text}</p>
+        <div className={`p-3 rounded-lg text-sm ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+          {message.text}
         </div>
       )}
 
-      {/* 用户信息卡片 */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            {user?.email?.[0].toUpperCase()}
-          </div>
-          <div className="flex-1">
-            <div className="font-semibold text-gray-800 text-lg">
-              {user?.user_metadata?.display_name || user?.email?.split('@')[0]}
+      {/* 用户信息 */}
+      <div>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">用户信息</h3>
+        <div className="bg-black/5 p-4 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-[#6b5a5a] rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+              {user?.email?.[0].toUpperCase()}
             </div>
-            <div className="text-sm text-gray-600">{user?.email}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium truncate">
+                {user?.user_metadata?.display_name || user?.email?.split('@')[0]}
+              </div>
+              <div className="text-sm opacity-60 truncate">{user?.email}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 同步状态卡片 */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <span>☁️</span>
-          <span>同步状态</span>
-        </h4>
-
-        <div className="space-y-3">
+      {/* 同步状态 */}
+      <div>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">同步状态</h3>
+        <div className="bg-black/5 p-4 rounded-lg space-y-3">
           {/* 网络状态 */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">网络状态</span>
-            <div className={`flex items-center gap-2 ${isOnline ? 'text-green-600' : 'text-orange-600'}`}>
+          <div className="flex items-center justify-between text-sm">
+            <span className="opacity-70">网络状态</span>
+            <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-600' : 'bg-orange-600'}`} />
-              <span className="text-sm font-medium">{isOnline ? '在线' : '离线'}</span>
+              <span className="font-medium">{isOnline ? '在线' : '离线'}</span>
             </div>
           </div>
 
           {/* 实时同步状态 */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">实时同步</span>
-            <div className={`flex items-center gap-2 ${realtimeConnected ? 'text-green-600' : 'text-gray-400'}`}>
+          <div className="flex items-center justify-between text-sm">
+            <span className="opacity-70">实时同步</span>
+            <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-600' : 'bg-gray-400'}`} />
-              <span className="text-sm font-medium">{realtimeConnected ? '已连接' : '未连接'}</span>
+              <span className="font-medium">{realtimeConnected ? '已连接' : '未连接'}</span>
             </div>
           </div>
 
           {/* 离线队列 */}
           {queueLength > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">待同步</span>
-              <span className="text-sm font-medium text-orange-600">{queueLength} 项</span>
+            <div className="flex items-center justify-between text-sm">
+              <span className="opacity-70">待同步</span>
+              <span className="font-medium text-orange-600">{queueLength} 项</span>
             </div>
           )}
 
           {/* 最后同步时间 */}
           {syncStatus.lastSyncTime && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">最后同步</span>
-              <span className="text-sm text-gray-500">
+            <div className="flex items-center justify-between text-sm">
+              <span className="opacity-70">最后同步</span>
+              <span className="opacity-60">
                 {new Date(syncStatus.lastSyncTime).toLocaleString('zh-CN', {
                   month: 'short',
                   day: 'numeric',
@@ -745,59 +739,59 @@ const AccountTab: React.FC = () => {
               </span>
             </div>
           )}
-        </div>
 
-        {/* 同步操作按钮 */}
-        <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleSync}
-            disabled={loading || !isOnline}
-            className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {syncStatus.syncing ? '同步中...' : '立即同步'}
-          </button>
-          <button
-            onClick={handleRestore}
-            disabled={loading || !isOnline}
-            className="flex-1 py-2 px-4 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            从云端恢复
-          </button>
+          {/* 同步操作按钮 */}
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={handleSync}
+              disabled={loading || !isOnline}
+              className="flex-1 py-2 px-3 bg-[#6b5a5a] text-white rounded-md text-sm font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {syncStatus.syncing ? '同步中...' : '立即同步'}
+            </button>
+            <button
+              onClick={handleRestore}
+              disabled={loading || !isOnline}
+              className="flex-1 py-2 px-3 bg-white/50 border border-black/10 rounded-md text-sm font-medium hover:bg-white/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              从云端恢复
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 修改密码 */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h4 className="text-lg font-semibold text-gray-800 mb-4">🔒 修改密码</h4>
-        <form onSubmit={handlePasswordChange} className="space-y-4">
+      <div>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">修改密码</h3>
+        <form onSubmit={handlePasswordChange} className="bg-black/5 p-4 rounded-lg space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-1">
               新密码
             </label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
               placeholder="至少 6 个字符"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-1">
               确认密码
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
               placeholder="再次输入新密码"
             />
           </div>
           <button
             type="submit"
             disabled={loading || !newPassword || !confirmPassword}
-            className="w-full py-2 px-4 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2 bg-[#6b5a5a] text-white rounded-md text-sm font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '修改中...' : '修改密码'}
           </button>
@@ -805,11 +799,11 @@ const AccountTab: React.FC = () => {
       </div>
 
       {/* 退出登录 */}
-      <div className="text-center">
+      <div className="text-center pt-2">
         <button
           onClick={handleSignOut}
           disabled={loading}
-          className="px-6 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm opacity-60 hover:opacity-100 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
         >
           退出登录
         </button>
@@ -960,7 +954,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
         <div className="flex border-b border-black/10 px-4 flex-shrink-0">
             <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>{t.progress}</TabButton>
             <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>{t.milestones}</TabButton>
-            <TabButton active={activeTab === 'account'} onClick={() => setActiveTab('account')}>👤 账号</TabButton>
+            <TabButton active={activeTab === 'account'} onClick={() => setActiveTab('account')}>账号</TabButton>
             <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>{t.about}</TabButton>
         </div>
 
