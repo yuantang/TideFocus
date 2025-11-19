@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { TimerMode, Sound, Task, ActiveSound, Achievement, Stats } from './types';
 import { SOUNDS, COMPLETION_SOUNDS, REMINDER_SOUNDS, DEFAULT_FOCUS_MINUTES, DEFAULT_BREAK_MINUTES, DEFAULT_LONG_BREAK_MINUTES, DEFAULT_SESSIONS_PER_ROUND, LONG_BREAK_QUOTES, getLocalizedAchievements } from './constants';
 import TimerPanel from './components/TimerPanel';
 import Controls from './components/Controls';
-import SettingsModal from './components/SettingsModal';
-import InfoModal from './components/InfoModal';
-import IntentionModal from './components/IntentionModal';
-import TaskListModal from './components/TaskListModal';
 import ToastContainer from './components/ToastContainer';
-import AchievementUnlockModal from './components/AchievementUnlockModal';
 import TemplateSelector from './components/TemplateSelector';
-import TemplateEditorModal from './components/TemplateEditorModal';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
@@ -22,6 +16,14 @@ import { useOfflineQueue } from './hooks/useOfflineQueue';
 import { useTemplates } from './hooks/useTemplates';
 import { getWeekdayName, getTranslations } from './i18n';
 import { PomodoroTemplate } from './types';
+
+// 懒加载非关键组件
+const SettingsModal = lazy(() => import('./components/SettingsModal'));
+const InfoModal = lazy(() => import('./components/InfoModal'));
+const IntentionModal = lazy(() => import('./components/IntentionModal'));
+const TaskListModal = lazy(() => import('./components/TaskListModal'));
+const AchievementUnlockModal = lazy(() => import('./components/AchievementUnlockModal'));
+const TemplateEditorModal = lazy(() => import('./components/TemplateEditorModal'));
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -797,74 +799,77 @@ export default function App() {
           <Controls isActive={isActive} onToggle={toggleTimer} onNext={handleNext} volume={masterVolume} onVolumeChange={setMasterVolume} isMuted={isMuted} onToggleMute={toggleMute} sessionCount={sessionCount} onSettingsClick={() => setShowSettings(true)} timeLeft={timeLeft} totalDuration={totalDuration} progress={progress} mode={mode} isFullscreen={isFullscreen} onToggleFullscreen={handleToggleFullscreen} textColor={controlsTextColor} sessionsPerRound={sessionsPerRound} isLongBreakNext={mode === 'focus' && sessionsPerRound > 0 && (sessionCount + 1) % sessionsPerRound === 0} onTasksClick={() => setShowTaskList(true)}/>
       </div>
 
-       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} onSave={handleSaveSettings}
-        currentSettings={{
-          focus: focusDuration / 60, break: breakDuration / 60, longBreak: longBreakDuration / 60,
-          sessionsPerRound, dailyGoal, isBreathingGuideEnabled, isDesktopNotificationsEnabled,
-          activeSounds, isCompletionSoundEnabled, completionSound: selectedCompletionSound,
-          focusBg: focusBgColor, focusText: focusTextColor, breakBg: breakBgColor, breakText: breakTextColor,
-          longBreakBg: longBreakBgColor, longBreakText: longBreakTextColor,
-        }}/>
-      <InfoModal
-        isOpen={showInfo}
-        onClose={() => setShowInfo(false)}
-        dailyGoal={dailyGoal}
-        dailySessionsCompleted={dailySessionsCompleted}
-        weeklyProgress={weeklyProgress}
-        totalSessions={totalSessions}
-        focusStreak={focusStreak}
-        unlockedAchievements={unlockedAchievements}
-        stats={{
-          totalSessions,
-          focusStreak,
-          dailySessionsCompleted,
-          dailyGoal,
-          totalFocusMinutes,
-          completedTasks,
-          nightSessions,
-          morningSessions,
-          longestSession,
-          perfectWeeks,
-          goalStreakDays
-        }}
-      />
-      <IntentionModal
-        isOpen={showIntentionPrompt}
-        onStart={handleStartFocus}
-        onClose={() => setShowIntentionPrompt(false)}
-        tasks={tasks.filter(t => !t.completed)}
-      />
-      <TaskListModal isOpen={showTaskList} onClose={() => setShowTaskList(false)} tasks={tasks} onAddTask={addTask} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
+      {/* 使用 Suspense 包裹懒加载的组件 */}
+      <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50"><div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div></div>}>
+        <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} onSave={handleSaveSettings}
+          currentSettings={{
+            focus: focusDuration / 60, break: breakDuration / 60, longBreak: longBreakDuration / 60,
+            sessionsPerRound, dailyGoal, isBreathingGuideEnabled, isDesktopNotificationsEnabled,
+            activeSounds, isCompletionSoundEnabled, completionSound: selectedCompletionSound,
+            focusBg: focusBgColor, focusText: focusTextColor, breakBg: breakBgColor, breakText: breakTextColor,
+            longBreakBg: longBreakBgColor, longBreakText: longBreakTextColor,
+          }}/>
+        <InfoModal
+          isOpen={showInfo}
+          onClose={() => setShowInfo(false)}
+          dailyGoal={dailyGoal}
+          dailySessionsCompleted={dailySessionsCompleted}
+          weeklyProgress={weeklyProgress}
+          totalSessions={totalSessions}
+          focusStreak={focusStreak}
+          unlockedAchievements={unlockedAchievements}
+          stats={{
+            totalSessions,
+            focusStreak,
+            dailySessionsCompleted,
+            dailyGoal,
+            totalFocusMinutes,
+            completedTasks,
+            nightSessions,
+            morningSessions,
+            longestSession,
+            perfectWeeks,
+            goalStreakDays
+          }}
+        />
+        <IntentionModal
+          isOpen={showIntentionPrompt}
+          onStart={handleStartFocus}
+          onClose={() => setShowIntentionPrompt(false)}
+          tasks={tasks.filter(t => !t.completed)}
+        />
+        <TaskListModal isOpen={showTaskList} onClose={() => setShowTaskList(false)} tasks={tasks} onAddTask={addTask} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
 
-      {/* 成就解锁动画 */}
-      <AchievementUnlockModal
-        achievement={unlockedAchievement}
-        isOpen={showAchievementUnlock}
-        onClose={() => {
-          setShowAchievementUnlock(false);
-          setUnlockedAchievement(null);
-        }}
-      />
+        {/* 成就解锁动画 */}
+        <AchievementUnlockModal
+          achievement={unlockedAchievement}
+          isOpen={showAchievementUnlock}
+          onClose={() => {
+            setShowAchievementUnlock(false);
+            setUnlockedAchievement(null);
+          }}
+        />
+
+        {/* 模板编辑器模态框 */}
+        <TemplateEditorModal
+          isOpen={showTemplateEditor}
+          onClose={() => {
+            setShowTemplateEditor(false);
+            setEditingTemplate(undefined);
+          }}
+          onSave={handleSaveTemplate}
+          editingTemplate={editingTemplate}
+          currentSettings={{
+            focusDuration: focusDuration / 60,
+            breakDuration: breakDuration / 60,
+            longBreakDuration: longBreakDuration / 60,
+            sessionsPerRound
+          }}
+        />
+      </Suspense>
 
       {/* Toast 通知 */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-
-      {/* 模板编辑器模态框 */}
-      <TemplateEditorModal
-        isOpen={showTemplateEditor}
-        onClose={() => {
-          setShowTemplateEditor(false);
-          setEditingTemplate(undefined);
-        }}
-        onSave={handleSaveTemplate}
-        editingTemplate={editingTemplate}
-        currentSettings={{
-          focusDuration: focusDuration / 60,
-          breakDuration: breakDuration / 60,
-          longBreakDuration: longBreakDuration / 60,
-          sessionsPerRound
-        }}
-      />
     </div>
   );
 }

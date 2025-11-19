@@ -22,10 +22,34 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           output: {
-            // 确保 Service Worker 不被打包
-            manualChunks: undefined
+            // 代码分割优化
+            manualChunks: (id) => {
+              // 将 node_modules 中的依赖分离到 vendor chunk
+              if (id.includes('node_modules')) {
+                // React 相关库单独打包
+                if (id.includes('react') || id.includes('react-dom')) {
+                  return 'react-vendor';
+                }
+                // Supabase 相关库单独打包
+                if (id.includes('@supabase')) {
+                  return 'supabase-vendor';
+                }
+                // Firebase 相关库单独打包
+                if (id.includes('firebase')) {
+                  return 'firebase-vendor';
+                }
+                // 其他第三方库
+                return 'vendor';
+              }
+            }
           }
-        }
+        },
+        // 优化构建性能
+        chunkSizeWarningLimit: 1000,
+        // 启用 CSS 代码分割
+        cssCodeSplit: true,
+        // 启用 sourcemap（开发环境）
+        sourcemap: mode === 'development'
       }
     };
 });
