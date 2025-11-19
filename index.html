@@ -6,7 +6,13 @@
     <link rel="alternate icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <!-- 移动端优化 -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- Primary Meta Tags -->
     <title>TideFocus - 心流时刻 | 专注力提升番茄钟计时器</title>
@@ -50,10 +56,54 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+      :root {
+        /* 安全区域变量 */
+        --sat: env(safe-area-inset-top);
+        --sar: env(safe-area-inset-right);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+      }
+
       body {
         background-color: #fdf6f6; /* A light, elegant pink */
         font-family: 'Josefin Sans', sans-serif;
+        transition: background-color 0.3s ease;
+        /* 移动端优化 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        /* 安全区域适配 */
+        padding-top: var(--sat);
+        padding-right: var(--sar);
+        padding-bottom: var(--sab);
+        padding-left: var(--sal);
       }
+
+      /* 暗黑模式样式 */
+      .dark body {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+      }
+
+      .dark {
+        color-scheme: dark;
+      }
+
+      /* 移动端优化 */
+      @media (max-width: 768px) {
+        body {
+          font-size: 14px;
+        }
+      }
+
+      /* 横屏提示 */
+      @media (orientation: landscape) and (max-height: 500px) {
+        .landscape-warning {
+          display: flex !important;
+        }
+      }
+
       @keyframes gentle-breathe {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.04); }

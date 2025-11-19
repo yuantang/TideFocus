@@ -93,9 +93,19 @@ export default function App() {
   const audioRefs = useRef<Record<string, HTMLAudioElement>>(
     SOUNDS.reduce((acc, sound) => {
       if (sound.url) {
-        const audio = new Audio(sound.url);
-        audio.loop = true;
-        acc[sound.id] = audio;
+        try {
+          const audio = new Audio(sound.url);
+          audio.loop = true;
+
+          // 添加错误处理
+          audio.addEventListener('error', (e) => {
+            console.error(`Failed to load audio: ${sound.name}`, e);
+          });
+
+          acc[sound.id] = audio;
+        } catch (error) {
+          console.error(`Failed to create audio for ${sound.name}:`, error);
+        }
       }
       return acc;
     }, {} as Record<string, HTMLAudioElement>)
@@ -205,7 +215,7 @@ export default function App() {
       const faviconColor = isLongBreakMode ? longBreakTextColor : (mode === 'focus' ? focusTextColor : breakTextColor);
       updateFavicon(progress, faviconMode, faviconColor);
     } else {
-      document.title = 'Gentle Focus Timer';
+      document.title = 'TideFocus';
       updateFavicon(0, 'inactive', '');
     }
   }, [isActive, timeLeft, mode, progress, isLongBreakMode, focusTextColor, breakTextColor, longBreakTextColor]);
@@ -492,21 +502,33 @@ export default function App() {
   useEffect(() => {
       const activeSoundIds = activeSounds.map(s => s.id);
       Object.entries(audioRefs.current).forEach(([id, audio]) => {
+          if (!audio) return; // 跳过加载失败的音频
+
+          const audioElement = audio as HTMLAudioElement;
           const soundIsActive = activeSoundIds.includes(id);
           const shouldBePlaying = soundIsActive && isActive;
 
-          if (shouldBePlaying && audio.paused) {
-              audio.play().catch(e => console.error(`Failed to play sound ${id}`, e));
-          } else if (!shouldBePlaying && !audio.paused) {
-              audio.pause();
-          }
+          try {
+            if (shouldBePlaying && audioElement.paused) {
+                audioElement.play().catch(e => console.error(`Failed to play sound ${id}`, e));
+            } else if (!shouldBePlaying && !audioElement.paused) {
+                audioElement.pause();
+            }
 
-          if (soundIsActive) {
-              const activeSound = activeSounds.find(s => s.id === id);
-              if (activeSound) audio.volume = activeSound.volume * masterVolume;
+            if (soundIsActive) {
+                const activeSound = activeSounds.find(s => s.id === id);
+                if (activeSound) audioElement.volume = activeSound.volume * masterVolume;
+            }
+          } catch (error) {
+            console.error(`Error managing audio ${id}:`, error);
           }
       });
-      completionAudioRef.current.volume = masterVolume;
+
+      try {
+        completionAudioRef.current.volume = masterVolume;
+      } catch (error) {
+        console.error('Error setting completion audio volume:', error);
+      }
   }, [isActive, activeSounds, masterVolume]);
 
   const toggleMute = () => {

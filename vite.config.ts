@@ -18,6 +18,14 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            // 确保 Service Worker 不被打包
+            manualChunks: undefined
+          }
+        }
       }
     };
 });
