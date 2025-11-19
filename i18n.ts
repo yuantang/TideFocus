@@ -14,6 +14,7 @@ export interface Translations {
   // 标签页
   progress: string;
   milestones: string;
+  account: string;
   about: string;
   
   // 视图类型
@@ -296,6 +297,121 @@ export interface Translations {
     skipToFocus: string;
     skipToLongBreak: string;
   };
+
+  // 账号管理
+  accountTab: {
+    // 未登录状态
+    cloudSync: string;
+    loginToSync: string;
+    login: string;
+    register: string;
+    displayName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    minPasswordLength: string;
+    forgotPassword: string;
+    backToLogin: string;
+    loginButton: string;
+    registerButton: string;
+    resetPasswordButton: string;
+    processing: string;
+
+    // 已登录状态
+    userInfo: string;
+    syncStatus: string;
+    networkStatus: string;
+    online: string;
+    offline: string;
+    realtimeSync: string;
+    connected: string;
+    disconnected: string;
+    pendingSync: string;
+    items: string;
+    lastSync: string;
+    syncNow: string;
+    syncing: string;
+    restoreFromCloud: string;
+
+    // 修改密码
+    changePassword: string;
+    newPassword: string;
+
+    // 退出登录
+    signOut: string;
+
+    // 消息提示
+    loginSuccess: string;
+    registerSuccess: string;
+    resetPasswordSuccess: string;
+    passwordChanged: string;
+    syncSuccess: string;
+    restoreSuccess: string;
+    signedOut: string;
+    passwordMismatch: string;
+    operationFailed: string;
+    syncFailed: string;
+    restoreFailed: string;
+    signOutFailed: string;
+    restoreConfirm: string;
+    signOutConfirm: string;
+    pageWillReload: string;
+  };
+
+  // 模板系统
+  templates: {
+    // 模板选择器
+    selectTemplate: string;
+    createCustom: string;
+
+    // 模板编辑器
+    createTemplate: string;
+    editTemplate: string;
+    templateName: string;
+    templateDescription: string;
+    selectIcon: string;
+    focusDuration: string;
+    breakDuration: string;
+    longBreakDuration: string;
+    sessionsPerRound: string;
+    preview: string;
+    create: string;
+    update: string;
+
+    // 预设模板名称
+    presetNames: {
+      classic: string;
+      study: string;
+      work: string;
+      creative: string;
+      sprint: string;
+      deepFocus: string;
+      relax: string;
+    };
+
+    // 预设模板描述
+    presetDescriptions: {
+      classic: string;
+      study: string;
+      work: string;
+      creative: string;
+      sprint: string;
+      deepFocus: string;
+      relax: string;
+    };
+
+    // 消息提示
+    templateCreated: string;
+    templateUpdated: string;
+    templateDeleted: string;
+    templateApplied: string;
+    deleteConfirm: string;
+
+    // 验证消息
+    nameRequired: string;
+    nameTooLong: string;
+    descriptionTooLong: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -309,6 +425,7 @@ export const translations: Record<Language, Translations> = {
 
     progress: '进度',
     milestones: '成就',
+    account: '账号',
     about: '关于',
     
     dayView: '日',
@@ -668,6 +785,108 @@ export const translations: Record<Language, Translations> = {
       skipToBreak: '跳到休息',
       skipToFocus: '跳到专注',
       skipToLongBreak: '跳到长休息',
+    },
+
+    accountTab: {
+      cloudSync: '云端同步',
+      loginToSync: '登录以启用多设备数据同步',
+      login: '登录',
+      register: '注册',
+      displayName: '显示名称',
+      email: '邮箱',
+      password: '密码',
+      confirmPassword: '确认密码',
+      minPasswordLength: '至少 6 个字符',
+      forgotPassword: '忘记密码？',
+      backToLogin: '返回登录',
+      loginButton: '登录',
+      registerButton: '注册',
+      resetPasswordButton: '发送重置邮件',
+      processing: '处理中...',
+
+      userInfo: '用户信息',
+      syncStatus: '同步状态',
+      networkStatus: '网络状态',
+      online: '在线',
+      offline: '离线',
+      realtimeSync: '实时同步',
+      connected: '已连接',
+      disconnected: '未连接',
+      pendingSync: '待同步',
+      items: '项',
+      lastSync: '最后同步',
+      syncNow: '立即同步',
+      syncing: '同步中...',
+      restoreFromCloud: '从云端恢复',
+
+      changePassword: '修改密码',
+      newPassword: '新密码',
+
+      signOut: '退出登录',
+
+      loginSuccess: '登录成功！',
+      registerSuccess: '注册成功！请查收验证邮件。',
+      resetPasswordSuccess: '密码重置邮件已发送！',
+      passwordChanged: '密码修改成功！',
+      syncSuccess: '同步成功！',
+      restoreSuccess: '恢复成功！页面将在 3 秒后刷新...',
+      signedOut: '已退出登录',
+      passwordMismatch: '两次输入的密码不一致',
+      operationFailed: '操作失败，请重试',
+      syncFailed: '同步失败',
+      restoreFailed: '恢复失败',
+      signOutFailed: '退出登录失败',
+      restoreConfirm: '确定要从云端恢复数据吗？这将覆盖本地数据！',
+      signOutConfirm: '确定要退出登录吗？',
+      pageWillReload: '页面将在 3 秒后刷新',
+    },
+
+    templates: {
+      selectTemplate: '选择模板',
+      createCustom: '创建自定义模板',
+
+      createTemplate: '创建模板',
+      editTemplate: '编辑模板',
+      templateName: '模板名称',
+      templateDescription: '模板描述',
+      selectIcon: '选择图标',
+      focusDuration: '专注时长',
+      breakDuration: '短休息时长',
+      longBreakDuration: '长休息时长',
+      sessionsPerRound: '每轮次数',
+      preview: '预览',
+      create: '创建',
+      update: '更新',
+
+      presetNames: {
+        classic: '经典番茄钟',
+        study: '学习模式',
+        work: '工作模式',
+        creative: '创作模式',
+        sprint: '冲刺模式',
+        deepFocus: '深度专注',
+        relax: '轻松模式',
+      },
+
+      presetDescriptions: {
+        classic: '25分专注，5分休息，适合大多数工作场景',
+        study: '25分专注，5分休息，适合学习和记忆',
+        work: '50分专注，10分休息，适合深度工作',
+        creative: '90分专注，20分休息，适合创意工作',
+        sprint: '15分专注，3分休息，短时高效',
+        deepFocus: '120分专注，30分休息，极致专注',
+        relax: '20分专注，10分休息，低压力学习',
+      },
+
+      templateCreated: '模板已创建',
+      templateUpdated: '模板已更新',
+      templateDeleted: '模板已删除',
+      templateApplied: '已切换到模板',
+      deleteConfirm: '确定要删除这个模板吗？',
+
+      nameRequired: '请输入模板名称',
+      nameTooLong: '模板名称不能超过 20 个字符',
+      descriptionTooLong: '模板描述不能超过 100 个字符',
     },
   },
 
@@ -1041,6 +1260,108 @@ export const translations: Record<Language, Translations> = {
       skipToFocus: '跳到專注',
       skipToLongBreak: '跳到長休息',
     },
+
+    accountTab: {
+      cloudSync: '雲端同步',
+      loginToSync: '登入以啟用多裝置資料同步',
+      login: '登入',
+      register: '註冊',
+      displayName: '顯示名稱',
+      email: '電子郵件',
+      password: '密碼',
+      confirmPassword: '確認密碼',
+      minPasswordLength: '至少 6 個字元',
+      forgotPassword: '忘記密碼？',
+      backToLogin: '返回登入',
+      loginButton: '登入',
+      registerButton: '註冊',
+      resetPasswordButton: '發送重設郵件',
+      processing: '處理中...',
+
+      userInfo: '使用者資訊',
+      syncStatus: '同步狀態',
+      networkStatus: '網路狀態',
+      online: '線上',
+      offline: '離線',
+      realtimeSync: '即時同步',
+      connected: '已連接',
+      disconnected: '未連接',
+      pendingSync: '待同步',
+      items: '項',
+      lastSync: '最後同步',
+      syncNow: '立即同步',
+      syncing: '同步中...',
+      restoreFromCloud: '從雲端恢復',
+
+      changePassword: '修改密碼',
+      newPassword: '新密碼',
+
+      signOut: '登出',
+
+      loginSuccess: '登入成功！',
+      registerSuccess: '註冊成功！請查收驗證郵件。',
+      resetPasswordSuccess: '密碼重設郵件已發送！',
+      passwordChanged: '密碼修改成功！',
+      syncSuccess: '同步成功！',
+      restoreSuccess: '恢復成功！頁面將在 3 秒後重新整理...',
+      signedOut: '已登出',
+      passwordMismatch: '兩次輸入的密碼不一致',
+      operationFailed: '操作失敗，請重試',
+      syncFailed: '同步失敗',
+      restoreFailed: '恢復失敗',
+      signOutFailed: '登出失敗',
+      restoreConfirm: '確定要從雲端恢復資料嗎？這將覆蓋本機資料！',
+      signOutConfirm: '確定要登出嗎？',
+      pageWillReload: '頁面將在 3 秒後重新整理',
+    },
+
+    templates: {
+      selectTemplate: '選擇模板',
+      createCustom: '建立自訂模板',
+
+      createTemplate: '建立模板',
+      editTemplate: '編輯模板',
+      templateName: '模板名稱',
+      templateDescription: '模板描述',
+      selectIcon: '選擇圖示',
+      focusDuration: '專注時長',
+      breakDuration: '短休息時長',
+      longBreakDuration: '長休息時長',
+      sessionsPerRound: '每輪次數',
+      preview: '預覽',
+      create: '建立',
+      update: '更新',
+
+      presetNames: {
+        classic: '經典番茄鐘',
+        study: '學習模式',
+        work: '工作模式',
+        creative: '創作模式',
+        sprint: '衝刺模式',
+        deepFocus: '深度專注',
+        relax: '輕鬆模式',
+      },
+
+      presetDescriptions: {
+        classic: '25分專注，5分休息，適合大多數工作場景',
+        study: '25分專注，5分休息，適合學習和記憶',
+        work: '50分專注，10分休息，適合深度工作',
+        creative: '90分專注，20分休息，適合創意工作',
+        sprint: '15分專注，3分休息，短時高效',
+        deepFocus: '120分專注，30分休息，極致專注',
+        relax: '20分專注，10分休息，低壓力學習',
+      },
+
+      templateCreated: '模板已建立',
+      templateUpdated: '模板已更新',
+      templateDeleted: '模板已刪除',
+      templateApplied: '已切換到模板',
+      deleteConfirm: '確定要刪除這個模板嗎？',
+
+      nameRequired: '請輸入模板名稱',
+      nameTooLong: '模板名稱不能超過 20 個字元',
+      descriptionTooLong: '模板描述不能超過 100 個字元',
+    },
   },
 
   'en': {
@@ -1412,6 +1733,108 @@ export const translations: Record<Language, Translations> = {
       skipToBreak: 'Skip to Break',
       skipToFocus: 'Skip to Focus',
       skipToLongBreak: 'Skip to Long Break',
+    },
+
+    accountTab: {
+      cloudSync: 'Cloud Sync',
+      loginToSync: 'Sign in to enable multi-device data sync',
+      login: 'Sign In',
+      register: 'Sign Up',
+      displayName: 'Display Name',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      minPasswordLength: 'At least 6 characters',
+      forgotPassword: 'Forgot password?',
+      backToLogin: 'Back to Sign In',
+      loginButton: 'Sign In',
+      registerButton: 'Sign Up',
+      resetPasswordButton: 'Send Reset Email',
+      processing: 'Processing...',
+
+      userInfo: 'User Info',
+      syncStatus: 'Sync Status',
+      networkStatus: 'Network Status',
+      online: 'Online',
+      offline: 'Offline',
+      realtimeSync: 'Realtime Sync',
+      connected: 'Connected',
+      disconnected: 'Disconnected',
+      pendingSync: 'Pending Sync',
+      items: 'items',
+      lastSync: 'Last Sync',
+      syncNow: 'Sync Now',
+      syncing: 'Syncing...',
+      restoreFromCloud: 'Restore from Cloud',
+
+      changePassword: 'Change Password',
+      newPassword: 'New Password',
+
+      signOut: 'Sign Out',
+
+      loginSuccess: 'Signed in successfully!',
+      registerSuccess: 'Signed up successfully! Please check your email for verification.',
+      resetPasswordSuccess: 'Password reset email sent!',
+      passwordChanged: 'Password changed successfully!',
+      syncSuccess: 'Synced successfully!',
+      restoreSuccess: 'Restored successfully! Page will reload in 3 seconds...',
+      signedOut: 'Signed out',
+      passwordMismatch: 'Passwords do not match',
+      operationFailed: 'Operation failed, please try again',
+      syncFailed: 'Sync failed',
+      restoreFailed: 'Restore failed',
+      signOutFailed: 'Sign out failed',
+      restoreConfirm: 'Are you sure you want to restore data from cloud? This will overwrite local data!',
+      signOutConfirm: 'Are you sure you want to sign out?',
+      pageWillReload: 'Page will reload in 3 seconds',
+    },
+
+    templates: {
+      selectTemplate: 'Select Template',
+      createCustom: 'Create Custom Template',
+
+      createTemplate: 'Create Template',
+      editTemplate: 'Edit Template',
+      templateName: 'Template Name',
+      templateDescription: 'Template Description',
+      selectIcon: 'Select Icon',
+      focusDuration: 'Focus Duration',
+      breakDuration: 'Short Break Duration',
+      longBreakDuration: 'Long Break Duration',
+      sessionsPerRound: 'Sessions Per Round',
+      preview: 'Preview',
+      create: 'Create',
+      update: 'Update',
+
+      presetNames: {
+        classic: 'Classic Pomodoro',
+        study: 'Study Mode',
+        work: 'Work Mode',
+        creative: 'Creative Mode',
+        sprint: 'Sprint Mode',
+        deepFocus: 'Deep Focus',
+        relax: 'Relax Mode',
+      },
+
+      presetDescriptions: {
+        classic: '25min focus, 5min break, suitable for most work scenarios',
+        study: '25min focus, 5min break, suitable for learning and memorization',
+        work: '50min focus, 10min break, suitable for deep work',
+        creative: '90min focus, 20min break, suitable for creative work',
+        sprint: '15min focus, 3min break, short and efficient',
+        deepFocus: '120min focus, 30min break, ultimate focus',
+        relax: '20min focus, 10min break, low-pressure learning',
+      },
+
+      templateCreated: 'Template created',
+      templateUpdated: 'Template updated',
+      templateDeleted: 'Template deleted',
+      templateApplied: 'Switched to template',
+      deleteConfirm: 'Are you sure you want to delete this template?',
+
+      nameRequired: 'Please enter template name',
+      nameTooLong: 'Template name cannot exceed 20 characters',
+      descriptionTooLong: 'Template description cannot exceed 100 characters',
     },
   },
 
@@ -1785,6 +2208,108 @@ export const translations: Record<Language, Translations> = {
       skipToFocus: 'Saltar a Enfoque',
       skipToLongBreak: 'Saltar a Descanso Largo',
     },
+
+    accountTab: {
+      cloudSync: 'Sincronización en la Nube',
+      loginToSync: 'Inicia sesión para habilitar la sincronización de datos entre dispositivos',
+      login: 'Iniciar Sesión',
+      register: 'Registrarse',
+      displayName: 'Nombre para Mostrar',
+      email: 'Correo Electrónico',
+      password: 'Contraseña',
+      confirmPassword: 'Confirmar Contraseña',
+      minPasswordLength: 'Al menos 6 caracteres',
+      forgotPassword: '¿Olvidaste tu contraseña?',
+      backToLogin: 'Volver a Iniciar Sesión',
+      loginButton: 'Iniciar Sesión',
+      registerButton: 'Registrarse',
+      resetPasswordButton: 'Enviar Correo de Restablecimiento',
+      processing: 'Procesando...',
+
+      userInfo: 'Información del Usuario',
+      syncStatus: 'Estado de Sincronización',
+      networkStatus: 'Estado de Red',
+      online: 'En Línea',
+      offline: 'Sin Conexión',
+      realtimeSync: 'Sincronización en Tiempo Real',
+      connected: 'Conectado',
+      disconnected: 'Desconectado',
+      pendingSync: 'Sincronización Pendiente',
+      items: 'elementos',
+      lastSync: 'Última Sincronización',
+      syncNow: 'Sincronizar Ahora',
+      syncing: 'Sincronizando...',
+      restoreFromCloud: 'Restaurar desde la Nube',
+
+      changePassword: 'Cambiar Contraseña',
+      newPassword: 'Nueva Contraseña',
+
+      signOut: 'Cerrar Sesión',
+
+      loginSuccess: '¡Sesión iniciada con éxito!',
+      registerSuccess: '¡Registro exitoso! Por favor, revisa tu correo para verificación.',
+      resetPasswordSuccess: '¡Correo de restablecimiento de contraseña enviado!',
+      passwordChanged: '¡Contraseña cambiada con éxito!',
+      syncSuccess: '¡Sincronizado con éxito!',
+      restoreSuccess: '¡Restaurado con éxito! La página se recargará en 3 segundos...',
+      signedOut: 'Sesión cerrada',
+      passwordMismatch: 'Las contraseñas no coinciden',
+      operationFailed: 'Operación fallida, por favor intenta de nuevo',
+      syncFailed: 'Sincronización fallida',
+      restoreFailed: 'Restauración fallida',
+      signOutFailed: 'Cierre de sesión fallido',
+      restoreConfirm: '¿Estás seguro de que quieres restaurar datos desde la nube? ¡Esto sobrescribirá los datos locales!',
+      signOutConfirm: '¿Estás seguro de que quieres cerrar sesión?',
+      pageWillReload: 'La página se recargará en 3 segundos',
+    },
+
+    templates: {
+      selectTemplate: 'Seleccionar Plantilla',
+      createCustom: 'Crear Plantilla Personalizada',
+
+      createTemplate: 'Crear Plantilla',
+      editTemplate: 'Editar Plantilla',
+      templateName: 'Nombre de la Plantilla',
+      templateDescription: 'Descripción de la Plantilla',
+      selectIcon: 'Seleccionar Icono',
+      focusDuration: 'Duración del Enfoque',
+      breakDuration: 'Duración del Descanso Corto',
+      longBreakDuration: 'Duración del Descanso Largo',
+      sessionsPerRound: 'Sesiones por Ronda',
+      preview: 'Vista Previa',
+      create: 'Crear',
+      update: 'Actualizar',
+
+      presetNames: {
+        classic: 'Pomodoro Clásico',
+        study: 'Modo de Estudio',
+        work: 'Modo de Trabajo',
+        creative: 'Modo Creativo',
+        sprint: 'Modo Sprint',
+        deepFocus: 'Enfoque Profundo',
+        relax: 'Modo Relajado',
+      },
+
+      presetDescriptions: {
+        classic: '25min enfoque, 5min descanso, adecuado para la mayoría de escenarios de trabajo',
+        study: '25min enfoque, 5min descanso, adecuado para aprendizaje y memorización',
+        work: '50min enfoque, 10min descanso, adecuado para trabajo profundo',
+        creative: '90min enfoque, 20min descanso, adecuado para trabajo creativo',
+        sprint: '15min enfoque, 3min descanso, corto y eficiente',
+        deepFocus: '120min enfoque, 30min descanso, enfoque máximo',
+        relax: '20min enfoque, 10min descanso, aprendizaje de baja presión',
+      },
+
+      templateCreated: 'Plantilla creada',
+      templateUpdated: 'Plantilla actualizada',
+      templateDeleted: 'Plantilla eliminada',
+      templateApplied: 'Cambiado a plantilla',
+      deleteConfirm: '¿Estás seguro de que quieres eliminar esta plantilla?',
+
+      nameRequired: 'Por favor ingresa el nombre de la plantilla',
+      nameTooLong: 'El nombre de la plantilla no puede exceder 20 caracteres',
+      descriptionTooLong: 'La descripción de la plantilla no puede exceder 100 caracteres',
+    },
   },
 
   'ja': {
@@ -2157,6 +2682,108 @@ export const translations: Record<Language, Translations> = {
       skipToFocus: '集中へスキップ',
       skipToLongBreak: '長い休憩へスキップ',
     },
+
+    accountTab: {
+      cloudSync: 'クラウド同期',
+      loginToSync: 'マルチデバイスデータ同期を有効にするにはサインインしてください',
+      login: 'サインイン',
+      register: '登録',
+      displayName: '表示名',
+      email: 'メールアドレス',
+      password: 'パスワード',
+      confirmPassword: 'パスワード確認',
+      minPasswordLength: '6文字以上',
+      forgotPassword: 'パスワードをお忘れですか？',
+      backToLogin: 'サインインに戻る',
+      loginButton: 'サインイン',
+      registerButton: '登録',
+      resetPasswordButton: 'リセットメールを送信',
+      processing: '処理中...',
+
+      userInfo: 'ユーザー情報',
+      syncStatus: '同期状態',
+      networkStatus: 'ネットワーク状態',
+      online: 'オンライン',
+      offline: 'オフライン',
+      realtimeSync: 'リアルタイム同期',
+      connected: '接続済み',
+      disconnected: '未接続',
+      pendingSync: '同期待ち',
+      items: '件',
+      lastSync: '最終同期',
+      syncNow: '今すぐ同期',
+      syncing: '同期中...',
+      restoreFromCloud: 'クラウドから復元',
+
+      changePassword: 'パスワード変更',
+      newPassword: '新しいパスワード',
+
+      signOut: 'サインアウト',
+
+      loginSuccess: 'サインインに成功しました！',
+      registerSuccess: '登録に成功しました！確認メールをご確認ください。',
+      resetPasswordSuccess: 'パスワードリセットメールを送信しました！',
+      passwordChanged: 'パスワードを変更しました！',
+      syncSuccess: '同期に成功しました！',
+      restoreSuccess: '復元に成功しました！3秒後にページを再読み込みします...',
+      signedOut: 'サインアウトしました',
+      passwordMismatch: 'パスワードが一致しません',
+      operationFailed: '操作に失敗しました。もう一度お試しください',
+      syncFailed: '同期に失敗しました',
+      restoreFailed: '復元に失敗しました',
+      signOutFailed: 'サインアウトに失敗しました',
+      restoreConfirm: 'クラウドからデータを復元しますか？ローカルデータが上書きされます！',
+      signOutConfirm: 'サインアウトしますか？',
+      pageWillReload: '3秒後にページを再読み込みします',
+    },
+
+    templates: {
+      selectTemplate: 'テンプレートを選択',
+      createCustom: 'カスタムテンプレートを作成',
+
+      createTemplate: 'テンプレートを作成',
+      editTemplate: 'テンプレートを編集',
+      templateName: 'テンプレート名',
+      templateDescription: 'テンプレートの説明',
+      selectIcon: 'アイコンを選択',
+      focusDuration: '集中時間',
+      breakDuration: '短い休憩時間',
+      longBreakDuration: '長い休憩時間',
+      sessionsPerRound: 'ラウンドあたりのセッション数',
+      preview: 'プレビュー',
+      create: '作成',
+      update: '更新',
+
+      presetNames: {
+        classic: 'クラシックポモドーロ',
+        study: '学習モード',
+        work: '作業モード',
+        creative: 'クリエイティブモード',
+        sprint: 'スプリントモード',
+        deepFocus: 'ディープフォーカス',
+        relax: 'リラックスモード',
+      },
+
+      presetDescriptions: {
+        classic: '25分集中、5分休憩、ほとんどの作業シナリオに適しています',
+        study: '25分集中、5分休憩、学習と記憶に適しています',
+        work: '50分集中、10分休憩、深い作業に適しています',
+        creative: '90分集中、20分休憩、クリエイティブな作業に適しています',
+        sprint: '15分集中、3分休憩、短時間で効率的',
+        deepFocus: '120分集中、30分休憩、究極の集中',
+        relax: '20分集中、10分休憩、低圧力学習',
+      },
+
+      templateCreated: 'テンプレートを作成しました',
+      templateUpdated: 'テンプレートを更新しました',
+      templateDeleted: 'テンプレートを削除しました',
+      templateApplied: 'テンプレートに切り替えました',
+      deleteConfirm: 'このテンプレートを削除しますか？',
+
+      nameRequired: 'テンプレート名を入力してください',
+      nameTooLong: 'テンプレート名は20文字を超えることはできません',
+      descriptionTooLong: 'テンプレートの説明は100文字を超えることはできません',
+    },
   },
 
   'ko': {
@@ -2528,6 +3155,108 @@ export const translations: Record<Language, Translations> = {
       skipToBreak: '휴식으로 건너뛰기',
       skipToFocus: '집중으로 건너뛰기',
       skipToLongBreak: '긴 휴식으로 건너뛰기',
+    },
+
+    accountTab: {
+      cloudSync: '클라우드 동기화',
+      loginToSync: '다중 기기 데이터 동기화를 활성화하려면 로그인하세요',
+      login: '로그인',
+      register: '회원가입',
+      displayName: '표시 이름',
+      email: '이메일',
+      password: '비밀번호',
+      confirmPassword: '비밀번호 확인',
+      minPasswordLength: '최소 6자',
+      forgotPassword: '비밀번호를 잊으셨나요?',
+      backToLogin: '로그인으로 돌아가기',
+      loginButton: '로그인',
+      registerButton: '회원가입',
+      resetPasswordButton: '재설정 이메일 보내기',
+      processing: '처리 중...',
+
+      userInfo: '사용자 정보',
+      syncStatus: '동기화 상태',
+      networkStatus: '네트워크 상태',
+      online: '온라인',
+      offline: '오프라인',
+      realtimeSync: '실시간 동기화',
+      connected: '연결됨',
+      disconnected: '연결 안 됨',
+      pendingSync: '동기화 대기 중',
+      items: '항목',
+      lastSync: '마지막 동기화',
+      syncNow: '지금 동기화',
+      syncing: '동기화 중...',
+      restoreFromCloud: '클라우드에서 복원',
+
+      changePassword: '비밀번호 변경',
+      newPassword: '새 비밀번호',
+
+      signOut: '로그아웃',
+
+      loginSuccess: '로그인 성공!',
+      registerSuccess: '회원가입 성공! 확인 이메일을 확인하세요.',
+      resetPasswordSuccess: '비밀번호 재설정 이메일을 보냈습니다!',
+      passwordChanged: '비밀번호가 변경되었습니다!',
+      syncSuccess: '동기화 성공!',
+      restoreSuccess: '복원 성공! 3초 후 페이지가 새로고침됩니다...',
+      signedOut: '로그아웃됨',
+      passwordMismatch: '비밀번호가 일치하지 않습니다',
+      operationFailed: '작업 실패, 다시 시도하세요',
+      syncFailed: '동기화 실패',
+      restoreFailed: '복원 실패',
+      signOutFailed: '로그아웃 실패',
+      restoreConfirm: '클라우드에서 데이터를 복원하시겠습니까? 로컬 데이터를 덮어씁니다!',
+      signOutConfirm: '로그아웃하시겠습니까?',
+      pageWillReload: '3초 후 페이지가 새로고침됩니다',
+    },
+
+    templates: {
+      selectTemplate: '템플릿 선택',
+      createCustom: '사용자 정의 템플릿 만들기',
+
+      createTemplate: '템플릿 만들기',
+      editTemplate: '템플릿 편집',
+      templateName: '템플릿 이름',
+      templateDescription: '템플릿 설명',
+      selectIcon: '아이콘 선택',
+      focusDuration: '집중 시간',
+      breakDuration: '짧은 휴식 시간',
+      longBreakDuration: '긴 휴식 시간',
+      sessionsPerRound: '라운드당 세션 수',
+      preview: '미리보기',
+      create: '만들기',
+      update: '업데이트',
+
+      presetNames: {
+        classic: '클래식 포모도로',
+        study: '학습 모드',
+        work: '작업 모드',
+        creative: '창작 모드',
+        sprint: '스프린트 모드',
+        deepFocus: '딥 포커스',
+        relax: '휴식 모드',
+      },
+
+      presetDescriptions: {
+        classic: '25분 집중, 5분 휴식, 대부분의 작업 시나리오에 적합',
+        study: '25분 집중, 5분 휴식, 학습 및 암기에 적합',
+        work: '50분 집중, 10분 휴식, 깊은 작업에 적합',
+        creative: '90분 집중, 20분 휴식, 창의적인 작업에 적합',
+        sprint: '15분 집중, 3분 휴식, 짧고 효율적',
+        deepFocus: '120분 집중, 30분 휴식, 궁극의 집중',
+        relax: '20분 집중, 10분 휴식, 저압 학습',
+      },
+
+      templateCreated: '템플릿이 생성되었습니다',
+      templateUpdated: '템플릿이 업데이트되었습니다',
+      templateDeleted: '템플릿이 삭제되었습니다',
+      templateApplied: '템플릿으로 전환되었습니다',
+      deleteConfirm: '이 템플릿을 삭제하시겠습니까?',
+
+      nameRequired: '템플릿 이름을 입력하세요',
+      nameTooLong: '템플릿 이름은 20자를 초과할 수 없습니다',
+      descriptionTooLong: '템플릿 설명은 100자를 초과할 수 없습니다',
     },
   },
 };

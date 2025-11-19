@@ -433,6 +433,7 @@ const MonthlyStatsView: React.FC<{ stats: Stats }> = ({ stats }) => {
 
 // 账号管理标签页
 const AccountTab: React.FC = () => {
+  const t = getTranslations();
   const { user, isAuthenticated, signIn, signUp, signOut, resetPassword, updatePassword } = useAuth();
   const { syncStatus, syncAll, restoreAll } = useCloudSync();
   const { isConnected: realtimeConnected } = useRealtimeSync();
@@ -464,18 +465,18 @@ const AccountTab: React.FC = () => {
     try {
       if (mode === 'login') {
         await signIn(email, password);
-        setMessage({ type: 'success', text: '登录成功！' });
+        setMessage({ type: 'success', text: t.accountTab.loginSuccess });
       } else if (mode === 'register') {
         await signUp(email, password, displayName);
-        setMessage({ type: 'success', text: '注册成功！请查收验证邮件。' });
+        setMessage({ type: 'success', text: t.accountTab.registerSuccess });
         setTimeout(() => setMode('login'), 2000);
       } else if (mode === 'reset') {
         await resetPassword(email);
-        setMessage({ type: 'success', text: '密码重置邮件已发送！' });
+        setMessage({ type: 'success', text: t.accountTab.resetPasswordSuccess });
         setTimeout(() => setMode('login'), 2000);
       }
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || '操作失败，请重试' });
+      setMessage({ type: 'error', text: err.message || t.accountTab.operationFailed });
     } finally {
       setLoading(false);
     }
@@ -485,12 +486,12 @@ const AccountTab: React.FC = () => {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      setMessage({ type: 'error', text: '两次输入的密码不一致' });
+      setMessage({ type: 'error', text: t.accountTab.passwordMismatch });
       return;
     }
 
     if (newPassword.length < 6) {
-      setMessage({ type: 'error', text: '密码至少需要 6 个字符' });
+      setMessage({ type: 'error', text: t.accountTab.minPasswordLength });
       return;
     }
 
@@ -499,25 +500,25 @@ const AccountTab: React.FC = () => {
 
     try {
       await updatePassword(newPassword);
-      setMessage({ type: 'success', text: '密码修改成功！' });
+      setMessage({ type: 'success', text: t.accountTab.passwordChanged });
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || '密码修改失败' });
+      setMessage({ type: 'error', text: error.message || t.accountTab.operationFailed });
     } finally {
       setLoading(false);
     }
   };
 
   const handleSignOut = async () => {
-    if (!confirm('确定要退出登录吗？')) return;
+    if (!confirm(t.accountTab.signOutConfirm)) return;
 
     setLoading(true);
     try {
       await signOut();
-      setMessage({ type: 'success', text: '已退出登录' });
+      setMessage({ type: 'success', text: t.accountTab.signedOut });
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || '退出登录失败' });
+      setMessage({ type: 'error', text: error.message || t.accountTab.signOutFailed });
     } finally {
       setLoading(false);
     }
@@ -528,25 +529,25 @@ const AccountTab: React.FC = () => {
     setMessage(null);
     try {
       await syncAll();
-      setMessage({ type: 'success', text: '同步成功！' });
+      setMessage({ type: 'success', text: t.accountTab.syncSuccess });
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || '同步失败' });
+      setMessage({ type: 'error', text: error.message || t.accountTab.syncFailed });
     } finally {
       setLoading(false);
     }
   };
 
   const handleRestore = async () => {
-    if (!confirm('确定要从云端恢复数据吗？这将覆盖本地数据！')) return;
+    if (!confirm(t.accountTab.restoreConfirm)) return;
 
     setLoading(true);
     setMessage(null);
     try {
       await restoreAll();
-      setMessage({ type: 'success', text: '恢复成功！页面将在 3 秒后刷新...' });
+      setMessage({ type: 'success', text: t.accountTab.restoreSuccess });
       setTimeout(() => window.location.reload(), 3000);
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || '恢复失败' });
+      setMessage({ type: 'error', text: error.message || t.accountTab.restoreFailed });
     } finally {
       setLoading(false);
     }
@@ -557,8 +558,8 @@ const AccountTab: React.FC = () => {
     return (
       <div className="space-y-4 max-w-md mx-auto">
         <div className="text-center">
-          <h3 className="text-md font-semibold opacity-80 mb-2">云端同步</h3>
-          <p className="text-xs opacity-60">登录以启用多设备数据同步</p>
+          <h3 className="text-md font-semibold opacity-80 mb-2">{t.accountTab.cloudSync}</h3>
+          <p className="text-xs opacity-60">{t.accountTab.loginToSync}</p>
         </div>
 
         {/* 消息提示 */}
@@ -576,7 +577,7 @@ const AccountTab: React.FC = () => {
               mode === 'login' ? 'bg-white/80 shadow-sm' : 'hover:bg-white/40'
             }`}
           >
-            登录
+            {t.accountTab.login}
           </button>
           <button
             onClick={() => setMode('register')}
@@ -584,7 +585,7 @@ const AccountTab: React.FC = () => {
               mode === 'register' ? 'bg-white/80 shadow-sm' : 'hover:bg-white/40'
             }`}
           >
-            注册
+            {t.accountTab.register}
           </button>
         </div>
 
@@ -593,21 +594,21 @@ const AccountTab: React.FC = () => {
           {mode === 'register' && (
             <div>
               <label className="block text-sm font-medium mb-1">
-                显示名称
+                {t.accountTab.displayName}
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
-                placeholder="输入你的名称"
+                placeholder={t.accountTab.displayName}
               />
             </div>
           )}
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              邮箱
+              {t.accountTab.email}
             </label>
             <input
               type="email"
@@ -622,7 +623,7 @@ const AccountTab: React.FC = () => {
           {mode !== 'reset' && (
             <div>
               <label className="block text-sm font-medium mb-1">
-                密码
+                {t.accountTab.password}
               </label>
               <input
                 type="password"
@@ -630,7 +631,7 @@ const AccountTab: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
-                placeholder="至少 6 个字符"
+                placeholder={t.accountTab.minPasswordLength}
               />
             </div>
           )}
@@ -640,7 +641,7 @@ const AccountTab: React.FC = () => {
             disabled={loading}
             className="w-full py-2.5 bg-[#6b5a5a] text-white rounded-md font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
           >
-            {loading ? '处理中...' : mode === 'login' ? '登录' : mode === 'register' ? '注册' : '发送重置邮件'}
+            {loading ? t.accountTab.processing : mode === 'login' ? t.accountTab.loginButton : mode === 'register' ? t.accountTab.registerButton : t.accountTab.resetPasswordButton}
           </button>
         </form>
 
@@ -651,7 +652,7 @@ const AccountTab: React.FC = () => {
               onClick={() => setMode('reset')}
               className="opacity-60 hover:opacity-100 transition-opacity"
             >
-              忘记密码？
+              {t.accountTab.forgotPassword}
             </button>
           )}
           {mode === 'reset' && (
@@ -659,7 +660,7 @@ const AccountTab: React.FC = () => {
               onClick={() => setMode('login')}
               className="opacity-60 hover:opacity-100 transition-opacity"
             >
-              返回登录
+              {t.accountTab.backToLogin}
             </button>
           )}
         </div>
@@ -679,7 +680,7 @@ const AccountTab: React.FC = () => {
 
       {/* 用户信息 */}
       <div>
-        <h3 className="text-md font-semibold opacity-80 text-center mb-3">用户信息</h3>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.accountTab.userInfo}</h3>
         <div className="bg-black/5 p-4 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-[#6b5a5a] rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
@@ -697,38 +698,38 @@ const AccountTab: React.FC = () => {
 
       {/* 同步状态 */}
       <div>
-        <h3 className="text-md font-semibold opacity-80 text-center mb-3">同步状态</h3>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.accountTab.syncStatus}</h3>
         <div className="bg-black/5 p-4 rounded-lg space-y-3">
           {/* 网络状态 */}
           <div className="flex items-center justify-between text-sm">
-            <span className="opacity-70">网络状态</span>
+            <span className="opacity-70">{t.accountTab.networkStatus}</span>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-600' : 'bg-orange-600'}`} />
-              <span className="font-medium">{isOnline ? '在线' : '离线'}</span>
+              <span className="font-medium">{isOnline ? t.accountTab.online : t.accountTab.offline}</span>
             </div>
           </div>
 
           {/* 实时同步状态 */}
           <div className="flex items-center justify-between text-sm">
-            <span className="opacity-70">实时同步</span>
+            <span className="opacity-70">{t.accountTab.realtimeSync}</span>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-600' : 'bg-gray-400'}`} />
-              <span className="font-medium">{realtimeConnected ? '已连接' : '未连接'}</span>
+              <span className="font-medium">{realtimeConnected ? t.accountTab.connected : t.accountTab.disconnected}</span>
             </div>
           </div>
 
           {/* 离线队列 */}
           {queueLength > 0 && (
             <div className="flex items-center justify-between text-sm">
-              <span className="opacity-70">待同步</span>
-              <span className="font-medium text-orange-600">{queueLength} 项</span>
+              <span className="opacity-70">{t.accountTab.pendingSync}</span>
+              <span className="font-medium text-orange-600">{queueLength} {t.accountTab.items}</span>
             </div>
           )}
 
           {/* 最后同步时间 */}
           {syncStatus.lastSyncTime && (
             <div className="flex items-center justify-between text-sm">
-              <span className="opacity-70">最后同步</span>
+              <span className="opacity-70">{t.accountTab.lastSync}</span>
               <span className="opacity-60">
                 {new Date(syncStatus.lastSyncTime).toLocaleString('zh-CN', {
                   month: 'short',
@@ -747,14 +748,14 @@ const AccountTab: React.FC = () => {
               disabled={loading || !isOnline}
               className="flex-1 py-2 px-3 bg-[#6b5a5a] text-white rounded-md text-sm font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {syncStatus.syncing ? '同步中...' : '立即同步'}
+              {syncStatus.syncing ? t.accountTab.syncing : t.accountTab.syncNow}
             </button>
             <button
               onClick={handleRestore}
               disabled={loading || !isOnline}
               className="flex-1 py-2 px-3 bg-white/50 border border-black/10 rounded-md text-sm font-medium hover:bg-white/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              从云端恢复
+              {t.accountTab.restoreFromCloud}
             </button>
           </div>
         </div>
@@ -762,30 +763,30 @@ const AccountTab: React.FC = () => {
 
       {/* 修改密码 */}
       <div>
-        <h3 className="text-md font-semibold opacity-80 text-center mb-3">修改密码</h3>
+        <h3 className="text-md font-semibold opacity-80 text-center mb-3">{t.accountTab.changePassword}</h3>
         <form onSubmit={handlePasswordChange} className="bg-black/5 p-4 rounded-lg space-y-3">
           <div>
             <label className="block text-sm font-medium mb-1">
-              新密码
+              {t.accountTab.newPassword}
             </label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
-              placeholder="至少 6 个字符"
+              placeholder={t.accountTab.minPasswordLength}
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
-              确认密码
+              {t.accountTab.confirmPassword}
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-3 py-2 bg-white/50 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdf6f6] focus:ring-[#6b5a5a]"
-              placeholder="再次输入新密码"
+              placeholder={t.accountTab.confirmPassword}
             />
           </div>
           <button
@@ -793,7 +794,7 @@ const AccountTab: React.FC = () => {
             disabled={loading || !newPassword || !confirmPassword}
             className="w-full py-2 bg-[#6b5a5a] text-white rounded-md text-sm font-medium hover:bg-[#5a4a4a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? '修改中...' : '修改密码'}
+            {loading ? t.accountTab.processing : t.accountTab.changePassword}
           </button>
         </form>
       </div>
@@ -805,7 +806,7 @@ const AccountTab: React.FC = () => {
           disabled={loading}
           className="text-sm opacity-60 hover:opacity-100 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
         >
-          退出登录
+          {t.accountTab.signOut}
         </button>
       </div>
     </div>
@@ -954,7 +955,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
         <div className="flex border-b border-black/10 px-4 flex-shrink-0">
             <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>{t.progress}</TabButton>
             <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>{t.milestones}</TabButton>
-            <TabButton active={activeTab === 'account'} onClick={() => setActiveTab('account')}>账号</TabButton>
+            <TabButton active={activeTab === 'account'} onClick={() => setActiveTab('account')}>{t.account}</TabButton>
             <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>{t.about}</TabButton>
         </div>
 
