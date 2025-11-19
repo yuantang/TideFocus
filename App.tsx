@@ -9,9 +9,6 @@ import IntentionModal from './components/IntentionModal';
 import TaskListModal from './components/TaskListModal';
 import ToastContainer from './components/ToastContainer';
 import AchievementUnlockModal from './components/AchievementUnlockModal';
-import AuthModal from './components/AuthModal';
-import AccountModal from './components/AccountModal';
-import SyncIndicator from './components/SyncIndicator';
 import TemplateSelector from './components/TemplateSelector';
 import TemplateEditorModal from './components/TemplateEditorModal';
 import { InfoIcon } from './components/Icons';
@@ -42,8 +39,6 @@ export default function App() {
   // 认证和云端同步
   const { isAuthenticated, configured: supabaseConfigured } = useAuth();
   const { syncAll } = useCloudSync();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showAccountModal, setShowAccountModal] = useState(false);
 
   // 实时同步
   const { isConnected: realtimeConnected, lastUpdate: realtimeLastUpdate } = useRealtimeSync();
@@ -758,18 +753,9 @@ export default function App() {
         />
       </div>
 
-      {/* 右上角按钮组 */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-3" style={{ color: controlsTextColor }}>
-        {/* 云端同步指示器 */}
-        {supabaseConfigured && (
-          <SyncIndicator
-            onOpenAuth={() => setShowAuthModal(true)}
-            onOpenAccount={() => setShowAccountModal(true)}
-          />
-        )}
-
-        {/* 信息按钮 */}
-        <button onClick={() => setShowInfo(true)} className="p-2 rounded-full text-current/70 hover:text-current transition-colors" aria-label="Show app information">
+      {/* 右上角信息按钮 */}
+      <div className="absolute top-4 right-4 z-20">
+        <button onClick={() => setShowInfo(true)} className="p-2 rounded-full text-current/70 hover:text-current transition-colors" aria-label="Show app information" style={{ color: controlsTextColor }}>
           <InfoIcon className="w-6 h-6" />
         </button>
       </div>
@@ -846,18 +832,6 @@ export default function App() {
 
       {/* Toast 通知 */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-
-      {/* 认证模态框 */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
-
-      {/* 账号管理模态框 */}
-      <AccountModal
-        isOpen={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-      />
 
       {/* 模板编辑器模态框 */}
       <TemplateEditorModal

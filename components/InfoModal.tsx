@@ -4,6 +4,10 @@ import { Achievement, Stats } from '../types';
 import { getLocalizedAchievements } from '../constants';
 import AchievementCard from './AchievementCard';
 import { getTranslations, getCurrentLanguage, getWeekdayName, type Language } from '../i18n';
+import { useAuth } from '../hooks/useAuth';
+import { useCloudSync } from '../hooks/useCloudSync';
+import { useRealtimeSync } from '../hooks/useRealtimeSync';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -427,6 +431,393 @@ const MonthlyStatsView: React.FC<{ stats: Stats }> = ({ stats }) => {
   );
 };
 
+// 账号管理标签页
+const AccountTab: React.FC = () => {
+  const { user, isAuthenticated, signIn, signUp, signOut, resetPassword, updatePassword } = useAuth();
+  const { syncStatus, syncAll, restoreAll } = useCloudSync();
+  const { isConnected: realtimeConnected } = useRealtimeSync();
+  const { isOnline, queueLength } = useOfflineQueue();
+
+  const [mode, setMode] = useState<'login' | 'register' | 'reset' | 'account'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // 如果已登录，显示账号管理界面
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setMode('account');
+    } else {
+      setMode('login');
+    }
+  }, [isAuthenticated, user]);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        await signIn(email, password);
+        setMessage({ type: 'success', text: '登录成功！' });
+      } else if (mode === 'register') {
+        await signUp(email, password, displayName);
+        setMessage({ type: 'success', text: '注册成功！请查收验证邮件。' });
+        setTimeout(() => setMode('login'), 2000);
+      } else if (mode === 'reset') {
+        await resetPassword(email);
+        setMessage({ type: 'success', text: '密码重置邮件已发送！' });
+        setTimeout(() => setMode('login'), 2000);
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || '操作失败，请重试' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      setMessage({ type: 'error', text: '两次输入的密码不一致' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setMessage({ type: 'error', text: '密码至少需要 6 个字符' });
+      return;
+    }
+
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      await updatePassword(newPassword);
+      setMessage({ type: 'success', text: '密码修改成功！' });
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || '密码修改失败' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    if (!confirm('确定要退出登录吗？')) return;
+
+    setLoading(true);
+    try {
+      await signOut();
+      setMessage({ type: 'success', text: '已退出登录' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || '退出登录失败' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      await syncAll();
+      setMessage({ type: 'success', text: '同步成功！' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || '同步失败' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (!confirm('确定要从云端恢复数据吗？这将覆盖本地数据！')) return;
+
+    setLoading(true);
+    setMessage(null);
+    try {
+      await restoreAll();
+      setMessage({ type: 'success', text: '恢复成功！页面将在 3 秒后刷新...' });
+      setTimeout(() => window.location.reload(), 3000);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || '恢复失败' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 未登录状态 - 显示登录/注册界面
+  if (!isAuthenticated || mode !== 'account') {
+    return (
+      <div className="space-y-6 max-w-md mx-auto">
+        <div className="text-center">
+          <h3 className="text-2xl font-bold mb-2">☁️ 云端同步</h3>
+          <p className="text-sm opacity-70">登录以启用多设备数据同步</p>
+        </div>
+
+        {/* 消息提示 */}
+        {message && (
+          <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <p className="text-sm font-medium">{message.text}</p>
+          </div>
+        )}
+
+        {/* 标签切换 */}
+        <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+          <button
+            onClick={() => setMode('login')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              mode === 'login' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            登录
+          </button>
+          <button
+            onClick={() => setMode('register')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              mode === 'register' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            注册
+          </button>
+        </div>
+
+        {/* 表单 */}
+        <form onSubmit={handleAuth} className="space-y-4">
+          {mode === 'register' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                显示名称
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="输入你的名称"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              邮箱
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="your@email.com"
+            />
+          </div>
+
+          {mode !== 'reset' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                密码
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="至少 6 个字符"
+              />
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '处理中...' : mode === 'login' ? '登录' : mode === 'register' ? '注册' : '发送重置邮件'}
+          </button>
+        </form>
+
+        {/* 底部链接 */}
+        <div className="text-center text-sm">
+          {mode === 'login' && (
+            <button
+              onClick={() => setMode('reset')}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              忘记密码？
+            </button>
+          )}
+          {mode === 'reset' && (
+            <button
+              onClick={() => setMode('login')}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              返回登录
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 已登录状态 - 显示账号管理界面
+  return (
+    <div className="space-y-6 max-w-2xl mx-auto">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold mb-2">👤 账号管理</h3>
+        <p className="text-sm opacity-70">管理你的账号和云端数据</p>
+      </div>
+
+      {/* 消息提示 */}
+      {message && (
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <p className="text-sm font-medium">{message.text}</p>
+        </div>
+      )}
+
+      {/* 用户信息卡片 */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            {user?.email?.[0].toUpperCase()}
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-gray-800 text-lg">
+              {user?.user_metadata?.display_name || user?.email?.split('@')[0]}
+            </div>
+            <div className="text-sm text-gray-600">{user?.email}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 同步状态卡片 */}
+      <div className="bg-white rounded-lg p-6 border border-gray-200">
+        <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <span>☁️</span>
+          <span>同步状态</span>
+        </h4>
+
+        <div className="space-y-3">
+          {/* 网络状态 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">网络状态</span>
+            <div className={`flex items-center gap-2 ${isOnline ? 'text-green-600' : 'text-orange-600'}`}>
+              <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-600' : 'bg-orange-600'}`} />
+              <span className="text-sm font-medium">{isOnline ? '在线' : '离线'}</span>
+            </div>
+          </div>
+
+          {/* 实时同步状态 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">实时同步</span>
+            <div className={`flex items-center gap-2 ${realtimeConnected ? 'text-green-600' : 'text-gray-400'}`}>
+              <div className={`w-2 h-2 rounded-full ${realtimeConnected ? 'bg-green-600' : 'bg-gray-400'}`} />
+              <span className="text-sm font-medium">{realtimeConnected ? '已连接' : '未连接'}</span>
+            </div>
+          </div>
+
+          {/* 离线队列 */}
+          {queueLength > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">待同步</span>
+              <span className="text-sm font-medium text-orange-600">{queueLength} 项</span>
+            </div>
+          )}
+
+          {/* 最后同步时间 */}
+          {syncStatus.lastSyncTime && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">最后同步</span>
+              <span className="text-sm text-gray-500">
+                {new Date(syncStatus.lastSyncTime).toLocaleString('zh-CN', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* 同步操作按钮 */}
+        <div className="flex gap-3 mt-4">
+          <button
+            onClick={handleSync}
+            disabled={loading || !isOnline}
+            className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {syncStatus.syncing ? '同步中...' : '立即同步'}
+          </button>
+          <button
+            onClick={handleRestore}
+            disabled={loading || !isOnline}
+            className="flex-1 py-2 px-4 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            从云端恢复
+          </button>
+        </div>
+      </div>
+
+      {/* 修改密码 */}
+      <div className="bg-white rounded-lg p-6 border border-gray-200">
+        <h4 className="text-lg font-semibold text-gray-800 mb-4">🔒 修改密码</h4>
+        <form onSubmit={handlePasswordChange} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              新密码
+            </label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="至少 6 个字符"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              确认密码
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="再次输入新密码"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !newPassword || !confirmPassword}
+            className="w-full py-2 px-4 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '修改中...' : '修改密码'}
+          </button>
+        </form>
+      </div>
+
+      {/* 退出登录 */}
+      <div className="text-center">
+        <button
+          onClick={handleSignOut}
+          disabled={loading}
+          className="px-6 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          退出登录
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, dailySessionsCompleted, weeklyProgress, totalSessions, focusStreak, unlockedAchievements, stats }) => {
   const [activeTab, setActiveTab] = useState('progress');
@@ -569,6 +960,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
         <div className="flex border-b border-black/10 px-4 flex-shrink-0">
             <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>{t.progress}</TabButton>
             <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>{t.milestones}</TabButton>
+            <TabButton active={activeTab === 'account'} onClick={() => setActiveTab('account')}>👤 账号</TabButton>
             <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>{t.about}</TabButton>
         </div>
 
@@ -707,7 +1099,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
                     <MilestonesTab unlocked={unlockedAchievements} stats={stats} />
                 </div>
             )}
-
+            {activeTab === 'account' && <AccountTab />}
             {activeTab === 'about' && (
                 <div>
                     <div className="space-y-4 text-center leading-relaxed">
