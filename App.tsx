@@ -12,6 +12,8 @@ import AchievementUnlockModal from './components/AchievementUnlockModal';
 import AuthModal from './components/AuthModal';
 import AccountModal from './components/AccountModal';
 import SyncIndicator from './components/SyncIndicator';
+import TemplateSelector from './components/TemplateSelector';
+import TemplateEditorModal from './components/TemplateEditorModal';
 import { InfoIcon } from './components/Icons';
 import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
@@ -20,7 +22,9 @@ import { useCloudSync } from './hooks/useCloudSync';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 import { useAutoSync } from './hooks/useAutoSync';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
+import { useTemplates } from './hooks/useTemplates';
 import { getWeekdayName } from './i18n';
+import { PomodoroTemplate } from './types';
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -55,6 +59,21 @@ export default function App() {
 
   // 离线队列
   const { isOnline, queueLength, isProcessing: queueProcessing } = useOfflineQueue();
+
+  // 模板系统
+  const {
+    allTemplates,
+    activeTemplate,
+    activeTemplateId,
+    applyTemplate,
+    addCustomTemplate,
+    updateCustomTemplate,
+    deleteCustomTemplate,
+    createFromCurrentSettings
+  } = useTemplates();
+
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<PomodoroTemplate | undefined>();
 
   const [mode, setMode] = useState<TimerMode>('focus');
 
@@ -573,6 +592,88 @@ export default function App() {
     }
   };
 
+  // 模板相关处理函数
+  const handleSelectTemplate = useCallback((templateId: string) => {
+    try {
+      const template = applyTemplate(templateId);
+
+      // 应用模板设置
+      const newFocusDuration = template.focusDuration * 60;
+      const newBreakDuration = template.breakDuration * 60;
+      const newLongBreakDuration = template.longBreakDuration * 60;
+      const newSessionsPerRound = template.sessionsPerRound;
+
+      setFocusDuration(newFocusDuration);
+      setBreakDuration(newBreakDuration);
+      setLongBreakDuration(newLongBreakDuration);
+      setSessionsPerRound(newSessionsPerRound);
+
+      // 保存到 localStorage
+      localStorage.setItem('focusDuration', String(newFocusDuration));
+      localStorage.setItem('breakDuration', String(newBreakDuration));
+      localStorage.setItem('longBreakDuration', String(newLongBreakDuration));
+      localStorage.setItem('sessionsPerRound', String(newSessionsPerRound));
+
+      // 如果当前不在运行中，更新剩余时间
+      if (!isActive) {
+        if (mode === 'focus') {
+          setTimeLeft(newFocusDuration);
+        } else if (isCurrentBreakLong) {
+          setTimeLeft(newLongBreakDuration);
+        } else {
+          setTimeLeft(newBreakDuration);
+        }
+      }
+
+      success(`已切换到「${template.name}」模板`);
+    } catch (err) {
+      error(err instanceof Error ? err.message : '切换模板失败');
+    }
+  }, [applyTemplate, isActive, mode, isCurrentBreakLong, success, error]);
+
+  const handleCreateTemplate = useCallback(() => {
+    setEditingTemplate(undefined);
+    setShowTemplateEditor(true);
+  }, []);
+
+  const handleEditTemplate = useCallback((template: PomodoroTemplate) => {
+    setEditingTemplate(template);
+    setShowTemplateEditor(true);
+  }, []);
+
+  const handleSaveTemplate = useCallback((templateData: Omit<PomodoroTemplate, 'id' | 'isCustom' | 'createdAt'>) => {
+    try {
+      if (editingTemplate) {
+        // 更新现有模板
+        updateCustomTemplate(editingTemplate.id, templateData);
+        success(`模板「${templateData.name}」已更新`);
+      } else {
+        // 创建新模板
+        const newTemplate = addCustomTemplate(
+          templateData.name,
+          templateData.description,
+          templateData.focusDuration,
+          templateData.breakDuration,
+          templateData.longBreakDuration,
+          templateData.sessionsPerRound,
+          templateData.icon
+        );
+        success(`模板「${newTemplate.name}」已创建`);
+      }
+    } catch (err) {
+      error(err instanceof Error ? err.message : '保存模板失败');
+    }
+  }, [editingTemplate, addCustomTemplate, updateCustomTemplate, success, error]);
+
+  const handleDeleteTemplate = useCallback((templateId: string) => {
+    try {
+      deleteCustomTemplate(templateId);
+      success('模板已删除');
+    } catch (err) {
+      error(err instanceof Error ? err.message : '删除模板失败');
+    }
+  }, [deleteCustomTemplate, success, error]);
+
   const addTask = (text: string, priority: 'high' | 'medium' | 'low' = 'medium') => {
       const newTask: Task = {
         id: Date.now().toString(),
@@ -645,6 +746,18 @@ export default function App() {
   
   return (
     <div className="h-screen w-screen flex flex-col font-sans antialiased overflow-hidden">
+      {/* 左上角模板选择器 */}
+      <div className="absolute top-4 left-4 z-20">
+        <TemplateSelector
+          templates={allTemplates}
+          activeTemplateId={activeTemplateId}
+          onSelectTemplate={handleSelectTemplate}
+          onCreateTemplate={handleCreateTemplate}
+          onEditTemplate={handleEditTemplate}
+          onDeleteTemplate={handleDeleteTemplate}
+        />
+      </div>
+
       {/* 右上角按钮组 */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-3" style={{ color: controlsTextColor }}>
         {/* 云端同步指示器 */}
@@ -744,6 +857,23 @@ export default function App() {
       <AccountModal
         isOpen={showAccountModal}
         onClose={() => setShowAccountModal(false)}
+      />
+
+      {/* 模板编辑器模态框 */}
+      <TemplateEditorModal
+        isOpen={showTemplateEditor}
+        onClose={() => {
+          setShowTemplateEditor(false);
+          setEditingTemplate(undefined);
+        }}
+        onSave={handleSaveTemplate}
+        editingTemplate={editingTemplate}
+        currentSettings={{
+          focusDuration: focusDuration / 60,
+          breakDuration: breakDuration / 60,
+          longBreakDuration: longBreakDuration / 60,
+          sessionsPerRound
+        }}
       />
     </div>
   );

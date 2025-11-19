@@ -66,3 +66,28 @@ export interface SoundscapePreset {
     volume: number;
   }>;
 }
+
+export interface PomodoroTemplate {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  focusDuration: number; // 分钟
+  breakDuration: number; // 分钟
+  longBreakDuration: number; // 分钟
+  sessionsPerRound: number;
+  isCustom?: boolean;
+  createdAt?: number;
+}
+
+export interface HistoryEntry {
+  id: string;
+  timestamp: number;
+  duration: number; // 实际专注时长（分钟）
+  mode: TimerMode;
+  intention?: string; // 专注意图
+  taskId?: string; // 关联的任务ID
+  quality?: number; // 专注质量（1-5星）
+  notes?: string; // 笔记和反思
+  templateId?: string; // 使用的模板ID
+}
