@@ -24,6 +24,7 @@ const IntentionModal = lazy(() => import('./components/IntentionModal'));
 const TaskListModal = lazy(() => import('./components/TaskListModal'));
 const AchievementUnlockModal = lazy(() => import('./components/AchievementUnlockModal'));
 const TemplateEditorModal = lazy(() => import('./components/TemplateEditorModal'));
+const OnboardingModal = lazy(() => import('./components/OnboardingModal'));
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -138,6 +139,9 @@ export default function App() {
   const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
   const [showAchievementUnlock, setShowAchievementUnlock] = useState(false);
 
+  // 首次使用引导
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   const audioRefs = useRef<Record<string, HTMLAudioElement>>(
     SOUNDS.reduce((acc, sound) => {
       if (sound.url) {
@@ -249,6 +253,13 @@ export default function App() {
         } else {
             localStorage.removeItem('dailyTasks');
         }
+    }
+
+    // 检查是否首次使用
+    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
+    if (!hasCompletedOnboarding) {
+      // 延迟显示引导，让页面先加载
+      setTimeout(() => setShowOnboarding(true), 1000);
     }
   }, []);
 
@@ -654,6 +665,11 @@ export default function App() {
     setShowTemplateEditor(true);
   }, []);
 
+  const handleOnboardingComplete = useCallback(() => {
+    localStorage.setItem('onboardingCompleted', 'true');
+    setShowOnboarding(false);
+  }, []);
+
   const handleSaveTemplate = useCallback((templateData: Omit<PomodoroTemplate, 'id' | 'isCustom' | 'createdAt'>) => {
     try {
       if (editingTemplate) {
@@ -865,6 +881,13 @@ export default function App() {
             longBreakDuration: longBreakDuration / 60,
             sessionsPerRound
           }}
+        />
+
+        {/* 首次使用引导 */}
+        <OnboardingModal
+          isOpen={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          onComplete={handleOnboardingComplete}
         />
       </Suspense>
 

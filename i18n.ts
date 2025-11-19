@@ -412,6 +412,25 @@ export interface Translations {
     nameTooLong: string;
     descriptionTooLong: string;
   };
+
+  // 首次使用引导
+  onboarding?: {
+    step1Title: string;
+    step1Desc: string;
+    step2Title: string;
+    step2Desc: string;
+    step3Title: string;
+    step3Desc: string;
+    step4Title: string;
+    step4Desc: string;
+    step5Title: string;
+    step5Desc: string;
+    stepProgress: string;
+    skip: string;
+    prev: string;
+    next: string;
+    start: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -888,6 +907,24 @@ export const translations: Record<Language, Translations> = {
       nameTooLong: '模板名称不能超过 20 个字符',
       descriptionTooLong: '模板描述不能超过 100 个字符',
     },
+
+    onboarding: {
+      step1Title: '欢迎使用 TideFocus',
+      step1Desc: '一个帮助你专注工作、提升效率的番茄钟应用。让我们快速了解核心功能，开始你的专注之旅！',
+      step2Title: '设置你的专注意图',
+      step2Desc: '每次开始专注前，设定你要完成的任务。明确的目标让专注更有方向，效率更高。',
+      step3Title: '选择白噪音',
+      step3Desc: '20种环境音效，帮助你进入专注状态。可以混合多种声音创造独特氛围，找到最适合你的专注环境。',
+      step4Title: '查看统计数据',
+      step4Desc: '追踪你的专注时长、完成的任务，解锁成就。数据可视化让你清晰看到自己的成长轨迹。',
+      step5Title: '使用模板快速开始',
+      step5Desc: '7种预设模板，适合不同场景：深度工作、快速冲刺、学习考试等。一键切换，立即开始专注！',
+      stepProgress: '步骤',
+      skip: '跳过',
+      prev: '上一步',
+      next: '下一步',
+      start: '开始使用',
+    },
   },
 
   'zh-TW': {
@@ -1362,6 +1399,24 @@ export const translations: Record<Language, Translations> = {
       nameRequired: '請輸入模板名稱',
       nameTooLong: '模板名稱不能超過 20 個字元',
       descriptionTooLong: '模板描述不能超過 100 個字元',
+    },
+
+    onboarding: {
+      step1Title: '歡迎使用 TideFocus',
+      step1Desc: '一個幫助你專注工作、提升效率的番茄鐘應用。讓我們快速了解核心功能，開始你的專注之旅！',
+      step2Title: '設置你的專注意圖',
+      step2Desc: '每次開始專注前，設定你要完成的任務。明確的目標讓專注更有方向，效率更高。',
+      step3Title: '選擇白噪音',
+      step3Desc: '20種環境音效，幫助你進入專注狀態。可以混合多種聲音創造獨特氛圍，找到最適合你的專注環境。',
+      step4Title: '查看統計數據',
+      step4Desc: '追蹤你的專注時長、完成的任務，解鎖成就。數據可視化讓你清晰看到自己的成長軌跡。',
+      step5Title: '使用模板快速開始',
+      step5Desc: '7種預設模板，適合不同場景：深度工作、快速衝刺、學習考試等。一鍵切換，立即開始專注！',
+      stepProgress: '步驟',
+      skip: '跳過',
+      prev: '上一步',
+      next: '下一步',
+      start: '開始使用',
     },
   },
 
@@ -1838,6 +1893,24 @@ export const translations: Record<Language, Translations> = {
       nameTooLong: 'Template name cannot exceed 20 characters',
       descriptionTooLong: 'Template description cannot exceed 100 characters',
     },
+
+    onboarding: {
+      step1Title: 'Welcome to TideFocus',
+      step1Desc: 'A Pomodoro app that helps you focus and boost productivity. Let\'s quickly explore the core features and start your focus journey!',
+      step2Title: 'Set Your Focus Intention',
+      step2Desc: 'Before each focus session, define what you want to accomplish. Clear goals make your focus more purposeful and efficient.',
+      step3Title: 'Choose White Noise',
+      step3Desc: '20 ambient sounds to help you enter a focused state. Mix multiple sounds to create your unique atmosphere and find your perfect focus environment.',
+      step4Title: 'View Statistics',
+      step4Desc: 'Track your focus time, completed tasks, and unlock achievements. Data visualization helps you see your growth clearly.',
+      step5Title: 'Use Templates for Quick Start',
+      step5Desc: '7 preset templates for different scenarios: deep work, quick sprint, study sessions, and more. One-click switch to start focusing immediately!',
+      stepProgress: 'Step',
+      skip: 'Skip',
+      prev: 'Previous',
+      next: 'Next',
+      start: 'Get Started',
+    },
   },
 
   'es': {
@@ -2312,6 +2385,24 @@ export const translations: Record<Language, Translations> = {
       nameRequired: 'Por favor ingresa el nombre de la plantilla',
       nameTooLong: 'El nombre de la plantilla no puede exceder 20 caracteres',
       descriptionTooLong: 'La descripción de la plantilla no puede exceder 100 caracteres',
+    },
+
+    onboarding: {
+      step1Title: 'Bienvenido a TideFocus',
+      step1Desc: 'Una aplicación Pomodoro que te ayuda a concentrarte y aumentar la productividad. ¡Exploremos rápidamente las funciones principales y comencemos tu viaje de concentración!',
+      step2Title: 'Establece tu Intención de Enfoque',
+      step2Desc: 'Antes de cada sesión de enfoque, define lo que quieres lograr. Los objetivos claros hacen que tu enfoque sea más propositivo y eficiente.',
+      step3Title: 'Elige Ruido Blanco',
+      step3Desc: '20 sonidos ambientales para ayudarte a entrar en un estado de concentración. Mezcla múltiples sonidos para crear tu atmósfera única y encontrar tu entorno de enfoque perfecto.',
+      step4Title: 'Ver Estadísticas',
+      step4Desc: 'Rastrea tu tiempo de enfoque, tareas completadas y desbloquea logros. La visualización de datos te ayuda a ver tu crecimiento claramente.',
+      step5Title: 'Usa Plantillas para Inicio Rápido',
+      step5Desc: '7 plantillas preestablecidas para diferentes escenarios: trabajo profundo, sprint rápido, sesiones de estudio y más. ¡Cambia con un clic para comenzar a enfocarte inmediatamente!',
+      stepProgress: 'Paso',
+      skip: 'Saltar',
+      prev: 'Anterior',
+      next: 'Siguiente',
+      start: 'Comenzar',
     },
   },
 
@@ -2788,6 +2879,24 @@ export const translations: Record<Language, Translations> = {
       nameTooLong: 'テンプレート名は20文字を超えることはできません',
       descriptionTooLong: 'テンプレートの説明は100文字を超えることはできません',
     },
+
+    onboarding: {
+      step1Title: 'TideFocusへようこそ',
+      step1Desc: '集中力を高め、生産性を向上させるポモドーロアプリです。コア機能を素早く理解して、集中の旅を始めましょう！',
+      step2Title: '集中の意図を設定',
+      step2Desc: '各集中セッションの前に、達成したいことを定義します。明確な目標により、集中がより目的的で効率的になります。',
+      step3Title: 'ホワイトノイズを選択',
+      step3Desc: '20種類の環境音で集中状態に入るのを助けます。複数の音を混ぜて独自の雰囲気を作り、完璧な集中環境を見つけましょう。',
+      step4Title: '統計を表示',
+      step4Desc: '集中時間、完了したタスクを追跡し、実績をアンロックします。データの可視化により、成長を明確に確認できます。',
+      step5Title: 'テンプレートでクイックスタート',
+      step5Desc: '7つのプリセットテンプレートで、さまざまなシナリオに対応：深い作業、クイックスプリント、学習セッションなど。ワンクリックで切り替えて、すぐに集中を開始！',
+      stepProgress: 'ステップ',
+      skip: 'スキップ',
+      prev: '前へ',
+      next: '次へ',
+      start: '始める',
+    },
   },
 
   'ko': {
@@ -3262,6 +3371,24 @@ export const translations: Record<Language, Translations> = {
       nameRequired: '템플릿 이름을 입력하세요',
       nameTooLong: '템플릿 이름은 20자를 초과할 수 없습니다',
       descriptionTooLong: '템플릿 설명은 100자를 초과할 수 없습니다',
+    },
+
+    onboarding: {
+      step1Title: 'TideFocus에 오신 것을 환영합니다',
+      step1Desc: '집중력을 높이고 생산성을 향상시키는 포모도로 앱입니다. 핵심 기능을 빠르게 살펴보고 집중 여정을 시작하세요!',
+      step2Title: '집중 의도 설정',
+      step2Desc: '각 집중 세션 전에 달성하고자 하는 것을 정의하세요. 명확한 목표는 집중을 더 목적적이고 효율적으로 만듭니다.',
+      step3Title: '백색 소음 선택',
+      step3Desc: '20가지 주변 소리로 집중 상태에 들어가는 것을 도와줍니다. 여러 소리를 혼합하여 독특한 분위기를 만들고 완벽한 집중 환경을 찾으세요.',
+      step4Title: '통계 보기',
+      step4Desc: '집중 시간, 완료된 작업을 추적하고 업적을 잠금 해제하세요. 데이터 시각화를 통해 성장을 명확하게 확인할 수 있습니다.',
+      step5Title: '템플릿으로 빠른 시작',
+      step5Desc: '다양한 시나리오를 위한 7가지 사전 설정 템플릿: 깊은 작업, 빠른 스프린트, 학습 세션 등. 원클릭으로 전환하여 즉시 집중을 시작하세요!',
+      stepProgress: '단계',
+      skip: '건너뛰기',
+      prev: '이전',
+      next: '다음',
+      start: '시작하기',
     },
   },
 };
