@@ -1,6 +1,8 @@
 import React from 'react';
 import { useCloudSync } from '../hooks/useCloudSync';
 import { useAuth } from '../hooks/useAuth';
+import { useRealtimeSync } from '../hooks/useRealtimeSync';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
 
 interface SyncIndicatorProps {
   onOpenAuth?: () => void;
@@ -10,6 +12,8 @@ interface SyncIndicatorProps {
 const SyncIndicator: React.FC<SyncIndicatorProps> = ({ onOpenAuth, onOpenAccount }) => {
   const { isAuthenticated, user } = useAuth();
   const { syncStatus, syncAll, restoreAll } = useCloudSync();
+  const { isConnected: realtimeConnected } = useRealtimeSync();
+  const { isOnline, queueLength } = useOfflineQueue();
   const [showMenu, setShowMenu] = React.useState(false);
 
   if (!isAuthenticated) {
@@ -40,7 +44,14 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ onOpenAuth, onOpenAccount
         </div>
 
         {/* 同步状态 */}
-        {syncStatus.syncing ? (
+        {!isOnline ? (
+          <div className="flex items-center gap-1 text-orange-600">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
+            </svg>
+            <span className="text-xs">离线{queueLength > 0 ? ` (${queueLength})` : ''}</span>
+          </div>
+        ) : syncStatus.syncing ? (
           <div className="flex items-center gap-1 text-blue-600">
             <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -53,6 +64,13 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ onOpenAuth, onOpenAccount
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-xs">同步失败</span>
+          </div>
+        ) : realtimeConnected ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span className="text-xs">实时同步</span>
           </div>
         ) : syncStatus.lastSyncTime ? (
           <div className="flex items-center gap-1 text-green-600">
@@ -95,11 +113,41 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ onOpenAuth, onOpenAccount
             </div>
 
             {/* 同步状态详情 */}
-            {syncStatus.lastSyncTime && (
-              <div className="p-3 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
-                上次同步: {new Date(syncStatus.lastSyncTime).toLocaleString('zh-CN')}
+            <div className="p-3 bg-gray-50 border-b border-gray-200 space-y-2">
+              {/* 网络状态 */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600">网络状态:</span>
+                <span className={isOnline ? 'text-green-600 font-medium' : 'text-orange-600 font-medium'}>
+                  {isOnline ? '在线' : '离线'}
+                </span>
               </div>
-            )}
+
+              {/* 实时同步状态 */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600">实时同步:</span>
+                <span className={realtimeConnected ? 'text-green-600 font-medium' : 'text-gray-400'}>
+                  {realtimeConnected ? '已连接' : '未连接'}
+                </span>
+              </div>
+
+              {/* 离线队列 */}
+              {queueLength > 0 && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600">待同步:</span>
+                  <span className="text-orange-600 font-medium">{queueLength} 项</span>
+                </div>
+              )}
+
+              {/* 上次同步时间 */}
+              {syncStatus.lastSyncTime && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600">上次同步:</span>
+                  <span className="text-gray-800">
+                    {new Date(syncStatus.lastSyncTime).toLocaleTimeString('zh-CN')}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {syncStatus.error && (
               <div className="p-3 bg-red-50 border-b border-red-200 text-xs text-red-600">

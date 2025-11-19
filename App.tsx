@@ -17,6 +17,9 @@ import { formatTime, updateFavicon } from './utils';
 import { useToast } from './hooks/useToast';
 import { useAuth } from './hooks/useAuth';
 import { useCloudSync } from './hooks/useCloudSync';
+import { useRealtimeSync } from './hooks/useRealtimeSync';
+import { useAutoSync } from './hooks/useAutoSync';
+import { useOfflineQueue } from './hooks/useOfflineQueue';
 import { getWeekdayName } from './i18n';
 
 
@@ -37,6 +40,21 @@ export default function App() {
   const { syncAll } = useCloudSync();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+
+  // 实时同步
+  const { isConnected: realtimeConnected, lastUpdate: realtimeLastUpdate } = useRealtimeSync();
+
+  // 自动同步
+  const { triggerSync, isSyncing: autoSyncing } = useAutoSync({
+    enabled: isAuthenticated,
+    debounceMs: 3000,
+    syncOnVisibilityChange: true,
+    syncOnFocus: true,
+    periodicSyncIntervalMs: 5 * 60 * 1000 // 5分钟
+  });
+
+  // 离线队列
+  const { isOnline, queueLength, isProcessing: queueProcessing } = useOfflineQueue();
 
   const [mode, setMode] = useState<TimerMode>('focus');
 
