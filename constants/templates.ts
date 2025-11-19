@@ -57,7 +57,7 @@ export const PRESET_TEMPLATES: PomodoroTemplate[] = [
     isCustom: false
   },
   {
-    id: 'deep',
+    id: 'deepFocus',
     name: '深度专注',
     description: '极致专注，适合复杂问题解决',
     icon: '🧠',
