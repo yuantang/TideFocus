@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PomodoroTemplate } from '../types';
+import { getTranslations } from '../i18n';
 
 interface TemplateEditorModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
   editingTemplate,
   currentSettings
 }) => {
+  const t = getTranslations();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('⭐');
@@ -53,23 +55,31 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
     const newErrors: string[] = [];
 
     if (!name.trim()) {
-      newErrors.push('请输入模板名称');
+      newErrors.push(t.templates.nameRequired);
+    }
+
+    if (name.trim().length > 20) {
+      newErrors.push(t.templates.nameTooLong);
+    }
+
+    if (description.trim().length > 100) {
+      newErrors.push(t.templates.descriptionTooLong);
     }
 
     if (focusDuration < 1 || focusDuration > 180) {
-      newErrors.push('专注时长必须在 1-180 分钟之间');
+      newErrors.push(`${t.templates.focusDuration}: 1-180 ${t.units.minutes}`);
     }
 
     if (breakDuration < 1 || breakDuration > 60) {
-      newErrors.push('短休息时长必须在 1-60 分钟之间');
+      newErrors.push(`${t.templates.breakDuration}: 1-60 ${t.units.minutes}`);
     }
 
     if (longBreakDuration < 1 || longBreakDuration > 120) {
-      newErrors.push('长休息时长必须在 1-120 分钟之间');
+      newErrors.push(`${t.templates.longBreakDuration}: 1-120 ${t.units.minutes}`);
     }
 
     if (sessionsPerRound < 1 || sessionsPerRound > 10) {
-      newErrors.push('每轮次数必须在 1-10 之间');
+      newErrors.push(`${t.templates.sessionsPerRound}: 1-10`);
     }
 
     setErrors(newErrors);
@@ -112,10 +122,10 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
         {/* 标题 */}
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-800">
-            {editingTemplate ? '编辑模板' : '创建自定义模板'}
+            {editingTemplate ? t.templates.editTemplate : t.templates.createTemplate}
           </h2>
           <p className="text-sm text-gray-500 mt-1">
-            {editingTemplate ? '修改模板设置' : '根据你的需求创建专属模板'}
+            {editingTemplate ? t.templates.editTemplate : t.templates.createTemplate}
           </p>
         </div>
 
@@ -139,7 +149,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
           {/* 图标选择 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">图标</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.selectIcon}</label>
             <div className="flex flex-wrap gap-2">
               {ICON_OPTIONS.map(iconOption => (
                 <button
@@ -159,12 +169,12 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
           {/* 模板名称 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">模板名称 *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.templateName} *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例如：深度工作模式"
+              placeholder={t.templates.templateName}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b86b6b] focus:border-transparent"
               maxLength={20}
             />
@@ -172,11 +182,11 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
           {/* 模板描述 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">描述</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.templateDescription}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="简单描述这个模板的用途..."
+              placeholder={t.templates.templateDescription}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b86b6b] focus:border-transparent resize-none"
               rows={2}
               maxLength={100}
@@ -186,7 +196,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
           {/* 时间设置 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">专注时长（分钟）*</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.focusDuration} ({t.units.minutes}) *</label>
               <input
                 type="number"
                 value={focusDuration}
@@ -197,7 +207,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">短休息（分钟）*</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.breakDuration} ({t.units.minutes}) *</label>
               <input
                 type="number"
                 value={breakDuration}
@@ -211,7 +221,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">长休息（分钟）*</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.longBreakDuration} ({t.units.minutes}) *</label>
               <input
                 type="number"
                 value={longBreakDuration}
@@ -222,7 +232,7 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">每轮次数 *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.templates.sessionsPerRound} *</label>
               <input
                 type="number"
                 value={sessionsPerRound}
@@ -236,14 +246,14 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
           {/* 预览 */}
           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-sm font-medium text-gray-700 mb-2">预览</div>
+            <div className="text-sm font-medium text-gray-700 mb-2">{t.templates.preview}</div>
             <div className="flex items-center gap-3">
               <span className="text-3xl">{icon}</span>
               <div>
-                <div className="font-medium text-gray-800">{name || '未命名模板'}</div>
-                <div className="text-xs text-gray-500">{description || '暂无描述'}</div>
+                <div className="font-medium text-gray-800">{name || t.templates.templateName}</div>
+                <div className="text-xs text-gray-500">{description || t.templates.templateDescription}</div>
                 <div className="text-xs text-gray-400 mt-1">
-                  专注 {focusDuration}分 · 休息 {breakDuration}分 · 长休息 {longBreakDuration}分 · {sessionsPerRound}轮
+                  {t.templates.focusDuration} {focusDuration}{t.units.minutes} · {t.templates.breakDuration} {breakDuration}{t.units.minutes} · {t.templates.longBreakDuration} {longBreakDuration}{t.units.minutes} · {sessionsPerRound}{t.templates.sessionsPerRound}
                 </div>
               </div>
             </div>
@@ -256,13 +266,13 @@ const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
             onClick={handleClose}
             className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
-            取消
+            {t.cancel}
           </button>
           <button
             onClick={handleSave}
             className="flex-1 px-4 py-2 bg-gradient-to-r from-[#b86b6b] to-[#a85a5a] hover:from-[#a85a5a] hover:to-[#985050] text-white rounded-lg transition-all font-medium"
           >
-            {editingTemplate ? '保存' : '创建'}
+            {editingTemplate ? t.templates.update : t.templates.create}
           </button>
         </div>
       </div>
