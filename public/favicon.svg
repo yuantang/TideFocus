@@ -1,8 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background Circle - 鲜艳的海洋蓝 -->
-  <circle cx="16" cy="16" r="16" fill="#1e88e5"/>
+  <!-- Background Circle - 深玫瑰色，与项目主色调协调 -->
+  <circle cx="16" cy="16" r="16" fill="#b86b6b"/>
 
-  <!-- Simplified Wave Pattern - 纯白色，更醒目 -->
+  <!-- Simplified Wave Pattern - 纯白色，醒目清晰 -->
   <path d="M 6 16 Q 10 13, 14 16 T 22 16 T 26 16"
         stroke="#ffffff"
         stroke-width="2.5"
@@ -21,7 +21,7 @@
   <circle cx="16" cy="10" r="4" fill="none" stroke="#ffffff" stroke-width="2"/>
   <circle cx="16" cy="10" r="3" fill="#ffffff" opacity="0.4"/>
 
-  <!-- Timer Hand - 更粗更明显 -->
+  <!-- Timer Hand - 清晰可见 -->
   <line x1="16" y1="10" x2="16" y2="7"
         stroke="#ffffff"
         stroke-width="2"
