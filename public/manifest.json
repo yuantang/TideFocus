@@ -4,8 +4,8 @@
   "description": "专业的番茄钟专注计时器，集成白噪音、任务管理、成就系统，帮助你进入心流状态，提升工作学习效率。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fdf6f6",
-  "theme_color": "#6b5a5a",
+  "background_color": "#ffffff",
+  "theme_color": "#1e88e5",
   "orientation": "portrait",
   "icons": [
     {

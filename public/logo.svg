@@ -1,49 +1,49 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background Circle with gradient -->
+  <!-- Background Circle with gradient - 海洋蓝渐变 -->
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8b7a7a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#6b5a5a;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#42a5f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e88e5;stop-opacity:1" />
     </linearGradient>
   </defs>
 
   <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
 
-  <!-- Wave Pattern (Tide) - More visible -->
+  <!-- Wave Pattern (Tide) - 纯白色，更醒目 -->
   <path d="M 100 256 Q 150 220, 200 256 T 300 256 T 400 256"
-        stroke="#fdf6f6"
-        stroke-width="28"
-        fill="none"
-        stroke-linecap="round"
-        opacity="0.5"/>
-
-  <path d="M 100 280 Q 150 244, 200 280 T 300 280 T 400 280"
-        stroke="#fdf6f6"
-        stroke-width="24"
+        stroke="#ffffff"
+        stroke-width="32"
         fill="none"
         stroke-linecap="round"
         opacity="0.7"/>
 
-  <path d="M 100 300 Q 150 264, 200 300 T 300 300 T 400 300"
-        stroke="#fdf6f6"
-        stroke-width="20"
+  <path d="M 100 280 Q 150 244, 200 280 T 300 280 T 400 280"
+        stroke="#ffffff"
+        stroke-width="28"
         fill="none"
         stroke-linecap="round"
-        opacity="0.9"/>
+        opacity="0.85"/>
 
-  <!-- Focus Circle (Timer) - More prominent -->
-  <circle cx="256" cy="180" r="65" fill="none" stroke="#fdf6f6" stroke-width="10"/>
-  <circle cx="256" cy="180" r="52" fill="#fdf6f6" opacity="0.3"/>
+  <path d="M 100 300 Q 150 264, 200 300 T 300 300 T 400 300"
+        stroke="#ffffff"
+        stroke-width="24"
+        fill="none"
+        stroke-linecap="round"
+        opacity="1"/>
 
-  <!-- Timer Hand -->
+  <!-- Focus Circle (Timer) - 纯白色，更突出 -->
+  <circle cx="256" cy="180" r="65" fill="none" stroke="#ffffff" stroke-width="12"/>
+  <circle cx="256" cy="180" r="52" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Timer Hand - 更粗更明显 -->
   <line x1="256" y1="180" x2="256" y2="135"
-        stroke="#fdf6f6"
-        stroke-width="8"
+        stroke="#ffffff"
+        stroke-width="10"
         stroke-linecap="round"/>
 
-  <!-- Decorative Dots -->
-  <circle cx="256" cy="115" r="6" fill="#fdf6f6"/>
-  <circle cx="321" cy="180" r="6" fill="#fdf6f6"/>
-  <circle cx="191" cy="180" r="6" fill="#fdf6f6"/>
+  <!-- Decorative Dots - 纯白色 -->
+  <circle cx="256" cy="115" r="8" fill="#ffffff"/>
+  <circle cx="321" cy="180" r="8" fill="#ffffff"/>
+  <circle cx="191" cy="180" r="8" fill="#ffffff"/>
 </svg>
 
