@@ -1,42 +1,49 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background Circle -->
-  <circle cx="256" cy="256" r="256" fill="#6b5a5a"/>
-  
-  <!-- Wave Pattern (Tide) -->
-  <path d="M 100 256 Q 150 220, 200 256 T 300 256 T 400 256" 
-        stroke="#fdf6f6" 
-        stroke-width="24" 
-        fill="none" 
-        stroke-linecap="round"
-        opacity="0.3"/>
-  
-  <path d="M 100 280 Q 150 244, 200 280 T 300 280 T 400 280" 
-        stroke="#fdf6f6" 
-        stroke-width="20" 
-        fill="none" 
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b7a7a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6b5a5a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
+
+  <!-- Wave Pattern (Tide) - More visible -->
+  <path d="M 100 256 Q 150 220, 200 256 T 300 256 T 400 256"
+        stroke="#fdf6f6"
+        stroke-width="28"
+        fill="none"
         stroke-linecap="round"
         opacity="0.5"/>
-  
-  <path d="M 100 300 Q 150 264, 200 300 T 300 300 T 400 300" 
-        stroke="#fdf6f6" 
-        stroke-width="16" 
-        fill="none" 
+
+  <path d="M 100 280 Q 150 244, 200 280 T 300 280 T 400 280"
+        stroke="#fdf6f6"
+        stroke-width="24"
+        fill="none"
         stroke-linecap="round"
         opacity="0.7"/>
-  
-  <!-- Focus Circle (Timer) -->
-  <circle cx="256" cy="180" r="60" fill="none" stroke="#fdf6f6" stroke-width="8"/>
-  <circle cx="256" cy="180" r="50" fill="#fdf6f6" opacity="0.2"/>
-  
+
+  <path d="M 100 300 Q 150 264, 200 300 T 300 300 T 400 300"
+        stroke="#fdf6f6"
+        stroke-width="20"
+        fill="none"
+        stroke-linecap="round"
+        opacity="0.9"/>
+
+  <!-- Focus Circle (Timer) - More prominent -->
+  <circle cx="256" cy="180" r="65" fill="none" stroke="#fdf6f6" stroke-width="10"/>
+  <circle cx="256" cy="180" r="52" fill="#fdf6f6" opacity="0.3"/>
+
   <!-- Timer Hand -->
-  <line x1="256" y1="180" x2="256" y2="140" 
-        stroke="#fdf6f6" 
-        stroke-width="6" 
+  <line x1="256" y1="180" x2="256" y2="135"
+        stroke="#fdf6f6"
+        stroke-width="8"
         stroke-linecap="round"/>
-  
+
   <!-- Decorative Dots -->
-  <circle cx="256" cy="120" r="4" fill="#fdf6f6"/>
-  <circle cx="316" cy="180" r="4" fill="#fdf6f6"/>
-  <circle cx="196" cy="180" r="4" fill="#fdf6f6"/>
+  <circle cx="256" cy="115" r="6" fill="#fdf6f6"/>
+  <circle cx="321" cy="180" r="6" fill="#fdf6f6"/>
+  <circle cx="191" cy="180" r="6" fill="#fdf6f6"/>
 </svg>
 
