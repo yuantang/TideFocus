@@ -4,7 +4,6 @@ import { Achievement, Stats } from '../types';
 import { getLocalizedAchievements } from '../constants';
 import AchievementCard from './AchievementCard';
 import { getTranslations, getCurrentLanguage, getWeekdayName, type Language } from '../i18n';
-import { useDataBackup } from '../hooks/useDataBackup';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -317,50 +316,7 @@ const WeeklyProgressChart: React.FC<{ progress: { day: string; count: number; is
   );
 };
 
-// 数据导出函数
-const exportDataAsJSON = (stats: Stats) => {
-  const data = {
-    exportDate: new Date().toISOString(),
-    statistics: stats,
-    version: '1.0'
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `flowmind-stats-${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
 
-const exportDataAsCSV = (stats: Stats, t: any) => {
-  const csvContent = [
-    [t.csvHeaders.metric, t.csvHeaders.value],
-    [t.csvHeaders.totalSessions, stats.totalSessions],
-    [t.csvHeaders.totalMinutes, stats.totalFocusMinutes],
-    [t.csvHeaders.completedTasks, stats.completedTasks],
-    [t.csvHeaders.streakDays, stats.focusStreak],
-    [t.csvHeaders.dailyGoal, stats.dailyGoal],
-    [t.csvHeaders.todayCompleted, stats.dailySessionsCompleted],
-    [t.csvHeaders.morningSessions, stats.morningSessions],
-    [t.csvHeaders.nightSessions, stats.nightSessions],
-    [t.csvHeaders.longestSession, stats.longestSession],
-    [t.csvHeaders.perfectWeeks, stats.perfectWeeks],
-    [t.csvHeaders.goalStreakDays, stats.goalStreakDays]
-  ].map(row => row.join(',')).join('\n');
-
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `flowmind-stats-${new Date().toISOString().split('T')[0]}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
 
 // 时段分布热力图组件
 const TimeDistributionHeatmap: React.FC<{ stats: Stats }> = ({ stats }) => {
@@ -466,178 +422,7 @@ const MonthlyStatsView: React.FC<{ stats: Stats }> = ({ stats }) => {
         </div>
       </div>
 
-      {/* 数据导出 */}
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg p-5 border border-gray-200">
-        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <span className="text-lg">💾</span>
-          {t.dataExport}
-        </h4>
-        <div className="flex gap-2">
-          <button
-            onClick={() => exportDataAsJSON(stats)}
-            className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-          >
-            📥 {t.exportJSON}
-          </button>
-          <button
-            onClick={() => exportDataAsCSV(stats, t)}
-            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
-          >
-            📊 {t.exportCSV}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-// 数据管理标签页
-const DataManagementTab: React.FC = () => {
-  const { exportData, importData } = useDataBackup();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
-
-  const handleExport = () => {
-    const result = exportData();
-    setMessage({ type: result.success ? 'success' : 'error', text: result.message });
-    setTimeout(() => setMessage(null), 3000);
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsImporting(true);
-    const result = await importData(file);
-    setMessage({ type: result.success ? 'success' : 'error', text: result.message });
-    setIsImporting(false);
-
-    // 清空文件输入
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-
-    // 如果导入成功，3秒后刷新页面
-    if (result.success) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    } else {
-      setTimeout(() => setMessage(null), 5000);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold mb-2">💾 数据管理</h3>
-        <p className="text-sm opacity-70">备份和恢复你的专注数据</p>
-      </div>
-
-      {/* 消息提示 */}
-      {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          <p className="text-sm font-medium">{message.text}</p>
-        </div>
-      )}
-
-      {/* 数据导出 */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-        <div className="flex items-start gap-4">
-          <div className="text-4xl">📤</div>
-          <div className="flex-1">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">导出数据</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              将所有数据导出为 JSON 文件，包括设置、历史记录、任务和成就。
-            </p>
-            <button
-              onClick={handleExport}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              📥 导出备份文件
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 数据导入 */}
-      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
-        <div className="flex items-start gap-4">
-          <div className="text-4xl">📥</div>
-          <div className="flex-1">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">导入数据</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              从备份文件恢复数据。<span className="text-red-600 font-medium">注意：这将覆盖当前所有数据！</span>
-            </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <button
-              onClick={handleImportClick}
-              disabled={isImporting}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isImporting ? '⏳ 导入中...' : '📤 选择备份文件'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 使用提示 */}
-      <div className="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl">💡</div>
-          <div className="flex-1">
-            <h4 className="text-sm font-semibold text-gray-800 mb-2">使用建议</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• 建议每周导出一次数据作为备份</li>
-              <li>• 更换设备或浏览器时，可以通过导入恢复数据</li>
-              <li>• 备份文件包含所有设置和历史记录</li>
-              <li>• 导入数据后页面会自动刷新</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* 数据说明 */}
-      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-        <h4 className="text-sm font-semibold text-gray-800 mb-3">📊 备份内容</h4>
-        <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>所有设置</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>历史记录</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>任务列表</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>成就进度</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>统计数据</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">✓</span>
-            <span>主题配色</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
@@ -784,7 +569,6 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
         <div className="flex border-b border-black/10 px-4 flex-shrink-0">
             <TabButton active={activeTab === 'progress'} onClick={() => setActiveTab('progress')}>{t.progress}</TabButton>
             <TabButton active={activeTab === 'milestones'} onClick={() => setActiveTab('milestones')}>{t.milestones}</TabButton>
-            <TabButton active={activeTab === 'data'} onClick={() => setActiveTab('data')}>💾 数据</TabButton>
             <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')}>{t.about}</TabButton>
         </div>
 
@@ -923,7 +707,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, dailyGoal, daily
                     <MilestonesTab unlocked={unlockedAchievements} stats={stats} />
                 </div>
             )}
-            {activeTab === 'data' && <DataManagementTab />}
+
             {activeTab === 'about' && (
                 <div>
                     <div className="space-y-4 text-center leading-relaxed">
