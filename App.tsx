@@ -14,6 +14,7 @@ import { useRealtimeSync } from './hooks/useRealtimeSync';
 import { useAutoSync } from './hooks/useAutoSync';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
 import { useTemplates } from './hooks/useTemplates';
+import { useAnalytics } from './hooks/useAnalytics';
 import { getWeekdayName, getTranslations } from './i18n';
 import { PomodoroTemplate } from './types';
 
@@ -41,6 +42,9 @@ export default function App() {
 
   // Toast hook
   const { toasts, removeToast, success, error, warning, info } = useToast();
+
+  // Analytics
+  const analytics = useAnalytics();
 
   // 认证和云端同步
   const { isAuthenticated, configured: supabaseConfigured } = useAuth();
@@ -323,14 +327,29 @@ export default function App() {
           setUnlockedAchievement(firstNew);
           setShowAchievementUnlock(true);
           success(`🎉 成就解锁：${firstNew.name}`);
+
+          // 追踪成就解锁
+          analytics.trackAchievementUnlock(
+            firstNew.id,
+            firstNew.name,
+            firstNew.category
+          );
         }
     }
-  }, [unlockedAchievements, success]);
+  }, [unlockedAchievements, success, analytics]);
 
   const switchMode = useCallback(() => {
     const wasFocus = mode === 'focus';
 
     if (wasFocus) {
+      // 追踪会话完成
+      const actualDuration = focusDuration - timeLeft;
+      analytics.trackSessionComplete(
+        'focus',
+        Math.floor(focusDuration / 60),
+        actualDuration
+      );
+
       if (linkedTaskId) {
         setTasks(prevTasks => {
             const newTasks = prevTasks.map(t => {
@@ -489,6 +508,9 @@ export default function App() {
   };
   
   const handleNext = () => {
+    // 追踪会话跳过
+    analytics.trackSessionSkip(mode, timeLeft);
+
     if (intervalRef.current) clearInterval(intervalRef.current);
     setIsActive(false);
     switchMode();
@@ -500,6 +522,14 @@ export default function App() {
     setShowIntentionPrompt(false);
     if (!userInteracted) { primeAudio(); setUserInteracted(true); }
     setIsActive(true);
+
+    // 追踪会话开始
+    analytics.trackSessionStart(
+      mode,
+      mode === 'focus' ? Math.floor(focusDuration / 60) : (mode === 'break' ? Math.floor(breakDuration / 60) : Math.floor(longBreakDuration / 60)),
+      !!newIntention,
+      !!taskId
+    );
   };
   
   const handleSaveSettings = (settings: any) => {
@@ -719,6 +749,10 @@ export default function App() {
           localStorage.setItem('dailyTasks', JSON.stringify({ date: todayStr, tasks: newTasks }));
           return newTasks;
       });
+
+      // 追踪任务创建
+      analytics.trackTaskCreate(false);
+
       success('任务已添加');
   };
 
@@ -748,6 +782,15 @@ export default function App() {
       // 更新完成任务计数
       if (updates.completed !== undefined && wasCompleted !== updates.completed) {
         if (updates.completed) {
+          const task = tasks.find(t => t.id === id);
+          if (task) {
+            // 计算任务完成时长（分钟）
+            const completionTime = Math.floor((Date.now() - task.createdAt) / 60000);
+
+            // 追踪任务完成
+            analytics.trackTaskComplete(completionTime);
+          }
+
           const newCompletedTasks = completedTasks + 1;
           setCompletedTasks(newCompletedTasks);
           localStorage.setItem('completedTasks', String(newCompletedTasks));

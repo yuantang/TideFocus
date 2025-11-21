@@ -102,8 +102,10 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION handle_new_user();
 
--- 9. 创建视图：用户数据统计
-CREATE OR REPLACE VIEW user_data_stats AS
+-- 9. 创建视图：用户数据统计（启用 RLS）
+CREATE OR REPLACE VIEW user_data_stats
+WITH (security_invoker = true)
+AS
 SELECT
   user_id,
   COUNT(*) as total_records,
@@ -112,8 +114,11 @@ SELECT
 FROM user_data
 GROUP BY user_id;
 
--- 10. 授予权限
+-- 10. 授予权限（只允许认证用户访问）
 GRANT SELECT ON user_data_stats TO authenticated;
+
+-- 注意：使用 security_invoker = true 后，视图会继承 user_data 表的 RLS 策略
+-- 用户只能看到自己的统计数据
 
 -- 完成！
 -- 现在可以在应用中使用 Supabase 进行用户认证和数据同步了。

@@ -1,5 +1,29 @@
 # TideFocus 更新日志
 
+## v1.0.1 (2025-01-21)
+
+### 🚀 性能优化
+- **音频资源 CDN 迁移**
+  - 将所有 25 个音频文件迁移到 Cloudflare CDN
+  - CDN 地址：`https://audio.tidefocus.app/sounds/`
+  - 显著减小应用打包体积
+  - 利用全球 CDN 加速音频加载
+  - 降低服务器负载
+
+### 🔧 技术改进
+- 更新 `constants.ts` 中所有音频 URL 为 CDN 地址
+- 优化 Service Worker 音频缓存策略
+- 移除本地音频文件目录（`public/sounds/` 和 `dist/sounds/`）
+- 更新 `vercel.json` 配置，移除不必要的音频路径缓存
+- 添加音频 CDN 测试脚本（`scripts/test-audio-cdn.js`）
+
+### 📝 文档
+- 新增 `AUDIO_CDN_MIGRATION.md` 迁移说明文档
+- 包含完整的音频文件列表和测试清单
+- 提供回滚方案
+
+---
+
 ## v1.0.0 (2024-11-18)
 
 ### 🎉 首次发布

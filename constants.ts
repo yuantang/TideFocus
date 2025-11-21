@@ -25,30 +25,30 @@ export const DEFAULT_SESSIONS_PER_ROUND = 4;
 const SOUNDS_BASE: Sound[] = [
   { id: 'none', name: '无声', url: '' },
   // 色彩噪音 - 不同频率的噪音，适合屏蔽干扰
-  { id: 'white_noise', name: '白噪音', url: '/sounds/ambient/white-noise.ogg' },
-  { id: 'pink_noise', name: '粉噪音', url: '/sounds/ambient/pink-noise.ogg' },
-  { id: 'brown_noise', name: '棕噪音', url: '/sounds/ambient/brown-noise.ogg' },
-  { id: 'violet_noise', name: '紫噪音', url: '/sounds/ambient/violet-noise.ogg' },
+  { id: 'white_noise', name: '白噪音', url: 'https://audio.tidefocus.app/sounds/ambient/white-noise.ogg' },
+  { id: 'pink_noise', name: '粉噪音', url: 'https://audio.tidefocus.app/sounds/ambient/pink-noise.ogg' },
+  { id: 'brown_noise', name: '棕噪音', url: 'https://audio.tidefocus.app/sounds/ambient/brown-noise.ogg' },
+  { id: 'violet_noise', name: '紫噪音', url: 'https://audio.tidefocus.app/sounds/ambient/violet-noise.ogg' },
   // 水声 - 流动的水声，舒缓放松
-  { id: 'rain', name: '雨声', url: '/sounds/ambient/rain.ogg' },
-  { id: 'waves', name: '海浪', url: '/sounds/ambient/waves.ogg' },
-  { id: 'stream', name: '溪流', url: '/sounds/ambient/stream.ogg' },
-  { id: 'ocean', name: '海洋', url: '/sounds/ambient/ocean.ogg' },
+  { id: 'rain', name: '雨声', url: 'https://audio.tidefocus.app/sounds/ambient/rain.ogg' },
+  { id: 'waves', name: '海浪', url: 'https://audio.tidefocus.app/sounds/ambient/waves.ogg' },
+  { id: 'stream', name: '溪流', url: 'https://audio.tidefocus.app/sounds/ambient/stream.ogg' },
+  { id: 'ocean', name: '海洋', url: 'https://audio.tidefocus.app/sounds/ambient/ocean.ogg' },
   // 火焰 - 温暖的火焰声，深度专注
-  { id: 'fireplace', name: '壁炉', url: '/sounds/ambient/fireplace.ogg' },
-  { id: 'campfire', name: '篝火', url: '/sounds/ambient/campfire.ogg' },
-  { id: 'thunder', name: '雷声', url: '/sounds/ambient/thunder.ogg' },
-  { id: 'wind', name: '风声', url: '/sounds/ambient/wind.ogg' },
+  { id: 'fireplace', name: '壁炉', url: 'https://audio.tidefocus.app/sounds/ambient/fireplace.ogg' },
+  { id: 'campfire', name: '篝火', url: 'https://audio.tidefocus.app/sounds/ambient/campfire.ogg' },
+  { id: 'thunder', name: '雷声', url: 'https://audio.tidefocus.app/sounds/ambient/thunder.ogg' },
+  { id: 'wind', name: '风声', url: 'https://audio.tidefocus.app/sounds/ambient/wind.ogg' },
   // 自然 - 自然环境声，放松心情
-  { id: 'forest', name: '森林', url: '/sounds/ambient/forest.ogg' },
-  { id: 'birds', name: '鸟鸣', url: '/sounds/ambient/birds.ogg' },
-  { id: 'crickets', name: '虫鸣', url: '/sounds/ambient/crickets.ogg' },
-  { id: 'wind_chimes', name: '风铃', url: '/sounds/ambient/wind-chimes.ogg' },
+  { id: 'forest', name: '森林', url: 'https://audio.tidefocus.app/sounds/ambient/forest.ogg' },
+  { id: 'birds', name: '鸟鸣', url: 'https://audio.tidefocus.app/sounds/ambient/birds.ogg' },
+  { id: 'crickets', name: '虫鸣', url: 'https://audio.tidefocus.app/sounds/ambient/crickets.ogg' },
+  { id: 'wind_chimes', name: '风铃', url: 'https://audio.tidefocus.app/sounds/ambient/wind-chimes.ogg' },
   // 环境 - 工作学习环境氛围
-  { id: 'cafe', name: '咖啡店', url: '/sounds/ambient/cafe.ogg' },
-  { id: 'library', name: '图书馆', url: '/sounds/ambient/library.ogg' },
-  { id: 'air_conditioner', name: '空调', url: '/sounds/ambient/air-conditioner.ogg' },
-  { id: 'city_ambient', name: '城市氛围', url: '/sounds/ambient/city-ambient.ogg' },
+  { id: 'cafe', name: '咖啡店', url: 'https://audio.tidefocus.app/sounds/ambient/cafe.ogg' },
+  { id: 'library', name: '图书馆', url: 'https://audio.tidefocus.app/sounds/ambient/library.ogg' },
+  { id: 'air_conditioner', name: '空调', url: 'https://audio.tidefocus.app/sounds/ambient/air-conditioner.ogg' },
+  { id: 'city_ambient', name: '城市氛围', url: 'https://audio.tidefocus.app/sounds/ambient/city-ambient.ogg' },
 ];
 
 export const getLocalizedSounds = (): Sound[] => {
@@ -119,9 +119,9 @@ export const SOUND_CATEGORIES = SOUND_CATEGORIES_BASE.map(category => {
 
 const COMPLETION_SOUNDS_BASE: Sound[] = [
     { id: 'none', name: '无声', url: '' },
-    { id: 'singing_bowl', name: '颂钵', url: '/sounds/completion/singing-bowl.ogg'},
-    { id: 'bamboo_chime', name: '竹风铃', url: '/sounds/completion/bamboo-chime.ogg'},
-    { id: 'music_box', name: '音乐盒', url: '/sounds/completion/music-box.ogg'}
+    { id: 'singing_bowl', name: '颂钵', url: 'https://audio.tidefocus.app/sounds/completion/singing-bowl.ogg'},
+    { id: 'bamboo_chime', name: '竹风铃', url: 'https://audio.tidefocus.app/sounds/completion/bamboo-chime.ogg'},
+    { id: 'music_box', name: '音乐盒', url: 'https://audio.tidefocus.app/sounds/completion/music-box.ogg'}
 ];
 
 export const getLocalizedCompletionSounds = (): Sound[] => {
@@ -142,8 +142,8 @@ export const COMPLETION_SOUNDS = COMPLETION_SOUNDS_BASE.map(sound => {
 
 const REMINDER_SOUNDS_BASE: Sound[] = [
     { id: 'none', name: '无声', url: '' },
-    { id: 'bell', name: '摇铃', url: '/sounds/reminder/bell.ogg'},
-    { id: 'piano', name: '钢琴', url: '/sounds/reminder/piano.ogg'}
+    { id: 'bell', name: '摇铃', url: 'https://audio.tidefocus.app/sounds/reminder/bell.ogg'},
+    { id: 'piano', name: '钢琴', url: 'https://audio.tidefocus.app/sounds/reminder/piano.ogg'}
 ];
 
 export const getLocalizedReminderSounds = (): Sound[] => {

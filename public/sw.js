@@ -15,33 +15,9 @@ const STATIC_ASSETS = [
   '/apple-touch-icon.png'
 ];
 
-// 音频文件（按需缓存）
-const AUDIO_ASSETS = [
-  '/sounds/rain.mp3',
-  '/sounds/ocean.mp3',
-  '/sounds/forest.mp3',
-  '/sounds/cafe.mp3',
-  '/sounds/fireplace.mp3',
-  '/sounds/thunder.mp3',
-  '/sounds/wind.mp3',
-  '/sounds/stream.mp3',
-  '/sounds/birds.mp3',
-  '/sounds/crickets.mp3',
-  '/sounds/whitenoise.mp3',
-  '/sounds/pinknoise.mp3',
-  '/sounds/brownnoise.mp3',
-  '/sounds/fan.mp3',
-  '/sounds/train.mp3',
-  '/sounds/keyboard.mp3',
-  '/sounds/clock.mp3',
-  '/sounds/heartbeat.mp3',
-  '/sounds/breath.mp3',
-  '/sounds/meditation.mp3',
-  '/sounds/bell.mp3',
-  '/sounds/chime.mp3',
-  '/sounds/gong.mp3',
-  '/sounds/ding.mp3'
-];
+// 音频文件现在托管在 Cloudflare CDN，不需要本地缓存
+// 音频 URL: https://audio.tidefocus.app/sounds/
+const AUDIO_ASSETS = [];
 
 // 安装事件 - 缓存静态资源
 self.addEventListener('install', (event) => {
