@@ -60,12 +60,18 @@ export const useAutoSync = (options: AutoSyncOptions = {}) => {
     if (!opts.enabled || !isAuthenticated) return;
 
     const handleStorageChange = (e: StorageEvent) => {
-      // 只监听特定的 key
+      // 监听所有需要同步的数据键
       const syncKeys = [
+        // 设置相关
+        'appSettings',
         'focusDuration', 'breakDuration', 'longBreakDuration',
         'dailyGoal', 'sessionsPerRound',
-        'tasks', 'history', 'unlockedAchievements',
-        'totalSessions', 'dailySessionsCompleted', 'focusStreak'
+        // 数据相关
+        'dailyTasks', 'focusHistory', 'unlockedAchievements', 'userStats',
+        // 统计相关
+        'totalSessions', 'dailySessionsCompleted', 'focusStreak',
+        'totalFocusMinutes', 'completedTasks', 'nightSessions',
+        'morningSessions', 'longestSession'
       ];
 
       if (e.key && syncKeys.includes(e.key)) {

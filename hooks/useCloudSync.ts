@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
+import { collectUserStats, saveUserStats, syncStatsToStorage } from '../utils/syncHelper';
 
 export type DataType = 'settings' | 'history' | 'tasks' | 'achievements' | 'stats';
 
@@ -125,13 +126,25 @@ export const useCloudSync = () => {
     setSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
 
     try {
+      // 在同步前，先收集所有统计数据到 userStats
+      syncStatsToStorage();
+
       const dataTypes: DataType[] = ['settings', 'history', 'tasks', 'achievements', 'stats'];
 
       for (const dataType of dataTypes) {
         // 使用映射的键名获取本地数据
         const storageKey = getStorageKey(dataType);
         const localDataStr = localStorage.getItem(storageKey);
-        if (!localDataStr) continue;
+        if (!localDataStr) {
+          // 如果是 stats 类型且没有数据，尝试收集
+          if (dataType === 'stats') {
+            const stats = collectUserStats();
+            await uploadData(dataType, stats);
+            localStorage.setItem(storageKey, JSON.stringify(stats));
+            localStorage.setItem(`${storageKey}_timestamp`, Date.now().toString());
+          }
+          continue;
+        }
 
         const localData = JSON.parse(localDataStr);
 
@@ -148,7 +161,10 @@ export const useCloudSync = () => {
         error: null,
         pendingChanges: 0
       });
+
+      console.log('✅ Sync all completed successfully');
     } catch (error: any) {
+      console.error('❌ Sync all failed:', error);
       setSyncStatus(prev => ({
         ...prev,
         syncing: false,
@@ -205,6 +221,77 @@ export const useCloudSync = () => {
     }
   }, [isAuthenticated, downloadData]);
 
+  // 智能合并两个数据集
+  const mergeData = (dataType: DataType, localData: any, cloudData: any): any => {
+    console.log(`🔀 Merging ${dataType} data...`);
+
+    switch (dataType) {
+      case 'achievements':
+        // 成就数据：取并集（合并所有唯一成就）
+        if (Array.isArray(localData) && Array.isArray(cloudData)) {
+          const merged = Array.from(new Set([...localData, ...cloudData]));
+          console.log(`  📊 Achievements: local=${localData.length}, cloud=${cloudData.length}, merged=${merged.length}`);
+          return merged;
+        }
+        return localData || cloudData || [];
+
+      case 'history':
+        // 历史记录：合并所有日期的数据，取最大值
+        if (typeof localData === 'object' && typeof cloudData === 'object') {
+          const merged = { ...cloudData, ...localData };
+          // 对于相同日期，取较大的值
+          Object.keys(cloudData).forEach(date => {
+            if (localData[date]) {
+              merged[date] = Math.max(localData[date], cloudData[date]);
+            }
+          });
+          console.log(`  📊 History: local=${Object.keys(localData).length} days, cloud=${Object.keys(cloudData).length} days, merged=${Object.keys(merged).length} days`);
+          return merged;
+        }
+        return localData || cloudData || {};
+
+      case 'stats':
+        // 统计数据：合并对象，数值取最大值
+        if (typeof localData === 'object' && typeof cloudData === 'object') {
+          const merged: any = { ...cloudData };
+          Object.keys(localData).forEach(key => {
+            if (typeof localData[key] === 'number' && typeof cloudData[key] === 'number') {
+              merged[key] = Math.max(localData[key], cloudData[key]);
+            } else {
+              merged[key] = localData[key] ?? cloudData[key];
+            }
+          });
+          // 确保包含所有云端的字段
+          Object.keys(cloudData).forEach(key => {
+            if (!(key in merged)) {
+              merged[key] = cloudData[key];
+            }
+          });
+          merged.lastUpdated = new Date().toISOString();
+          console.log(`  📊 Stats merged: ${Object.keys(merged).length} fields`);
+          return merged;
+        }
+        return localData || cloudData || {};
+
+      case 'tasks':
+        // 任务数据：使用较新的数据（任务是每日重置的）
+        if (localData?.date && cloudData?.date) {
+          const useLocal = localData.date >= cloudData.date;
+          console.log(`  📊 Tasks: using ${useLocal ? 'local' : 'cloud'} (${useLocal ? localData.date : cloudData.date})`);
+          return useLocal ? localData : cloudData;
+        }
+        return localData || cloudData || { date: new Date().toISOString().split('T')[0], tasks: [] };
+
+      case 'settings':
+        // 设置数据：使用本地数据优先（用户最近的设置）
+        console.log(`  📊 Settings: using local data`);
+        return localData || cloudData || {};
+
+      default:
+        return localData || cloudData;
+    }
+  };
+
   // 智能合并云端和本地数据
   const smartMerge = useCallback(async () => {
     if (!isAuthenticated || syncInProgressRef.current) {
@@ -215,7 +302,9 @@ export const useCloudSync = () => {
     setSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
 
     try {
+      console.log('🔄 Starting smart merge...');
       const dataTypes: DataType[] = ['settings', 'history', 'tasks', 'achievements', 'stats'];
+      let hasChanges = false;
 
       for (const dataType of dataTypes) {
         const cloudData = await downloadData(dataType);
@@ -223,32 +312,34 @@ export const useCloudSync = () => {
         const localDataStr = localStorage.getItem(storageKey);
 
         if (cloudData && localDataStr) {
-          // 都有数据，比较时间戳
-          const cloudTime = new Date(cloudData.updated_at).getTime();
-          const localTime = parseInt(localStorage.getItem(`${storageKey}_timestamp`) || '0');
+          // 都有数据，进行智能合并
+          console.log(`🔀 Both local and cloud data exist for ${dataType}, merging...`);
+          const localData = JSON.parse(localDataStr);
+          const mergedData = mergeData(dataType, localData, cloudData.data);
 
-          if (cloudTime > localTime) {
-            // 云端更新，使用云端数据
-            console.log(`📥 Using cloud data for ${dataType} (cloud: ${new Date(cloudTime).toISOString()}, local: ${new Date(localTime).toISOString()})`);
-            localStorage.setItem(storageKey, JSON.stringify(cloudData.data));
-            localStorage.setItem(`${storageKey}_timestamp`, cloudTime.toString());
-          } else {
-            // 本地更新，上传本地数据
-            console.log(`📤 Uploading local data for ${dataType} (local: ${new Date(localTime).toISOString()}, cloud: ${new Date(cloudTime).toISOString()})`);
-            const localData = JSON.parse(localDataStr);
-            await uploadData(dataType, localData);
-          }
+          // 保存合并后的数据到本地
+          localStorage.setItem(storageKey, JSON.stringify(mergedData));
+          localStorage.setItem(`${storageKey}_timestamp`, Date.now().toString());
+
+          // 上传合并后的数据到云端
+          await uploadData(dataType, mergedData);
+          hasChanges = true;
+
         } else if (cloudData && !localDataStr) {
-          // 只有云端数据
+          // 只有云端数据，下载到本地
           console.log(`📥 Downloading cloud data for ${dataType} (no local data)`);
           localStorage.setItem(storageKey, JSON.stringify(cloudData.data));
           const cloudTime = new Date(cloudData.updated_at).getTime();
           localStorage.setItem(`${storageKey}_timestamp`, cloudTime.toString());
+          hasChanges = true;
+
         } else if (!cloudData && localDataStr) {
-          // 只有本地数据
+          // 只有本地数据，上传到云端
           console.log(`📤 Uploading local data for ${dataType} (no cloud data)`);
           const localData = JSON.parse(localDataStr);
           await uploadData(dataType, localData);
+          localStorage.setItem(`${storageKey}_timestamp`, Date.now().toString());
+          hasChanges = true;
         }
       }
 
@@ -260,6 +351,26 @@ export const useCloudSync = () => {
       });
 
       console.log('✅ Smart merge completed successfully');
+
+      // 如果有数据变化，恢复统计数据并刷新页面
+      if (hasChanges) {
+        // 从 userStats 恢复所有统计数据到独立的 localStorage 键
+        const userStatsStr = localStorage.getItem('userStats');
+        if (userStatsStr) {
+          try {
+            const stats = JSON.parse(userStatsStr);
+            saveUserStats(stats);
+            console.log('📊 Stats restored after merge:', stats);
+          } catch (error) {
+            console.error('Failed to restore stats:', error);
+          }
+        }
+
+        console.log('🔄 Data changed, reloading page in 1 second...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
     } catch (error: any) {
       console.error('❌ Smart merge failed:', error);
       setSyncStatus(prev => ({
