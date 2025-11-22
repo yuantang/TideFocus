@@ -26,6 +26,7 @@ const TaskListModal = lazy(() => import('./components/TaskListModal'));
 const AchievementUnlockModal = lazy(() => import('./components/AchievementUnlockModal'));
 const TemplateEditorModal = lazy(() => import('./components/TemplateEditorModal'));
 const OnboardingModal = lazy(() => import('./components/OnboardingModal'));
+const ShareModal = lazy(() => import('./components/ShareModal'));
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -145,6 +146,15 @@ export default function App() {
 
   // 首次使用引导
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // 分享功能
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareData, setShareData] = useState({
+    focusMinutes: 0,
+    tasksCompleted: 0,
+    streak: 0,
+    chartData: [] as number[]
+  });
 
   const audioRefs = useRef<Record<string, HTMLAudioElement>>(
     SOUNDS.reduce((acc, sound) => {
@@ -448,6 +458,28 @@ export default function App() {
       });
 
       setWeeklyProgress(prev => prev.map(d => d.isToday ? { ...d, count: newDailyCount } : d));
+
+      // 每完成 3 个番茄钟或达成每日目标时，提示分享
+      if (newDailyCount % 3 === 0 || (dailyGoal > 0 && newDailyCount === dailyGoal)) {
+        setTimeout(() => {
+          // 准备分享数据
+          const history: Record<string, number> = JSON.parse(localStorage.getItem('focusHistory') || '{}');
+          const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (6 - i));
+            const dateStr = d.toISOString().split('T')[0];
+            return history[dateStr] || 0;
+          });
+
+          setShareData({
+            focusMinutes: Math.floor(newTotalFocusMinutes % 1440), // 今日专注时长
+            tasksCompleted: tasks.filter(t => t.completed).length,
+            streak: currentStreak,
+            chartData: last7Days
+          });
+          setShowShareModal(true);
+        }, 2000); // 延迟 2 秒显示，让用户先看到完成提示
+      }
 
       const newSessionCount = sessionCount + 1;
       setSessionCount(newSessionCount);
@@ -830,8 +862,38 @@ export default function App() {
         />
       </div>
 
-      {/* 右上角信息按钮 */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* 右上角按钮组 */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        {/* 分享按钮 */}
+        <button
+          onClick={() => {
+            // 准备分享数据
+            const history: Record<string, number> = JSON.parse(localStorage.getItem('focusHistory') || '{}');
+            const last7Days = Array.from({ length: 7 }, (_, i) => {
+              const d = new Date();
+              d.setDate(d.getDate() - (6 - i));
+              const dateStr = d.toISOString().split('T')[0];
+              return history[dateStr] || 0;
+            });
+
+            setShareData({
+              focusMinutes: Math.floor(totalFocusMinutes % 1440),
+              tasksCompleted: tasks.filter(t => t.completed).length,
+              streak: focusStreak,
+              chartData: last7Days
+            });
+            setShowShareModal(true);
+          }}
+          className="p-2 rounded-full text-current/70 hover:text-current transition-colors"
+          aria-label="分享成就"
+          style={{ color: controlsTextColor }}
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+        </button>
+
+        {/* 信息按钮 */}
         <button onClick={() => setShowInfo(true)} className="p-2 rounded-full text-current/70 hover:text-current transition-colors" aria-label="Show app information" style={{ color: controlsTextColor }}>
           <InfoIcon className="w-6 h-6" />
         </button>
@@ -931,6 +993,14 @@ export default function App() {
           isOpen={showOnboarding}
           onClose={() => setShowOnboarding(false)}
           onComplete={handleOnboardingComplete}
+        />
+
+        {/* 分享功能 */}
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          data={shareData}
+          type="daily"
         />
       </Suspense>
 
