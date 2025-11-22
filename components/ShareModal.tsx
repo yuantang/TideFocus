@@ -31,7 +31,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, data, type = '
     if (isOpen) {
       setIsVisible(true);
       // 自动生成第一张卡片
-      if (!imageUrl && referralCode) {
+      if (!imageUrl && referralCode && !referralLoading) {
+        console.log('自动生成分享卡片，邀请码:', referralCode);
         handleGenerate();
       }
     } else {
@@ -42,13 +43,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, data, type = '
         setImageUrl('');
       }
     }
-  }, [isOpen, referralCode]);
+  }, [isOpen, referralCode, referralLoading]);
 
   const handleGenerate = async () => {
-    if (!referralCode || referralLoading) return;
+    console.log('handleGenerate 被调用');
+    console.log('referralCode:', referralCode);
+    console.log('referralLoading:', referralLoading);
+
+    if (!referralCode || referralLoading) {
+      console.log('无法生成：邀请码为空或正在加载');
+      return;
+    }
 
     setIsGenerating(true);
     try {
+      console.log('开始生成分享卡片...');
       const config: ShareCardConfig = {
         type,
         template,
@@ -59,17 +68,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, data, type = '
         }
       };
 
+      console.log('配置:', config);
       const blob = await generateShareCard(config);
-      
+      console.log('卡片生成成功，大小:', blob.size);
+
       // 清理旧的 URL
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
       }
-      
+
       const url = URL.createObjectURL(blob);
       setImageUrl(url);
+      console.log('图片 URL 已设置:', url);
     } catch (error) {
       console.error('生成分享卡片失败:', error);
+      alert('生成失败：' + (error as Error).message);
     } finally {
       setIsGenerating(false);
     }

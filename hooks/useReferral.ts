@@ -23,7 +23,17 @@ export const useReferral = () => {
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
+        // 未登录用户使用本地生成的邀请码
+        const localCode = localStorage.getItem('local_referral_code');
+        if (localCode) {
+          setReferralCode(localCode);
+        } else {
+          const newCode = generateReferralCode();
+          localStorage.setItem('local_referral_code', newCode);
+          setReferralCode(newCode);
+        }
         setIsLoading(false);
         return;
       }
@@ -47,6 +57,11 @@ export const useReferral = () => {
 
         if (!error) {
           setReferralCode(newCode);
+        } else {
+          // 如果更新失败，使用本地生成的邀请码
+          const localCode = localStorage.getItem('local_referral_code') || generateReferralCode();
+          localStorage.setItem('local_referral_code', localCode);
+          setReferralCode(localCode);
         }
       }
 
@@ -68,6 +83,15 @@ export const useReferral = () => {
       setRewards(rewardsData || []);
     } catch (error) {
       console.error('加载邀请数据失败:', error);
+      // 出错时使用本地邀请码
+      const localCode = localStorage.getItem('local_referral_code');
+      if (localCode) {
+        setReferralCode(localCode);
+      } else {
+        const newCode = generateReferralCode();
+        localStorage.setItem('local_referral_code', newCode);
+        setReferralCode(newCode);
+      }
     } finally {
       setIsLoading(false);
     }
