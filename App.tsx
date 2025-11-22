@@ -17,6 +17,7 @@ import { useTemplates } from './hooks/useTemplates';
 import { useAnalytics } from './hooks/useAnalytics';
 import { getWeekdayName, getTranslations } from './i18n';
 import { PomodoroTemplate } from './types';
+import { initVersionCheck } from './utils/versionCheck';
 
 // 懒加载非关键组件
 const SettingsModal = lazy(() => import('./components/SettingsModal'));
@@ -198,6 +199,13 @@ export default function App() {
   useEffect(() => { localStorage.setItem('breakTextColor', breakTextColor) }, [breakTextColor]);
   useEffect(() => { localStorage.setItem('longBreakBgColor', longBreakBgColor) }, [longBreakBgColor]);
   useEffect(() => { localStorage.setItem('longBreakTextColor', longBreakTextColor) }, [longBreakTextColor]);
+
+  // 版本检测和缓存管理
+  useEffect(() => {
+    initVersionCheck().catch(err => {
+      console.error('Version check failed:', err);
+    });
+  }, []);
 
   // Load progress history, achievements, and tasks
   useEffect(() => {

@@ -1,6 +1,6 @@
 // Service Worker for TideFocus PWA
-const CACHE_NAME = 'tidefocus-v1.0.0';
-const RUNTIME_CACHE = 'tidefocus-runtime';
+const CACHE_NAME = 'tidefocus-v1.0.1'; // 更新版本号以清除旧缓存
+const RUNTIME_CACHE = 'tidefocus-runtime-v1.0.1';
 
 // 需要缓存的静态资源
 const STATIC_ASSETS = [
@@ -101,6 +101,22 @@ self.addEventListener('fetch', (event) => {
       caches.match(request).then((cachedResponse) => {
         return cachedResponse || fetch(request);
       })
+    );
+    return;
+  }
+
+  // JS/CSS 文件 - 网络优先策略（避免缓存旧版本）
+  if (url.pathname.includes('/assets/') && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css'))) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // 不缓存 JS/CSS 文件，始终从网络获取最新版本
+          return response;
+        })
+        .catch(() => {
+          // 网络失败时尝试从缓存获取
+          return caches.match(request);
+        })
     );
     return;
   }

@@ -121,3 +121,20 @@ export const clearAllCaches = async (): Promise<boolean> => {
   }
 };
 
+// 强制刷新应用（清除缓存并重新加载）
+export const forceRefresh = async (): Promise<void> => {
+  console.log('Force refreshing application...');
+
+  // 1. 清除所有缓存
+  await clearAllCaches();
+
+  // 2. 注销 Service Worker
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(reg => reg.unregister()));
+  }
+
+  // 3. 硬刷新页面
+  window.location.reload();
+};
+
