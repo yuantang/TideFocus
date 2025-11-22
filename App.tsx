@@ -27,7 +27,6 @@ const TaskListModal = lazy(() => import('./components/TaskListModal'));
 const AchievementUnlockModal = lazy(() => import('./components/AchievementUnlockModal'));
 const TemplateEditorModal = lazy(() => import('./components/TemplateEditorModal'));
 const OnboardingModal = lazy(() => import('./components/OnboardingModal'));
-// const ShareModal = lazy(() => import('./components/ShareModal')); // 暂时隐藏分享功能
 
 
 const DEFAULT_FOCUS_BG = '#f8e0e0';
@@ -147,15 +146,6 @@ export default function App() {
 
   // 首次使用引导
   const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // 分享功能
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [shareData, setShareData] = useState({
-    focusMinutes: 0,
-    tasksCompleted: 0,
-    streak: 0,
-    chartData: [] as number[]
-  });
 
   const audioRefs = useRef<Record<string, HTMLAudioElement>>(
     SOUNDS.reduce((acc, sound) => {
@@ -950,14 +940,6 @@ export default function App() {
           onClose={() => setShowOnboarding(false)}
           onComplete={handleOnboardingComplete}
         />
-
-        {/* 分享功能 - 暂时隐藏 */}
-        {/* <ShareModal
-          isOpen={showShareModal}
-          onClose={() => setShowShareModal(false)}
-          data={shareData}
-          type="daily"
-        /> */}
       </Suspense>
 
       {/* Toast 通知 */}

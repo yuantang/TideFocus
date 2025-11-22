@@ -1,6 +1,6 @@
 // 版本检测和缓存管理工具
 
-const APP_VERSION = '1.0.1'; // 与 package.json 保持一致
+const APP_VERSION = '1.0.5'; // 与 package.json 保持一致
 const VERSION_KEY = 'app_version';
 
 /**
