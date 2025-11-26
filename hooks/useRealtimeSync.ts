@@ -84,13 +84,19 @@ export const useRealtimeSync = () => {
         error: null
       }));
 
-      // 触发页面刷新以应用新数据
-      if (eventType === 'UPDATE' || eventType === 'INSERT') {
-        console.log('🔄 Data updated, reloading page...');
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      }
+      // 注意：不自动刷新页面，避免循环刷新问题
+      // 用户可以手动刷新页面来查看最新数据
+      // 或者在下次打开应用时会自动加载最新数据
+      console.log(`✅ Data updated for ${dataType}, version ${version}. Refresh page to see changes.`);
+
+      // 如果需要自动刷新，可以取消下面的注释
+      // 但要注意：这可能导致循环刷新问题
+      // if (eventType === 'UPDATE' || eventType === 'INSERT') {
+      //   console.log('🔄 Data updated, reloading page...');
+      //   setTimeout(() => {
+      //     window.location.reload();
+      //   }, 500);
+      // }
     } catch (error) {
       console.error('Error applying realtime update:', error);
       setSyncState(prev => ({

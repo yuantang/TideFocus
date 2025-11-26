@@ -1,6 +1,6 @@
 // Service Worker for TideFocus PWA
-const CACHE_NAME = 'tidefocus-v1.0.6'; // 更新版本号以清除旧缓存
-const RUNTIME_CACHE = 'tidefocus-runtime-v1.0.6';
+const CACHE_NAME = 'tidefocus-v1.0.7'; // 更新版本号以清除旧缓存
+const RUNTIME_CACHE = 'tidefocus-runtime-v1.0.7';
 
 // 需要缓存的静态资源
 const STATIC_ASSETS = [

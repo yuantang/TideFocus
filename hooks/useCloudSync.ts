@@ -352,7 +352,7 @@ export const useCloudSync = () => {
 
       console.log('✅ Smart merge completed successfully');
 
-      // 如果有数据变化，恢复统计数据并刷新页面
+      // 如果有数据变化，恢复统计数据
       if (hasChanges) {
         // 从 userStats 恢复所有统计数据到独立的 localStorage 键
         const userStatsStr = localStorage.getItem('userStats');
@@ -366,10 +366,16 @@ export const useCloudSync = () => {
           }
         }
 
-        console.log('🔄 Data changed, reloading page in 1 second...');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // 标记需要刷新，但不立即刷新
+        // 让用户在当前会话中继续使用，下次打开应用时会自动加载最新数据
+        console.log('✅ Data merged successfully. Changes will be applied on next app launch.');
+
+        // 如果确实需要立即刷新，可以取消下面的注释
+        // 但注意：这会中断用户当前的操作
+        // console.log('🔄 Data changed, reloading page in 1 second...');
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 1000);
       }
     } catch (error: any) {
       console.error('❌ Smart merge failed:', error);
