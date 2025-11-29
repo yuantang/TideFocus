@@ -28,20 +28,20 @@
 #### 验证方法
 ```bash
 # 访问以下 URL 验证
-https://tidefocus.app/sitemap.xml
-https://tidefocus.app/robots.txt
+https://www.tidefocus.app/sitemap.xml
+https://www.tidefocus.app/robots.txt
 ```
 
 #### 提交到搜索引擎
 1. **Google Search Console**
    - 访问：https://search.google.com/search-console
-   - 添加网站：tidefocus.app
-   - 提交 sitemap：https://tidefocus.app/sitemap.xml
+   - 添加网站：www.tidefocus.app
+   - 提交 sitemap：https://www.tidefocus.app/sitemap.xml
 
 2. **Bing Webmaster Tools**
    - 访问：https://www.bing.com/webmasters
-   - 添加网站：tidefocus.app
-   - 提交 sitemap：https://tidefocus.app/sitemap.xml
+   - 添加网站：www.tidefocus.app
+   - 提交 sitemap：https://www.tidefocus.app/sitemap.xml
 
 ### 2. Meta 标签优化
 
@@ -80,7 +80,7 @@ https://tidefocus.app/robots.txt
   "@type": "WebApplication",
   "name": "TideFocus",
   "alternateName": "TideFocus - Pomodoro Timer",
-  "url": "https://tidefocus.app",
+  "url": "https://www.tidefocus.app",
   "description": "A minimal pomodoro timer online for students and professionals. Free focus timer with white noise, task management, and deep work tracking.",
   "applicationCategory": "ProductivityApplication",
   "operatingSystem": "Web Browser",

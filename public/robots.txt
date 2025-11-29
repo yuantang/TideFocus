@@ -1,9 +1,9 @@
 # TideFocus - 心流时刻
-# https://tidefocus.app
+# https://www.tidefocus.app
 
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://tidefocus.app/sitemap.xml
+Sitemap: https://www.tidefocus.app/sitemap.xml
 

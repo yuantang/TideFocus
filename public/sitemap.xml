@@ -4,21 +4,21 @@
 
   <!-- Homepage - Main Focus Timer -->
   <url>
-    <loc>https://tidefocus.app/</loc>
+    <loc>https://www.tidefocus.app/</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://tidefocus.app/" />
-    <xhtml:link rel="alternate" hreflang="zh" href="https://tidefocus.app/" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://tidefocus.app/" />
-    <xhtml:link rel="alternate" hreflang="ko" href="https://tidefocus.app/" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://tidefocus.app/" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://www.tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.tidefocus.app/" />
   </url>
 
   <!-- Clear Cache Tool Page -->
   <url>
-    <loc>https://tidefocus.app/clear-cache.html</loc>
+    <loc>https://www.tidefocus.app/clear-cache.html</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>

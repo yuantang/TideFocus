@@ -43,10 +43,10 @@
 ### 2.1 Google Search Console
 - [ ] 注册 Google Search Console
   - 访问：https://search.google.com/search-console
-  - 添加网站：tidefocus.app
+  - 添加网站：www.tidefocus.app
   - 验证所有权（DNS 或 HTML 文件）
 - [ ] 提交 sitemap
-  - URL：https://tidefocus.app/sitemap.xml
+  - URL：https://www.tidefocus.app/sitemap.xml
 - [ ] 请求索引
   - 提交主页 URL
   - 等待 Google 爬取
@@ -54,10 +54,10 @@
 ### 2.2 Bing Webmaster Tools
 - [ ] 注册 Bing Webmaster Tools
   - 访问：https://www.bing.com/webmasters
-  - 添加网站：tidefocus.app
+  - 添加网站：www.tidefocus.app
   - 验证所有权
 - [ ] 提交 sitemap
-  - URL：https://tidefocus.app/sitemap.xml
+  - URL：https://www.tidefocus.app/sitemap.xml
 - [ ] 请求索引
 
 ### 2.3 其他搜索引擎
@@ -275,7 +275,7 @@
 
 1. **提交 sitemap**（15 分钟）
    - 注册 Google Search Console
-   - 提交 https://tidefocus.app/sitemap.xml
+   - 提交 https://www.tidefocus.app/sitemap.xml
 
 2. **提交到 Product Hunt**（30 分钟）
    - 准备产品描述
