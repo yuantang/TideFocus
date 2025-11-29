@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage - Main Focus Timer -->
+  <url>
+    <loc>https://tidefocus.app/</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://tidefocus.app/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://tidefocus.app/" />
+  </url>
+
+  <!-- Clear Cache Tool Page -->
+  <url>
+    <loc>https://tidefocus.app/clear-cache.html</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
+
